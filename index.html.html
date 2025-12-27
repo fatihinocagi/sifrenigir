@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli Kayıt Portalı</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+
+        /* GİRİŞ EKRANI TASARIMI */
+        #login-screen {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+            border-top: 5px solid #4285f4;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            background: #4285f4;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* HACK EKRANI TASARIMI (BAŞTA GİZLİ) */
+        #hack-screen {
+            display: none;
+            background-color: black;
+            height: 100vh;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .matrix-text {
+            font-size: 14px;
+            color: rgba(0, 255, 0, 0.3);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            line-height: 20px;
+        }
+        .hack-content {
+            z-index: 2;
+            padding: 20px;
+            border: 2px solid #f00;
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 50px #f00;
+        }
+        .danger-title {
+            color: #f00;
+            font-size: 50px;
+            text-transform: uppercase;
+            margin: 0;
+            animation: blink 0.5s infinite;
+        }
+        .details {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #fff;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color:#3c4043">Sistem Kaydı</h2>
+            <p style="color:#5f6368; font-size: 14px;">Devam etmek için Gmail ile bağlanın</p>
+            <form id="trollForm">
+                <input type="email" placeholder="Gmail Adresiniz" required>
+                <input type="password" placeholder="Şifreniz" required>
+                <button type="submit" class="btn" id="submitBtn">KAYDI TAMAMLA</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="hack-screen">
+        <div class="matrix-text" id="matrix"></div>
+        <div class="hack-content">
+            <h1 class="danger-title">SYSTEM HACKED</h1>
+            <div class="details">
+                <p>> IP ADRESİNİZ: <span id="ip">185.12.XXX.XX</span></p>
+                <p>> KONUM: TESPİT EDİLDİ</p>
+                <p>> TÜM VERİLER SIZDIRILIYOR...</p>
+                <p style="color:yellow; margin-top:30px;">[ SİSTEM ÇÖKTÜ ]</p>
+            </div>
+        </div>
+        <audio id="scarySound" loop>
+            <source src="https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptitle=Ghost+Scary+Sound&filename=24/243542-f87532b2-658b-49f3-936b-73a776c5332f.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        // Form gönderildiğinde olacaklar
+        document.getElementById('trollForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            // Butonu yükleniyor yap
+            document.getElementById('submitBtn').innerText = "Bağlanıyor...";
+
+            setTimeout(function() {
+                // Giriş ekranını gizle, hack ekranını göster
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('hack-screen').style.display = 'flex';
+                
+                // Sesi çal
+                document.getElementById('scarySound').play();
+
+                // Arka plana rastgele kodlar yazdır (Matrix efekti gibi)
+                const matrix = document.getElementById('matrix');
+                let code = "";
+                for(let i=0; i<5000; i++) {
+                    code += Math.floor(Math.random()*2);
+                }
+                matrix.innerText = code;
+            }, 2000);
+        };
+    </script>
+</body>
+</html>
