@@ -19,7 +19,7 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Ürün Kartı Efekti */
-        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1a1a1a; }
+        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1a1a1a; position: relative; }
         .product-card:hover { border-color: var(--main-red); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 0, 0, 0.15); }
         .badge { background: var(--main-red); color: white; font-size: 10px; font-weight: 900; padding: 4px 8px; position: absolute; top: 10px; left: 10px; z-index: 10; }
         
@@ -28,6 +28,15 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; }
         ::-webkit-scrollbar-thumb:hover { background: var(--main-red); }
+
+        /* Slider Styles */
+        .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
+        .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; width: 200%; height: 100%; }
+        .slide { width: 50%; height: 100%; flex-shrink: 0; display: flex; items-center; justify-content: center; }
+        .slide img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply; }
+        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; cursor: pointer; z-index: 20; font-size: 18px; }
+        .slider-btn.prev { left: 10px; }
+        .slider-btn.next { right: 10px; }
     </style>
 </head>
 <body>
@@ -62,158 +71,99 @@
         </div>
     </header>
 
-    <main id="home" class="page active">
-        <section class="relative h-[85vh] flex items-center justify-center overflow-hidden">
-            <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover opacity-60">
-                <source src="https://assets.mixkit.co/videos/preview/mixkit-urban-fashion-man-in-the-city-at-night-41551-large.mp4" type="video/mp4">
-            </video>
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
-            <div class="relative z-20 text-center px-4">
-                <h2 class="oswald text-6xl md:text-9xl font-black italic tracking-tighter mb-4">DRIP OR DIE</h2>
-                <p class="max-w-xl mx-auto text-zinc-300 font-medium mb-10 tracking-wide">Türkiye'nin en seçkin drill ve sokak modası koleksiyonu. Orijinal kalıplar, ithal kumaşlar.</p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button onclick="showPage('shop')" class="bg-white text-black px-12 py-5 font-black uppercase text-xs hover:bg-red-600 hover:text-white transition-all transform hover:scale-105">KOLEKSİYONU GÖR</button>
-                    <button onclick="showPage('shoes')" class="bg-transparent border-2 border-white px-12 py-5 font-black uppercase text-xs hover:bg-white hover:text-black transition-all">SNEAKERS</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 px-6 max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="relative h-80 group cursor-pointer overflow-hidden border border-zinc-800" onclick="showPage('shop')">
-                <img src="https://images.stockx.com/images/Nike-Sportswear-Tech-Fleece-Full-Zip-Hoodie-Anthracite-Black.jpg" class="w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-700">
-                <div class="absolute inset-0 flex items-center justify-center font-black text-3xl tracking-tighter oswald italic">TECH FLEECE</div>
-            </div>
-            <div class="relative h-80 group cursor-pointer overflow-hidden border border-zinc-800" onclick="showPage('shop')">
-                <img src="https://images.stockx.com/images/Trapstar-Chenille-Decoded-It-s-Secret-Hoodie-Black-Blue.jpg" class="w-full h-full object-cover opacity-70 group-hover:scale-110 transition duration-700">
-                <div class="absolute inset-0 flex items-center justify-center font-black text-3xl tracking-tighter oswald italic">TRAPSTAR</div>
-            </div>
-            <div class="relative h-80 group cursor-pointer overflow-hidden border border-zinc-800" onclick="showPage('shoes')">
-                <img src="https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/i1-7685600c-3571-4603-9d93-3e1b716f9f9d/air-max-plus-shoes-9vS6fL.png" class="w-full h-full object-contain p-8 group-hover:scale-110 transition duration-700">
-                <div class="absolute inset-0 flex items-center justify-center font-black text-3xl tracking-tighter oswald italic uppercase">Air Max TN</div>
-            </div>
-        </section>
-    </main>
-
-    <main id="shop" class="page py-16 px-6 max-w-[1600px] mx-auto">
+    <main id="shop" class="page py-16 px-6 max-w-[1600px] mx-auto active">
         <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
                 <h2 class="oswald text-5xl font-black italic uppercase italic">Giyim Koleksiyonu</h2>
                 <p class="text-zinc-500 mt-2">Drip Caws özel seçki: Tech Fleece, Trapstar, Corteiz</p>
             </div>
-            <div class="flex gap-4 text-xs font-bold uppercase">
-                <span class="text-red-600 border-b border-red-600 pb-1">TÜMÜ</span>
-                <span class="text-zinc-500 cursor-pointer">Üst Giyim</span>
-                <span class="text-zinc-500 cursor-pointer">Alt Giyim</span>
-                <span class="text-zinc-500 cursor-pointer">Mont</span>
-            </div>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="product-list-shop"></div>
-    </main>
-
-    <main id="shoes" class="page py-16 px-6 max-w-[1600px] mx-auto">
-        <h2 class="oswald text-5xl font-black italic uppercase mb-12">Sneaker Heads</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="product-list-shoes"></div>
-    </main>
-
-    <main id="contact" class="page py-24 px-6">
-        <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-16 items-center">
-            <div class="flex-1">
-                <h2 class="oswald text-6xl font-black uppercase italic mb-6">Bize<br><span class="text-red-600">Yazın</span></h2>
-                <p class="text-zinc-400 mb-8 font-medium">Siparişlerinizle ilgili her türlü soru için 7/24 destek hattımız aktif.</p>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4"><i class="fa-brands fa-instagram text-2xl text-red-600"></i> <span class="font-bold">@dripcaws.tr</span></div>
-                    <div class="flex items-center gap-4"><i class="fa-brands fa-whatsapp text-2xl text-green-500"></i> <span class="font-bold">05xx xxx xx xx</span></div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            
+            <div class="product-card group bg-zinc-950 p-4">
+                <div class="badge">%15 İNDİRİM</div>
+                <div class="h-64 overflow-hidden mb-6 bg-white relative">
+                    <div class="slider-container" id="tech-fleece-slider">
+                        <div class="slider-wrapper">
+                            <div class="slide">
+                                <img src="https://i.pinimg.com/originals/31/28/59/312859505383884557.jpg" alt="Nike Tech Fleece Siyah">
+                            </div>
+                            <div class="slide">
+                                <img src="https://i.pinimg.com/originals/80/22/10/8022105581583917d0c83a54a7c0f16f.jpg" alt="Nike Tech Fleece Gri">
+                            </div>
+                        </div>
+                        <button class="slider-btn prev" onclick="moveSlide(-1, 'tech-fleece-slider')">&#10094;</button>
+                        <button class="slider-btn next" onclick="moveSlide(1, 'tech-fleece-slider')">&#10095;</button>
+                    </div>
                 </div>
+                <h3 class="font-black text-[11px] mb-2 tracking-tight h-8 uppercase">NIKE TECH FLEECE - SEZON RENKLERİ</h3>
+                <div class="flex items-baseline gap-2 mb-4">
+                    <span class="text-red-600 font-black text-lg">2.850 TL</span>
+                    <span class="text-zinc-600 text-[10px] line-through">3.200 TL</span>
+                </div>
+                <button class="w-full bg-white text-black py-3 text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition">SEPETE EKLE</button>
             </div>
-            <div class="flex-1 w-full bg-zinc-900/50 p-8 border border-zinc-800">
-                <input type="text" placeholder="ADINIZ" class="w-full bg-black border border-zinc-800 p-4 mb-4 text-xs font-bold outline-none focus:border-red-600">
-                <input type="email" placeholder="E-POSTA" class="w-full bg-black border border-zinc-800 p-4 mb-4 text-xs font-bold outline-none focus:border-red-600">
-                <textarea placeholder="MESAJINIZ" rows="4" class="w-full bg-black border border-zinc-800 p-4 mb-4 text-xs font-bold outline-none focus:border-red-600"></textarea>
-                <button class="w-full bg-red-600 py-4 font-black text-xs uppercase hover:bg-white hover:text-black transition">Gönder</button>
+
+            <div class="product-card group bg-zinc-950 p-4">
+                <div class="badge">POPÜLER</div>
+                <div class="h-64 overflow-hidden mb-6 bg-white flex items-center justify-center">
+                    <img src="https://images.stockx.com/images/Trapstar-Irongate-Detachable-Hood-Puffer-Jacket-Black.jpg" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500">
+                </div>
+                <h3 class="font-black text-[11px] mb-2 tracking-tight h-8 uppercase">TRAPSTAR IRONGATE PUFFER - SHINY BLACK</h3>
+                <div class="flex items-baseline gap-2 mb-4">
+                    <span class="text-red-600 font-black text-lg">4.500 TL</span>
+                    <span class="text-zinc-600 text-[10px] line-through">5.500 TL</span>
+                </div>
+                <button class="w-full bg-white text-black py-3 text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition">SEPETE EKLE</button>
             </div>
-        </div>
+            
+            </div>
     </main>
 
     <footer class="bg-zinc-950 border-t border-zinc-900 py-20 px-6 mt-20">
-        <div class="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div class="col-span-1 md:col-span-2">
-                <div class="oswald text-4xl font-black italic mb-6">DRIP<span class="text-red-600">CAWS</span></div>
-                <p class="text-zinc-500 text-sm max-w-sm">Türkiye'nin drill kültürüne yön veren ilk dijital mağazası. En nadir ürünler, en uygun fiyatlarla.</p>
-            </div>
-            <div>
-                <h4 class="font-black text-xs uppercase mb-6 tracking-widest">Kategoriler</h4>
-                <ul class="text-zinc-500 text-sm space-y-3 font-medium">
-                    <li><a class="hover:text-red-600">Tech Fleece</a></li>
-                    <li><a class="hover:text-red-600">Trapstar Ceket</a></li>
-                    <li><a class="hover:text-red-600">Corteiz Takım</a></li>
-                    <li><a class="hover:text-red-600">Sneakers</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-black text-xs uppercase mb-6 tracking-widest">Yardım</h4>
-                <ul class="text-zinc-500 text-sm space-y-3 font-medium">
-                    <li><a class="hover:text-red-600">Sipariş Sorgula</a></li>
-                    <li><a class="hover:text-red-600">İade Şartları</a></li>
-                    <li><a class="hover:text-red-600">Teslimat Bilgisi</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="max-w-[1600px] mx-auto mt-20 pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-zinc-600 font-black">
-            <p>© 2026 DRIP CAWS OFFICIAL. ALL RIGHTS RESERVED.</p>
-            <div class="flex gap-4 items-center">
-                <i class="fa-brands fa-cc-visa text-2xl"></i>
-                <i class="fa-brands fa-cc-mastercard text-2xl"></i>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Troy_logo.png" class="h-4 grayscale opacity-50">
-            </div>
+        <div class="max-w-[1600px] mx-auto text-center">
+            <div class="oswald text-4xl font-black italic mb-6">DRIP<span class="text-red-600">CAWS</span></div>
+            <p class="text-zinc-600 text-[10px] font-black">© 2026 DRIP CAWS OFFICIAL. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
     <script>
-        const products = {
-            shop: [
-                { name: "NIKE TECH FLEECE - BLACK/GREY", price: "2.850 TL", old: "3.200 TL", img: "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/60359781-8b2b-426b-8f3b-6500418388b0/sportswear-tech-fleece-windrunner-mens-full-zip-hoodie-9f936S.png", badge: "%15 İNDİRİM" },
-                { name: "TRAPSTAR IRONGATE PUFFER - SHINY BLACK", price: "4.500 TL", old: "5.500 TL", img: "https://images.stockx.com/images/Trapstar-Irongate-Detachable-Hood-Puffer-Jacket-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1635235439", badge: "POPÜLER" },
-                { name: "CORTEIZ ALCATRAZ SWEATPANTS - GREY", price: "1.650 TL", old: "2.100 TL", img: "https://images.stockx.com/images/Corteiz-Alcatraz-Sweatpants-Grey.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1635865239", badge: "" },
-                { name: "SYNA WORLD LOGO T-SHIRT SET", price: "2.400 TL", old: "2.900 TL", img: "https://images.stockx.com/images/Syna-World-Logo-T-Shirt-Shorts-Set-Blue.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1685012539", badge: "YENİ" },
-                { name: "NIKE TECH FLEECE - FULL WHITE", price: "2.850 TL", old: "3.400 TL", img: "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/8b2b95c2-f191-4e7a-9a00-111160359781/tech-fleece-hoodie.png", badge: "" },
-                { name: "TRAPSTAR CHENILLE HOODIE - GREY", price: "1.950 TL", old: "2.500 TL", img: "https://images.stockx.com/images/Trapstar-Chenille-Decoded-It-s-Secret-Hoodie-Black-Grey.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1635235439", badge: "" },
-                { name: "MINUS TWO CARGO PANTS - BLACK", price: "2.200 TL", old: "2.800 TL", img: "https://images.stockx.com/images/Minus-Two-Cargo-Pants-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1665012539", badge: "TREND" }
-            ],
-            shoes: [
-                { name: "NIKE AIR MAX PLUS TN - TRIPLE BLACK", price: "3.100 TL", old: "3.800 TL", img: "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/i1-7685600c-3571-4603-9d93-3e1b716f9f9d/air-max-plus-shoes-9vS6fL.png", badge: "EN ÇOK SATAN" },
-                { name: "ADIDAS CAMPUS 00S - CORE BLACK", price: "2.450 TL", old: "2.900 TL", img: "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/8966209e7d8042559596af69013f9948_9366/Campus_00s_Shoes_Black_HQ8708_01_standard.jpg", badge: "STOKTA" },
-                { name: "AIR JORDAN 4 RETRO - MILITARY BLACK", price: "4.200 TL", old: "5.500 TL", img: "https://images.stockx.com/images/Air-Jordan-4-Retro-Military-Black-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1653065239", badge: "LIMITLI" },
-                { name: "NIKE DUNK LOW - PANDA", price: "2.600 TL", old: "3.200 TL", img: "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/b1bcbca4-e850-459a-91c0-613d6f57ee50/dunk-low-shoes-69p39v.png", badge: "" }
-            ]
-        };
-
+        // Sayfa Değiştirme Fonksiyonu (Temel)
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            // Bu örnekte sadece Shop sayfası aktif. Diğer sayfalar için içerik eklenmeli.
+            if(id === 'shop' || id === 'home') {
+                document.getElementById('shop').classList.add('active');
+            }
             window.scrollTo(0, 0);
         }
 
-        function render() {
-            const createCard = (p) => `
-                <div class="product-card group relative bg-zinc-950 p-4">
-                    ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
-                    <div class="h-64 overflow-hidden mb-6 bg-white flex items-center justify-center">
-                        <img src="${p.img}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500">
-                    </div>
-                    <h3 class="font-black text-[11px] mb-2 tracking-tight h-8 uppercase">${p.name}</h3>
-                    <div class="flex items-baseline gap-2 mb-4">
-                        <span class="text-red-600 font-black text-lg">${p.price}</span>
-                        <span class="text-zinc-600 text-[10px] line-through">${p.old}</span>
-                    </div>
-                    <button class="w-full bg-white text-black py-3 text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition">SEPETE EKLE</button>
-                </div>
-            `;
-            
-            document.getElementById('product-list-shop').innerHTML = products.shop.map(createCard).join('');
-            document.getElementById('product-list-shoes').innerHTML = products.shoes.map(createCard).join('');
-        }
+        // Slider Fonksiyonu
+        let slideIndices = {}; // Her slider için ayrı bir index tutar
 
-        render();
+        function moveSlide(n, sliderId) {
+            if (!slideIndices[sliderId]) {
+                slideIndices[sliderId] = 0; // Eğer bu slider için index yoksa, 0'dan başla
+            }
+
+            const slider = document.getElementById(sliderId);
+            const wrapper = slider.querySelector('.slider-wrapper');
+            const totalSlides = slider.querySelectorAll('.slide').length;
+
+            slideIndices[sliderId] += n;
+
+            // Döngüsel slider (sona gelince başa dön)
+            if (slideIndices[sliderId] >= totalSlides) {
+                slideIndices[sliderId] = 0;
+            } else if (slideIndices[sliderId] < 0) {
+                slideIndices[sliderId] = totalSlides - 1;
+            }
+
+            // Wrapper'ı kaydır
+            const percentage = -slideIndices[sliderId] * 100; // Genişlik 200% olduğu için 100% kaydır
+            wrapper.style.transform = `translateX(${percentage/totalSlides}%)`; // Toplam genişliğe göre oranla
+        }
     </script>
 </body>
 </html>
