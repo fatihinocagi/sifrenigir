@@ -2,296 +2,213 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Lexicon - Professional Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <title>Lexicon Hero - Pixel Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-blue: #00f2ff; --neon-pink: #ff0055; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020205; font-family: 'Orbitron', sans-serif; }
-        
-        /* Arka Plan Efekti */
-        #nebula {
-            position: fixed; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #0a1128 0%, #020205 100%);
-            z-index: -1;
+        body { margin: 0; background: #121212; overflow: hidden; font-family: 'Press Start 2P', cursive; }
+        #game-ui { position: absolute; top: 20px; left: 20px; color: white; z-index: 10; }
+        .mission-box {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(0, 0, 0, 0.7); padding: 15px;
+            border: 3px solid #00f2ff; color: #00f2ff; font-size: 10px;
         }
-
-        /* Modern UI Elements */
-        #ui-wrapper {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; padding: 30px; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-        }
-
-        #top-bar { display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        .stat-box { text-align: left; }
-        .label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
-        .value { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 0 10px var(--neon-blue); }
-
-        #sentence-display {
-            width: 60%; align-self: center; text-align: center;
-            border-bottom: 2px solid var(--neon-blue);
-        }
-
-        .word-slot {
-            display: inline-block; margin: 0 10px; font-size: 22px;
-            color: rgba(255,255,255,0.2); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .active-word { color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); }
-        .completed-word { color: #00ff88; text-shadow: 0 0 15px #00ff88; }
-
-        #shield-container { width: 200px; height: 10px; background: #222; border-radius: 5px; margin-top: 5px; overflow: hidden; }
-        #shield-bar { width: 100%; height: 100%; background: var(--neon-blue); transition: width 0.3s; }
-
-        canvas { display: block; filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.2)); }
+        canvas { display: block; box-shadow: inset 0 0 100px #000; }
     </style>
 </head>
 <body>
 
-<div id="nebula"></div>
-<div id="ui-wrapper">
-    <div id="top-bar">
-        <div class="glass-card stat-box">
-            <div class="label">SCORE</div>
-            <div id="score" class="value">0000</div>
-            <div class="label" style="margin-top:10px">SHIELD</div>
-            <div id="shield-container"><div id="shield-bar"></div></div>
-        </div>
+<div id="game-ui">
+    <div>POINTS: <span id="score">0</span></div>
+    <div id="lives-display" style="color: #ff0055; margin-top: 10px;">LIVES: ♥♥♥</div>
+</div>
 
-        <div id="sentence-display" class="glass-card">
-            <div class="label">MISSION: CONSTRUCT SENTENCE</div>
-            <div id="slots-area"></div>
-        </div>
-
-        <div class="glass-card stat-box" style="text-align:right">
-            <div class="label">TARGET UNIT</div>
-            <div class="value" style="font-size:18px">STUDY ABROAD</div>
-            <div class="label" style="margin-top:10px; color:var(--neon-pink)">LEVEL: 9TH GRADE</div>
-        </div>
-    </div>
+<div class="mission-box">
+    MISSION: COLLECT WORDS
+    <div id="target" style="color: #fff; margin-top: 10px; font-size: 14px;">NEXT: "UNIQUE"</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
 <script>
-/** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// --- GAME CONFIG ---
-const targetSentence = ["I", "WANT", "TO", "STUDY", "ABROAD", "IN", "A", "UNIQUE", "DESTINATION"];
-const vocabularyPool = ["DESTINATION", "UNIQUE", "COLLEAGUE", "ABROAD", "GENEROUS", "AMBITIOUS", "TRADITION", "ENVIRONMENT", "CULTURE", "SCHOLARSHIP"];
-let currentIndex = 0;
+const GRAVITY = 0.6;
+const JUMP = -14;
+const SPEED = 6;
+
 let score = 0;
-let shield = 100;
-let screenShake = 0;
+let lives = 3;
+let frameCount = 0;
+const mission = ["UNIQUE", "DESTINATION", "SCHOLARSHIP", "ABROAD", "COLLEAGUE"];
+let currentIdx = 0;
 
-const player = { x: canvas.width/2, y: canvas.height - 120, w: 60, h: 70, targetX: canvas.width/2 };
-const projectiles = [];
-const enemies = [];
-const particles = [];
-const floatTexts = [];
+const keys = {};
+window.onkeydown = e => keys[e.code] = true;
+window.onkeyup = e => keys[e.code] = false;
 
-// UI Setup
-const slotsArea = document.getElementById('slots-area');
-targetSentence.forEach((word, i) => {
-    const span = document.createElement('span');
-    span.className = 'word-slot';
-    span.id = `slot-${i}`;
-    span.innerText = "_".repeat(word.length);
-    slotsArea.appendChild(span);
-});
-updateActiveSlot();
+const player = {
+    x: 100, y: 500, w: 30, h: 50,
+    vx: 0, vy: 0, grounded: false,
+    facing: 1 // 1 for right, -1 for left
+};
 
-// --- AUDIO ENGINE ---
-const audio = new (window.AudioContext || window.webkitAudioContext)();
-function beep(freq, type, vol, len) {
-    const osc = audio.createOscillator();
-    const gain = audio.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audio.currentTime);
-    gain.gain.setValueAtTime(vol, audio.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + len);
-    osc.connect(gain); gain.connect(audio.destination);
-    osc.start(); osc.stop(audio.currentTime + len);
-}
+const platforms = [
+    {x: 0, y: canvas.height - 50, w: canvas.width, h: 50}, // Ground
+    {x: 200, y: canvas.height - 200, w: 150, h: 20},
+    {x: 450, y: canvas.height - 350, w: 200, h: 20},
+    {x: 100, y: canvas.height - 450, w: 150, h: 20},
+    {x: 750, y: canvas.height - 250, w: 150, h: 20},
+    {x: 1000, y: canvas.height - 400, w: 200, h: 20}
+];
 
-// --- CLASSES ---
-class Particle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.v = { x: (Math.random()-0.5)*10, y: (Math.random()-0.5)*10 };
-        this.life = 1.0;
-        this.color = color;
-    }
-    draw() {
-        this.life -= 0.02;
-        ctx.fillStyle = this.color.replace('1)', `${this.life})`);
-        ctx.fillRect(this.x, this.y, 3, 3);
-    }
-}
+const words = mission.map((text, i) => ({
+    text, x: 200 + Math.random()*(canvas.width-400), 
+    y: 100 + Math.random()*(canvas.height-400),
+    collected: false
+}));
 
-class Enemy {
-    constructor() {
-        this.isCorrect = Math.random() > 0.5;
-        this.word = this.isCorrect ? targetSentence[currentIndex] : vocabularyPool[Math.floor(Math.random()*vocabularyPool.length)];
-        this.x = Math.random() * (canvas.width - 150) + 75;
-        this.y = -50;
-        this.speed = 1.5 + (score / 2000);
-        this.w = ctx.measureText(this.word).width + 40;
-    }
-    draw() {
-        this.y += this.speed;
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        
-        // Neon Box
-        ctx.strokeStyle = this.isCorrect ? '#00f2ff' : '#ff0055';
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = ctx.strokeStyle;
-        ctx.strokeRect(-this.w/2, -20, this.w, 40);
-        
-        // Text
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 16px Orbitron';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.word, 0, 7);
-        ctx.restore();
-    }
-}
-
-// --- CORE FUNCTIONS ---
-function updateActiveSlot() {
-    document.querySelectorAll('.word-slot').forEach(s => s.classList.remove('active-word'));
-    if(currentIndex < targetSentence.length) {
-        document.getElementById(`slot-${currentIndex}`).classList.add('active-word');
-    }
-}
-
-function spawn() { if(enemies.length < 5) enemies.push(new Enemy()); }
-
-function handleCollision(enemyIndex, bulletIndex) {
-    const en = enemies[enemyIndex];
-    screenShake = 10;
-    
-    // Effect
-    for(let i=0; i<15; i++) particles.push(new Particle(en.x, en.y, en.isCorrect ? 'rgba(0, 242, 255, 1)' : 'rgba(255, 0, 85, 1)'));
-    
-    if(en.word === targetSentence[currentIndex]) {
-        beep(600, 'sine', 0.1, 0.3);
-        const slot = document.getElementById(`slot-${currentIndex}`);
-        slot.innerText = en.word;
-        slot.className = 'word-slot completed-word';
-        currentIndex++;
-        score += 500;
-        updateActiveSlot();
-        if(currentIndex >= targetSentence.length) victory();
-    } else {
-        beep(150, 'sawtooth', 0.1, 0.4);
-        score = Math.max(0, score - 200);
-        shield -= 20;
-        document.getElementById('shield-bar').style.width = shield + "%";
-        if(shield <= 0) gameOver();
-    }
-    
-    enemies.splice(enemyIndex, 1);
-    if(bulletIndex !== null) projectiles.splice(bulletIndex, 1);
-}
-
-function victory() {
-    alert("🌌 MISSION ACCOMPLISHED!\nScore: " + score + "\n9th Grade English: MASTERED");
-    location.reload();
-}
-
-function gameOver() {
-    alert("🚀 SHIELD DEPLETED!\nMission Failed. Try again, Cadet.");
-    location.reload();
-}
-
-// --- RENDER LOOP ---
-function draw() {
-    ctx.clearRect(0,0, canvas.width, canvas.height);
-    
-    // Screen Shake
-    if(screenShake > 0) {
-        ctx.translate(Math.random()*screenShake, Math.random()*screenShake);
-        screenShake *= 0.9;
-    }
-
-    // Player (Cyberpunk Ship)
-    player.x += (player.targetX - player.x) * 0.1;
+// --- KARAKTER ÇİZİM FONKSİYONU (İNSAN FİGÜRÜ) ---
+function drawHuman(x, y, facing, isMoving, isJumping) {
     ctx.save();
-    ctx.translate(player.x, player.y);
-    // Ship Body
-    ctx.fillStyle = '#111';
-    ctx.strokeStyle = var(--neon-blue);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, -40); ctx.lineTo(30, 20); ctx.lineTo(-30, 20); ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    // Engine Glow
-    ctx.fillStyle = Math.random() > 0.5 ? var(--neon-pink) : var(--neon-blue);
-    ctx.fillRect(-10, 20, 20, 10);
+    ctx.translate(x + 15, y + 25);
+    ctx.scale(facing, 1);
+
+    const anim = isMoving ? Math.sin(frameCount * 0.2) * 10 : 0;
+    
+    // Kafa
+    ctx.fillStyle = "#FFDBAC"; // Ten rengi
+    ctx.fillRect(-10, -25, 20, 20);
+    
+    // Saç/Şapka
+    ctx.fillStyle = "#331E12";
+    ctx.fillRect(-10, -25, 20, 5);
+
+    // Gövde (T-Shirt)
+    ctx.fillStyle = "#00f2ff";
+    ctx.fillRect(-12, -5, 24, 20);
+
+    // Bacaklar
+    ctx.fillStyle = "#333";
+    if (isJumping) {
+        ctx.fillRect(-10, 15, 8, 10); // Sol bacak kırık
+        ctx.fillRect(2, 10, 8, 10);   // Sağ bacak yukarıda
+    } else {
+        ctx.fillRect(-10, 15, 8, 10 + anim); // Sol bacak
+        ctx.fillRect(2, 15, 8, 10 - anim);  // Sağ bacak
+    }
+
+    // Kollar
+    ctx.fillStyle = "#FFDBAC";
+    if (isMoving) {
+        ctx.fillRect(8, -5, 6, 12 + anim);
+    } else {
+        ctx.fillRect(8, -5, 6, 15);
+    }
+
     ctx.restore();
+}
 
-    // Projectiles
-    projectiles.forEach((p, i) => {
-        p.y -= 15;
-        ctx.fillStyle = var(--neon-pink);
-        ctx.shadowBlur = 15; ctx.shadowColor = var(--neon-pink);
-        ctx.fillRect(p.x-2, p.y, 4, 20);
-        if(p.y < 0) projectiles.splice(i, 1);
-        
-        enemies.forEach((en, ei) => {
-            if(p.x > en.x - en.w/2 && p.x < en.x + en.w/2 && p.y > en.y - 20 && p.y < en.y + 20) {
-                handleCollision(ei, i);
+function update() {
+    frameCount++;
+    if (keys['ArrowRight'] || keys['KeyD']) {
+        player.vx = SPEED;
+        player.facing = 1;
+    } else if (keys['ArrowLeft'] || keys['KeyA']) {
+        player.vx = -SPEED;
+        player.facing = -1;
+    } else {
+        player.vx *= 0.8;
+    }
+
+    if ((keys['Space'] || keys['KeyW'] || keys['ArrowUp']) && player.grounded) {
+        player.vy = JUMP;
+        player.grounded = false;
+    }
+
+    player.vy += GRAVITY;
+    player.x += player.vx;
+    player.y += player.vy;
+
+    player.grounded = false;
+    platforms.forEach(p => {
+        if (player.x < p.x + p.w && player.x + player.w > p.x &&
+            player.y < p.y + p.h && player.y + player.h > p.y) {
+            if (player.vy > 0) {
+                player.y = p.y - player.h;
+                player.vy = 0;
+                player.grounded = true;
             }
-        });
+        }
     });
 
-    enemies.forEach((en, i) => {
-        en.draw();
-        if(en.y > canvas.height) enemies.splice(i, 1);
+    words.forEach(w => {
+        if (!w.collected && Math.abs(player.x - w.x) < 50 && Math.abs(player.y - w.y) < 50) {
+            if (w.text === mission[currentIdx]) {
+                w.collected = true;
+                currentIdx++;
+                score += 500;
+                if(currentIdx < mission.length) {
+                    document.getElementById('target').innerText = `NEXT: "${mission[currentIdx]}"`;
+                } else {
+                    alert("VICTORY! All words collected!");
+                    location.reload();
+                }
+            } else {
+                lives--;
+                player.x = 100; player.y = 100;
+                document.getElementById('lives-display').innerText = "LIVES: " + "♥".repeat(lives);
+                if(lives <= 0) { alert("GAME OVER!"); location.reload(); }
+            }
+        }
     });
 
-    particles.forEach((p, i) => {
-        p.draw();
-        if(p.life <= 0) particles.splice(i, 1);
+    if (player.y > canvas.height) { player.x = 100; player.y = 0; lives--; }
+}
+
+function draw() {
+    ctx.fillStyle = "#1a1a2e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Platformlar
+    ctx.fillStyle = "#16213e";
+    platforms.forEach(p => {
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.strokeStyle = "#4cc9f0";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
     });
 
-    document.getElementById('score').innerText = score.toString().padStart(4, '0');
+    // Kelimeler
+    words.forEach(w => {
+        if (!w.collected) {
+            ctx.fillStyle = (w.text === mission[currentIdx]) ? "#fff" : "#444";
+            ctx.font = "12px 'Press Start 2P'";
+            ctx.textAlign = "center";
+            ctx.fillText(w.text, w.x, w.y);
+            if (w.text === mission[currentIdx]) {
+                ctx.strokeStyle = "rgba(255,255,255,0.2)";
+                ctx.beginPath();
+                ctx.arc(w.x, w.y-5, 40, 0, Math.PI*2);
+                ctx.stroke();
+            }
+        }
+    });
+
+    // Karakter (İnsan)
+    const isMoving = Math.abs(player.vx) > 0.5;
+    drawHuman(player.x, player.y, player.facing, isMoving, !player.grounded);
+
+    document.getElementById('score').innerText = score;
     requestAnimationFrame(draw);
 }
 
-// --- INPUTS ---
-window.onmousemove = (e) => player.targetX = e.clientX;
-window.onclick = () => {
-    projectiles.push({x: player.x, y: player.y - 20});
-    beep(200, 'square', 0.05, 0.1);
-};
-window.onkeydown = (e) => { if(e.code === 'Space') window.onclick(); };
-
-setInterval(spawn, 1500);
-draw();
-
-// CSS Variables helper
-const style = getComputedStyle(document.documentElement);
-var --neon-blue = style.getPropertyValue('--neon-blue').trim();
-var --neon-pink = style.getPropertyValue('--neon-pink').trim();
-
+gameLoop = () => { update(); draw(); requestAnimationFrame(gameLoop); };
+draw(); // Start loop
+update();
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
