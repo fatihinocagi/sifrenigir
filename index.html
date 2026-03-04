@@ -1,22 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Hollow Lexicon - Alpha Build</title>
+    <title>Hollow Lexicon: Path of Knowledge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #08080a; overflow: hidden; font-family: 'Courier New', monospace; }
-        canvas { display: block; }
+        body { margin: 0; background: #010103; overflow: hidden; font-family: 'Orbitron', sans-serif; }
         #ui {
-            position: absolute; top: 20px; left: 20px; color: #fff;
-            text-shadow: 0 0 5px #00f2ff; pointer-events: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
         }
+        .sentence-bar {
+            position: absolute; top: 30px; width: 100%; text-align: center;
+            font-family: 'Cinzel', serif; font-size: 28px; color: #fff;
+            text-shadow: 0 0 15px #00f2ff; letter-spacing: 5px;
+        }
+        .hp-bar { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: #ff0055; font-size: 20px; }
+        
+        /* Bölüm Geçiş Animasyonu */
+        #transition-overlay {
+            position: absolute; width: 100%; height: 100%;
+            background: white; opacity: 0; display: flex; align-items: center;
+            justify-content: center; z-index: 100; transition: opacity 0.5s;
+        }
+        #word-splash {
+            font-family: 'Cinzel', serif; font-size: 80px; color: #000;
+            transform: scale(0.5); transition: transform 0.5s;
+        }
+        canvas { display: block; }
     </style>
 </head>
 <body>
 
+<div id="transition-overlay">
+    <div id="word-splash">EXCELLENT!</div>
+</div>
+
 <div id="ui">
-    <div>FOCUS: <span id="word-target" style="color:#ff0055">NONE</span></div>
-    <div style="font-size: 10px; margin-top:5px;">Controls: A-D (Move), W (Jump - Hold for higher), SHIFT (Dash)</div>
+    <div class="sentence-bar" id="sentence-display">_ _ _ _ _</div>
+    <div class="hp-bar" id="hp-display">♥♥♥</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
@@ -27,178 +49,172 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// --- HOLLOW KNIGHT FİZİK AYARLARI ---
-const CONFIG = {
-    gravity: 0.8,
-    accel: 1.5,          // Hızlanma (Akıcılık için)
-    friction: 0.85,      // Sürtünme (Yağ gibi kayma hissi)
-    maxSpeed: 8,
-    jumpForce: -16,
-    minJumpForce: -6,    // Kısa basınca zıplama yüksekliği
-    dashSpeed: 20,
-    dashDuration: 10     // Kaç frame dash yapacak
-};
+const sentence = ["I", "WANT", "TO", "LEARN", "ENGLISH"];
+let currentLevel = 0;
+let hp = 3;
+let isTransitioning = false;
 
-let frameCount = 0;
 const keys = {};
 window.onkeydown = e => keys[e.code] = true;
 window.onkeyup = e => keys[e.code] = false;
 
-// --- NESNELER ---
-const player = {
-    x: 100, y: 300, w: 25, h: 45,
-    vx: 0, vy: 0,
-    grounded: false,
-    facing: 1,
-    isDashing: false,
-    dashTimer: 0,
-    canDash: true
-};
+const player = { x: 50, y: 300, vx: 0, vy: 0, w: 25, h: 45, grounded: false, facing: 1 };
 
-const platforms = [
-    {x: 0, y: canvas.height - 30, w: canvas.width, h: 30}, // Ground
-    {x: 200, y: canvas.height - 150, w: 200, h: 15},
-    {x: 500, y: canvas.height - 280, w: 150, h: 15},
-    {x: 800, y: canvas.height - 200, w: 200, h: 15},
-    {x: 100, y: canvas.height - 350, w: 150, h: 15},
+// Bölüm Tasarımları
+const levels = [
+    {
+        platforms: [{x:0, y:600, w:500, h:40}, {x:600, y:450, w:300, h:20}, {x:1000, y:350, w:300, h:20}],
+        spikes: [{x:500, y:610, w:100, h:30}],
+        goal: {x:1150, y:300, text: "I"}
+    },
+    {
+        platforms: [{x:0, y:600, w:200, h:40}, {x:300, y:450, w:200, h:20}, {x:600, y:300, w:200, h:20}, {x:900, y:450, w:200, h:20}],
+        spikes: [{x:200, y:620, w:1200, h:40}, {x:500, y:420, w:100, h:30}],
+        goal: {x:1000, y:400, text: "WANT"}
+    },
+    {
+        platforms: [{x:0, y:300, w:150, h:20}, {x:250, y:450, w:150, h:20}, {x:500, y:300, w:150, h:20}, {x:750, y:450, w:150, h:20}, {x:1000, y:300, w:150, h:20}],
+        spikes: [{x:0, y:600, w:2000, h:100}],
+        goal: {x:1050, y:250, text: "TO"}
+    },
+    {
+        platforms: [{x:0, y:600, w:1500, h:40}, {x:400, y:400, w:400, h:20}],
+        spikes: [{x:200, y:570, w:800, h:30}],
+        goal: {x:600, y:350, text: "LEARN"}
+    },
+    {
+        platforms: [{x:0, y:600, w:300, h:40}, {x:400, y:300, w:100, h:10}, {x:600, y:500, w:100, h:10}, {x:800, y:300, w:100, h:10}, {x:1000, y:500, w:300, h:40}],
+        spikes: [{x:300, y:620, w:700, h:40}],
+        goal: {x:1150, y:450, text: "ENGLISH"}
+    }
 ];
 
-// --- FİZİK MOTORU (AKICI HAREKET) ---
+function updateSentenceUI() {
+    let text = sentence.map((w, i) => i < currentLevel ? w : "_").join("  ");
+    document.getElementById('sentence-display').innerText = text;
+    document.getElementById('hp-display').innerText = "♥".repeat(hp);
+}
+
+function triggerTransition(word) {
+    isTransitioning = true;
+    const overlay = document.getElementById('transition-overlay');
+    const splash = document.getElementById('word-splash');
+    
+    splash.innerText = word;
+    overlay.style.opacity = "1";
+    splash.style.transform = "scale(1.5)";
+
+    setTimeout(() => {
+        currentLevel++;
+        if(currentLevel >= levels.length) {
+            alert("TEBRİKLER! CÜMLEYİ TAMAMLADIN: I WANT TO LEARN ENGLISH");
+            location.reload();
+        } else {
+            resetPlayer();
+            updateSentenceUI();
+            overlay.style.opacity = "0";
+            splash.style.transform = "scale(0.5)";
+            isTransitioning = false;
+        }
+    }, 1500);
+}
+
+function resetPlayer() {
+    player.x = 50; player.y = 200;
+    player.vx = 0; player.vy = 0;
+}
+
 function update() {
-    frameCount++;
+    if(isTransitioning) return;
 
-    // 1. Dash Mantığı
-    if (keys['ShiftLeft'] && player.canDash && !player.isDashing) {
-        player.isDashing = true;
-        player.canDash = false;
-        player.dashTimer = CONFIG.dashDuration;
-        player.vy = 0; // Dash sırasında yerçekimini kapa
+    // Kontroller
+    if (keys['KeyD'] || keys['ArrowRight']) { player.vx += 1; player.facing = 1; }
+    else if (keys['KeyA'] || keys['ArrowLeft']) { player.vx -= 1; player.facing = -1; }
+    else player.vx *= 0.82;
+
+    if ((keys['Space'] || keys['KeyW']) && player.grounded) {
+        player.vy = -14;
+        player.grounded = false;
     }
 
-    if (player.isDashing) {
-        player.vx = CONFIG.dashSpeed * player.facing;
-        player.dashTimer--;
-        if (player.dashTimer <= 0) {
-            player.isDashing = false;
-            player.vx = CONFIG.maxSpeed * player.facing * 0.5; // Dash bitişi yavaşla
-        }
-    } else {
-        // 2. Yatay Hareket (Akıcı Hızlanma/Yavaşlama)
-        if (keys['KeyD']) {
-            player.vx += CONFIG.accel;
-            player.facing = 1;
-        } else if (keys['KeyA']) {
-            player.vx -= CONFIG.accel;
-            player.facing = -1;
-        }
-
-        player.vx *= CONFIG.friction; // Sürtünme uygula
-
-        // Maksimum hız sınırı
-        if (Math.abs(player.vx) > CONFIG.maxSpeed) {
-            player.vx = CONFIG.maxSpeed * Math.sign(player.vx);
-        }
-
-        // 3. Zıplama Mantığı (Hassas Kontrol)
-        if ((keys['KeyW'] || keys['Space']) && player.grounded) {
-            player.vy = CONFIG.jumpForce;
-            player.grounded = false;
-        }
-        
-        // Hollow Knight Hissi: Tuşu bırakınca zıplamayı kes
-        if (!(keys['KeyW'] || keys['Space']) && player.vy < CONFIG.minJumpForce) {
-            player.vy = CONFIG.minJumpForce;
-        }
-
-        // Yerçekimi
-        player.vy += CONFIG.gravity;
-    }
-
-    // Pozisyonu güncelle
+    player.vy += 0.75;
     player.x += player.vx;
     player.y += player.vy;
 
-    // 4. Çarpışma Kontrolü (Pürüzsüz)
+    const lvl = levels[currentLevel];
+
+    // Çarpışmalar
     player.grounded = false;
-    platforms.forEach(p => {
-        // Yatay Çarpışma (Duvarlar)
-        if (player.x < p.x + p.w && player.x + player.w > p.x &&
-            player.y + player.h > p.y && player.y < p.y + p.h) {
-            
-            // Üstten çarpma (Yere inme)
-            if (player.vy > 0 && player.y + player.h - player.vy <= p.y) {
-                player.y = p.y - player.h;
-                player.vy = 0;
-                player.grounded = true;
-                player.canDash = true; // Yere değince dash yenile
-            } 
-            // Alttan çarpma (Kafayı vurma)
-            else if (player.vy < 0 && player.y - player.vy >= p.y + p.h) {
-                player.y = p.y + p.h;
-                player.vy = 0;
-            }
+    lvl.platforms.forEach(p => {
+        if (player.x < p.x + p.w && player.x + player.w > p.x && player.y + player.h > p.y && player.y + player.h < p.y + 15 && player.vy >= 0) {
+            player.y = p.y - player.h;
+            player.vy = 0;
+            player.grounded = true;
         }
     });
 
-    // Ekran sınırları
-    if (player.x < 0) player.x = 0;
-    if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
-    if (player.y > canvas.height) { player.x = 100; player.y = 100; player.vy = 0; }
-}
-
-// --- ÇİZİM VE ATMOSFER ---
-function draw() {
-    // Arka plan (Gradient - Derinlik hissi)
-    let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, "#0a0a12");
-    grd.addColorStop(1, "#020205");
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Platformlar (Neon-Gothic)
-    ctx.fillStyle = "#111";
-    platforms.forEach(p => {
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        
-        // Neon Çizgi
-        ctx.strokeStyle = "#ff0055";
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "#ff0055";
-        ctx.strokeRect(p.x, p.y, p.w, p.h);
-        ctx.shadowBlur = 0; // Reset blur
+    lvl.spikes.forEach(s => {
+        if (player.x < s.x + s.w && player.x + player.w > s.x && player.y < s.y + s.h && player.y + player.h > s.y) {
+            hp--;
+            if(hp <= 0) { alert("ÖLDÜN! Tekrar dene."); location.reload(); }
+            resetPlayer();
+            updateSentenceUI();
+        }
     });
 
-    // Karakter (Pelerinli Silüet)
-    ctx.save();
-    ctx.translate(player.x + player.w/2, player.y + player.h/2);
-    ctx.scale(player.facing, 1);
-    
-    // Pelerin (Hareketli)
-    const capeAnim = Math.sin(frameCount * 0.15) * 3;
-    ctx.fillStyle = player.isDashing ? "#fff" : "#ff0055";
-    ctx.beginPath();
-    ctx.moveTo(-10, -20);
-    ctx.lineTo(10, -20);
-    ctx.lineTo(15 + capeAnim, 20); // Pelerin ucu dalgalanıyor
-    ctx.lineTo(-15 - capeAnim, 20);
-    ctx.fill();
+    // Hedef Kelimeye Ulaşma
+    let goal = lvl.goal;
+    if (Math.abs(player.x - goal.x) < 40 && Math.abs(player.y - goal.y) < 40) {
+        triggerTransition(goal.text);
+    }
 
-    // Kafa/Vücut Silüeti
+    if(player.y > canvas.height) { hp--; resetPlayer(); updateSentenceUI(); }
+}
+
+function draw() {
+    ctx.fillStyle = "#010103";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const lvl = levels[currentLevel];
+
+    // Platformlar
+    ctx.shadowBlur = 15; ctx.shadowColor = "#00f2ff";
+    ctx.fillStyle = "#111";
+    lvl.platforms.forEach(p => ctx.fillRect(p.x, p.y, p.w, p.h));
+
+    // Dikenler
+    ctx.shadowColor = "#ff0055";
+    ctx.fillStyle = "#ff0055";
+    lvl.spikes.forEach(s => {
+        for(let i=0; i<s.w; i+=20) {
+            ctx.beginPath();
+            ctx.moveTo(s.x + i, s.y + s.h);
+            ctx.lineTo(s.x + i + 10, s.y);
+            ctx.lineTo(s.x + i + 20, s.y + s.h);
+            ctx.fill();
+        }
+    });
+
+    // Hedef (Ruh gibi parlayan kelime)
+    ctx.shadowColor = "#fff";
     ctx.fillStyle = "#fff";
-    ctx.fillRect(-8, -25, 16, 16); // Kafa
-    ctx.fillRect(-5, -9, 10, 20); // Gövde
+    ctx.font = "bold 24px Cinzel";
+    ctx.textAlign = "center";
+    ctx.fillText(lvl.goal.text, lvl.goal.x, lvl.goal.y + Math.sin(Date.now()*0.005)*10);
 
-    ctx.restore();
+    // Karakter
+    ctx.shadowColor = "#00f2ff";
+    ctx.fillStyle = "#00f2ff";
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(draw);
 }
 
-function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
+updateSentenceUI();
+setInterval(update, 1000/60);
+draw();
 </script>
 </body>
 </html>
+
