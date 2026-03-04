@@ -2,60 +2,64 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Hollow Lexicon: The Academy of Void</title>
+    <title>Hollow Lexicon: Absolute Academy</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #020205; overflow: hidden; font-family: 'Orbitron', sans-serif; }
-        canvas { display: block; filter: contrast(115%) brightness(95%); }
+        :root { --neon: #00f2ff; --warn: #ff0055; --bg: #02040a; }
+        body { margin: 0; background: var(--bg); overflow: hidden; font-family: 'Orbitron', sans-serif; color: white; }
+        canvas { display: block; filter: contrast(120%) saturate(1.2); }
 
-        /* UI KATMANLARI */
-        #ui-wrapper { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
+        /* UI ELEMENTS */
+        #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
+        .overlay { position: absolute; inset: 0; background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%); }
         
-        #main-menu, #settings-screen {
-            position: absolute; inset: 0; background: radial-gradient(circle, #0f172a 0%, #020617 100%);
+        #menu, #settings {
+            position: absolute; inset: 0; background: var(--bg);
             display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
+            transition: opacity 0.5s;
         }
 
-        .title { font-family: 'Cinzel'; font-size: 70px; color: #fff; text-shadow: 0 0 30px #00f2ff; margin-bottom: 20px; }
-        
+        .main-title { font-family: 'Cinzel'; font-size: 80px; text-shadow: 0 0 30px var(--neon); margin: 0; }
         .btn {
-            padding: 20px 70px; margin: 15px; border: 2px solid #00f2ff; color: #fff;
-            background: rgba(0, 242, 255, 0.05); cursor: pointer; font-size: 22px;
-            font-family: 'Orbitron'; transition: 0.3s; letter-spacing: 4px;
+            padding: 15px 45px; margin: 10px; border: 2px solid var(--neon); color: white;
+            background: transparent; cursor: pointer; font-size: 20px; font-family: 'Orbitron';
+            transition: 0.3s; letter-spacing: 5px; text-transform: uppercase;
         }
-        .btn:hover { background: #00f2ff; color: #000; box-shadow: 0 0 50px #00f2ff; transform: scale(1.05); }
+        .btn:hover, .btn.active { background: var(--neon); color: black; box-shadow: 0 0 50px var(--neon); }
 
         #hud { position: absolute; top: 30px; left: 30px; display: none; }
-        .sentence-box { background: rgba(0,0,0,0.6); padding: 15px 30px; border-left: 5px solid #00f2ff; border-radius: 0 15px 15px 0; }
-        .sentence-display { font-family: 'Cinzel'; font-size: 35px; color: #fff; text-shadow: 0 0 15px #00f2ff; }
-        .hp-bar { font-size: 30px; color: #ff0055; margin-top: 10px; letter-spacing: 5px; }
-
-        input[type=range] { width: 300px; accent-color: #00f2ff; cursor: pointer; }
+        .stat-card { background: rgba(10, 20, 50, 0.7); padding: 25px; border-radius: 0 20px 20px 0; border-left: 8px solid var(--neon); backdrop-filter: blur(5px); }
+        .word-display { font-family: 'Cinzel'; font-size: 40px; text-shadow: 0 0 15px var(--neon); }
+        .hp-heart { font-size: 30px; color: var(--warn); filter: drop-shadow(0 0 10px var(--warn)); }
     </style>
 </head>
 <body>
 
-<div id="ui-wrapper">
-    <div id="main-menu">
-        <div class="title">HOLLOW LEXICON</div>
-        <div style="color: #64748b; margin-bottom: 40px; letter-spacing: 2px;">THE ACADEMY OF VOID</div>
-        <button class="btn" onclick="initGame()">START ADVENTURE</button>
-        <button class="btn" onclick="showSettings()">SETTINGS</button>
+<div id="ui-layer">
+    <div class="overlay"></div>
+    
+    <div id="menu">
+        <h1 class="main-title">HOLLOW LEXICON</h1>
+        <p style="letter-spacing: 10px; color: #64748b; margin-bottom: 50px;">THE FINAL ACADEMY</p>
+        <button class="btn" onclick="startGame()">Enter The Void</button>
+        <button class="btn" onclick="toggleSettings(true)">Settings</button>
     </div>
 
-    <div id="settings-screen" style="display:none;">
-        <h2 style="color:#00f2ff; font-family:'Cinzel'; font-size: 40px;">AUDIO CONFIG</h2>
-        <div style="margin: 40px; text-align: center; color: white;">
-            <p id="vol-text">VOLUME: 80%</p>
-            <input type="range" id="vol-slider" min="0" max="100" value="80" oninput="updateVolText()">
+    <div id="settings" style="display:none;">
+        <h2 style="font-family:'Cinzel'; font-size: 40px; color: var(--neon);">Academy Config</h2>
+        <div style="margin: 30px;">
+            <p>CHALLENGE LEVEL</p>
+            <button id="easy-btn" class="btn" onclick="setDiff('easy')">Easy</button>
+            <button id="hard-btn" class="btn" onclick="setDiff('hardcore')">Hardcore</button>
         </div>
-        <button class="btn" onclick="hideSettings()">SAVE & BACK</button>
+        <button class="btn" style="border-color: var(--warn); color: var(--warn);" onclick="toggleSettings(false)">Apply & Back</button>
     </div>
 
     <div id="hud">
-        <div class="sentence-box">
-            <div class="sentence-display" id="sentence-text">_ _ _ _ _</div>
-            <div class="hp-bar" id="hp-icons">♥♥♥</div>
+        <div class="stat-card">
+            <div id="sentence" class="word-display">_ _ _ _ _</div>
+            <div id="hearts" class="hp-heart">♥♥♥</div>
+            <div id="area-tag" style="color: var(--neon); font-size: 12px; margin-top: 10px;">AREA: LOADING...</div>
         </div>
     </div>
 </div>
@@ -69,293 +73,281 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// --- OYUN AYARLARI VE DURUMU ---
+// --- ENGINE CONFIG ---
 const GAME = {
-    active: false,
-    frame: 0,
-    level: 0,
-    hp: 3,
-    shake: 0,
-    volume: 0.8,
-    words: ["I", "WANT", "TO", "LEARN", "ENGLISH"]
+    active: false, frame: 0, level: 0, hp: 3, shake: 0, difficulty: 'easy',
+    words: ["I", "WANT", "TO", "LEARN", "ENGLISH"],
+    areas: ["HALL OF ORIGIN", "FORGOTTEN ARCHIVE", "AETHER TOWER", "THE ABYSSAL LAB", "THRONE OF KNOWLEDGE"],
+    config: {
+        easy: { grav: 0.7, jump: -18, speed: 9, hp: 5, enemySpeed: 2 },
+        hardcore: { grav: 1.1, jump: -16, speed: 7, hp: 1, enemySpeed: 6 }
+    }
 };
 
 const keys = {};
 window.onkeydown = e => keys[e.code] = true;
 window.onkeyup = e => keys[e.code] = false;
 
-// --- SINIFLAR (OBJE ODAKLI YAPI) ---
+// --- ART & PHYSICS CLASSES ---
 
 class Particle {
-    constructor(x, y, type) {
+    constructor(x, y, color, speedScale = 1) {
         this.x = x; this.y = y;
-        this.vx = (Math.random() - 0.5) * 8;
-        this.vy = (Math.random() - 0.5) * 8;
+        this.vx = (Math.random() - 0.5) * 10 * speedScale;
+        this.vy = (Math.random() - 0.5) * 10 * speedScale;
         this.life = 40 + Math.random() * 20;
-        this.size = Math.random() * 3 + 1;
-        this.char = type === 'knowledge' ? ["A","B","C","?","!"][Math.floor(Math.random()*5)] : null;
+        this.color = color;
+        this.size = Math.random() * 4 + 1;
     }
     update() { this.x += this.vx; this.y += this.vy; this.life--; }
-    draw(cx) {
+    draw(cx, cy) {
         ctx.globalAlpha = this.life / 60;
-        if(this.char) {
-            ctx.fillStyle = "#00f2ff";
-            ctx.font = "14px Arial";
-            ctx.fillText(this.char, this.x - cx, this.y);
-        } else {
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(this.x - cx, this.y, this.size, this.size);
-        }
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x - cx, this.y - cy, this.size, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalAlpha = 1;
     }
 }
 
 class Enemy {
-    constructor(x, y, range, speed, type) {
-        this.x = x; this.y = y; this.baseX = x;
-        this.range = range; this.speed = speed;
-        this.type = type; // 'wanderer' or 'chaser'
+    constructor(x, y, range, type = 'patrol') {
+        this.x = x; this.y = y; this.baseX = x; this.baseY = y;
+        this.range = range; this.type = type;
+        this.angle = Math.random() * Math.PI * 2;
         this.w = 40; this.h = 40;
-        this.angle = 0;
     }
     update(px, py) {
-        this.angle += 0.1;
-        if(this.type === 'wanderer') {
-            this.x += this.speed;
-            if(Math.abs(this.x - this.baseX) > this.range) this.speed *= -1;
-        } else {
-            // Chaser AI: Oyuncuya belli mesafedeyse kovalar
+        const speed = GAME.config[GAME.difficulty].enemySpeed;
+        this.angle += 0.05;
+        
+        if (this.type === 'patrol') {
+            this.x = this.baseX + Math.sin(this.angle) * this.range;
+        } else if (this.type === 'chaser') {
             let dist = Math.hypot(px - this.x, py - this.y);
-            if(dist < 400) {
-                this.x += (px - this.x) * 0.02;
-                this.y += (py - this.y) * 0.02;
+            if (dist < 500) {
+                this.x += (px - this.x) * (speed * 0.005);
+                this.y += (py - this.y) * (speed * 0.005);
             }
         }
     }
-    draw(cx) {
+    draw(cx, cy) {
         ctx.save();
-        ctx.translate(this.x - cx + 20, this.y + 20);
-        ctx.rotate(Math.sin(this.angle) * 0.2);
-        
-        // Rakip Tasarımı: Uçan Kırmızı "F" Notu veya Kitap
-        ctx.shadowBlur = 15; ctx.shadowColor = "#ff0055";
+        ctx.translate(this.x - cx + 20, this.y - cy + 20);
+        ctx.rotate(Math.sin(GAME.frame * 0.1) * 0.2);
+        ctx.shadowBlur = 20; ctx.shadowColor = "#ff0055";
         ctx.fillStyle = "#ff0055";
-        ctx.font = "bold 40px Cinzel";
+        ctx.font = "bold 45px Cinzel";
         ctx.textAlign = "center";
         ctx.fillText("F", 0, 15);
-        
-        // Etrafındaki karanlık enerji
-        ctx.strokeStyle = "rgba(255, 0, 85, 0.3)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-20, -20, 40, 40);
         ctx.restore();
     }
 }
 
-class Player {
+class LevelManager {
     constructor() {
-        this.w = 40; this.h = 65;
-        this.reset();
-        this.particles = [];
+        this.currentLevelData = [];
+        this.loadLevel(0);
     }
-    reset() {
-        this.x = 200; this.y = 400; this.vx = 0; this.vy = 0;
-        this.facing = 1; this.grounded = false;
-        this.dashing = false; this.dashCooldown = 0;
+    loadLevel(idx) {
+        const layouts = [
+            { // Level 1
+                platforms: [{x:0, y:700, w:1500, h:500, c:'#1e293b'}, {x:1600, y:550, w:400, h:40, c:'#451a03'}],
+                enemies: [new Enemy(1000, 650, 400)],
+                goal: {x:2500, y:650}
+            },
+            { // Level 2
+                platforms: [{x:0, y:700, w:500, h:200}, {x:600, y:500, w:300, h:40}, {x:200, y:300, w:300, h:40}, {x:700, y:150, w:400, h:40}],
+                enemies: [new Enemy(650, 450, 150, 'chaser')],
+                goal: {x:800, y:100}
+            },
+            { // Level 3
+                platforms: [{x:0, y:600, w:200, h:40}, {x:300, y:450, w:200, h:40}, {x:600, y:300, w:200, h:40}, {x:900, y:450, w:200, h:40}, {x:1200, y:600, w:500, h:40}],
+                enemies: [new Enemy(600, 250, 100), new Enemy(1000, 400, 50)],
+                goal: {x:1450, y:550}
+            },
+            { // Level 4
+                platforms: [{x:0, y:700, w:3000, h:100}, {x:500, y:550, w:200, h:20}, {x:1000, y:400, w:200, h:20}],
+                enemies: [new Enemy(1500, 650, 800), new Enemy(500, 650, 400, 'chaser')],
+                goal: {x:2800, y:650}
+            },
+            { // Level 5 (Final)
+                platforms: [{x:0, y:700, w:400, h:40}, {x:500, y:500, w:300, h:40}, {x:1000, y:300, w:400, h:40}, {x:1500, y:500, w:300, h:40}, {x:2000, y:700, w:800, h:300}],
+                enemies: [new Enemy(1100, 250, 0, 'chaser'), new Enemy(2200, 650, 300)],
+                goal: {x:2500, y:650}
+            }
+        ];
+        this.currentLevelData = layouts[idx];
     }
+}
+
+const player = {
+    x: 100, y: 500, vx: 0, vy: 0, w: 40, h: 65,
+    facing: 1, grounded: false, dashCD: 0, dashing: false,
+    particles: [],
     update(lvl) {
-        // Dash
-        if(keys['ShiftLeft'] && this.dashCooldown <= 0) {
-            this.dashing = true; this.dashCooldown = 50;
-            GAME.shake = 15;
-            for(let i=0; i<15; i++) this.particles.push(new Particle(this.x+20, this.y+30, 'knowledge'));
+        const conf = GAME.config[GAME.difficulty];
+        
+        // DASH LOGIC
+        if (keys['ShiftLeft'] && this.dashCD <= 0) {
+            this.dashing = true; this.dashCD = 50;
+            GAME.shake = 18;
+            for(let i=0; i<20; i++) this.particles.push(new Particle(this.x+20, this.y+30, "#00f2ff", 1.5));
             setTimeout(() => this.dashing = false, 200);
         }
 
-        if(this.dashing) {
-            this.vx = 24 * this.facing; this.vy = 0;
+        if (this.dashing) {
+            this.vx = 26 * this.facing; this.vy = 0;
         } else {
-            if(keys['KeyD'] || keys['ArrowRight']) { this.vx += 1; this.facing = 1; }
-            else if(keys['KeyA'] || keys['ArrowLeft']) { this.vx -= 1; this.facing = -1; }
-            else this.vx *= 0.82;
+            if (keys['KeyD'] || keys['ArrowRight']) { this.vx += 1.1; this.facing = 1; }
+            else if (keys['KeyA'] || keys['ArrowLeft']) { this.vx -= 1.1; this.facing = -1; }
+            else this.vx *= 0.84;
 
-            if(Math.abs(this.vx) > 8) this.vx = 8 * Math.sign(this.vx);
-            if((keys['Space'] || keys['KeyW']) && this.grounded) { this.vy = -18; this.grounded = false; }
-            this.vy += 0.85;
+            if (Math.abs(this.vx) > conf.speed) this.vx = conf.speed * Math.sign(this.vx);
+            if ((keys['Space'] || keys['KeyW']) && this.grounded) { this.vy = conf.jump; this.grounded = false; }
+            this.vy += conf.grav;
         }
 
         this.x += this.vx; this.y += this.vy;
-        if(this.dashCooldown > 0) this.dashCooldown--;
+        if (this.dashCD > 0) this.dashCD--;
 
-        // Collision
+        // COLLISIONS
         this.grounded = false;
         lvl.platforms.forEach(p => {
-            if(this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y + this.h < p.y + 25 && this.vy >= 0) {
+            if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y + this.h < p.y + 25 && this.vy >= 0) {
                 this.y = p.y - this.h; this.vy = 0; this.grounded = true;
             }
         });
 
-        // Bug Fix & Die
-        if(this.y > canvas.height + 200) takeDamage();
-
-        this.particles.forEach((p, i) => { p.update(); if(p.life <= 0) this.particles.splice(i, 1); });
-    }
-    draw(cx) {
-        this.particles.forEach(p => p.draw(cx));
-        
+        if (this.y > canvas.height + 300) takeDamage();
+        this.particles.forEach((p, i) => { p.update(); if (p.life <= 0) this.particles.splice(i, 1); });
+    },
+    draw(cx, cy) {
+        this.particles.forEach(p => p.draw(cx, cy));
         ctx.save();
-        ctx.translate(this.x - cx + 20, this.y + 35);
+        ctx.translate(this.x - cx + 20, this.y - cy + 32);
         ctx.scale(this.facing, 1);
-
-        // Attığın karakterin stili
-        // Saç
-        ctx.fillStyle = "#5d4037";
-        ctx.beginPath(); ctx.roundRect(-20, -45, 40, 30, 10); ctx.fill();
-        // Yüz
-        ctx.fillStyle = "#ffe0b2";
-        ctx.beginPath(); ctx.arc(0, -25, 15, 0, Math.PI*2); ctx.fill();
-        // Ceket (Yeşil)
-        ctx.fillStyle = "#2d4c2d";
-        ctx.fillRect(-18, -10, 36, 40);
-        // Kitap
-        ctx.fillStyle = "#1b5e20";
-        ctx.fillRect(8, -5, 18, 25);
-        ctx.fillStyle = "#fff"; ctx.fillRect(22, -5, 4, 25);
-
+        
+        // Scholar Art (Senin karakterin renkleriyle)
+        ctx.fillStyle = "#5d4037"; ctx.beginPath(); ctx.roundRect(-20, -45, 40, 30, 10); ctx.fill(); // Saç
+        ctx.fillStyle = "#ffe0b2"; ctx.beginPath(); ctx.arc(0, -25, 14, 0, Math.PI*2); ctx.fill(); // Yüz
+        ctx.fillStyle = "#2d4c2d"; ctx.fillRect(-18, -10, 36, 40); // Ceket
+        ctx.fillStyle = "#1b5e20"; ctx.fillRect(8, -5, 18, 25); // Kitap
         ctx.restore();
     }
-}
-
-// --- HARİTA VERİSİ (BÜYÜK VE AYRINTILI) ---
-const levelData = {
-    platforms: [
-        {x: 0, y: 700, w: 1200, h: 400, type: 'marble'}, 
-        {x: 1400, y: 550, w: 400, h: 40, type: 'shelf'},
-        {x: 1100, y: 350, w: 300, h: 40, type: 'shelf'},
-        {x: 1900, y: 400, w: 300, h: 40, type: 'shelf'},
-        {x: 2300, y: 600, w: 1500, h: 500, type: 'marble'},
-        {x: 3900, y: 450, w: 400, h: 40, type: 'shelf'},
-        {x: 4500, y: 650, w: 1500, h: 400, type: 'marble'}
-    ],
-    enemies: [
-        new Enemy(1400, 500, 350, 3, 'wanderer'),
-        new Enemy(2500, 550, 0, 0, 'chaser'),
-        new Enemy(4000, 400, 300, 5, 'wanderer')
-    ],
-    goal: {x: 5500, y: 600}
 };
 
-const player = new Player();
-const cam = { x: 0 };
+const LM = new LevelManager();
+const cam = { x: 0, y: 0 };
 
-// --- OYUN MANTIĞI ---
-
-function showSettings() { document.getElementById('settings-screen').style.display = 'flex'; }
-function hideSettings() { document.getElementById('settings-screen').style.display = 'none'; }
-function updateVolText() {
-    let v = document.getElementById('vol-slider').value;
-    document.getElementById('vol-text').innerText = `VOLUME: ${v}%`;
-    GAME.volume = v / 100;
-}
+// --- MAIN FUNCTIONS ---
 
 function takeDamage() {
     GAME.hp--; GAME.shake = 30;
-    if(GAME.hp <= 0) { alert("FAILED THE EXAM!"); location.reload(); }
-    player.reset();
-    updateHUD();
+    if (GAME.hp <= 0) { alert("ACADEMY DISMISSED!"); location.reload(); }
+    player.x = 100; player.y = 500; updateUI();
 }
 
-function updateHUD() {
-    let t = GAME.words.map((w, i) => i < GAME.level ? w : "_").join("  ");
-    document.getElementById('sentence-text').innerText = t;
-    document.getElementById('hp-icons').innerText = "♥".repeat(GAME.hp);
+function updateUI() {
+    document.getElementById('sentence').innerText = GAME.words.map((w, i) => i < GAME.level ? w : "_").join(" ");
+    document.getElementById('hearts').innerText = "♥".repeat(GAME.hp);
+    document.getElementById('area-tag').innerText = `AREA: ${GAME.areas[GAME.level]}`;
 }
 
-function initGame() {
-    document.getElementById('main-menu').style.display = 'none';
-    document.getElementById('hud').style.display = 'block';
-    GAME.active = true;
-    updateHUD();
-    requestAnimationFrame(gameLoop);
+function startGame() {
+    document.getElementById('menu').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('hud').style.display = 'block';
+        GAME.active = true;
+        updateUI();
+        gameLoop();
+    }, 500);
+}
+
+function toggleSettings(s) { 
+    document.getElementById('settings').style.display = s ? 'flex' : 'none';
+    setDiff(GAME.difficulty);
+}
+
+function setDiff(d) {
+    GAME.difficulty = d;
+    GAME.hp = GAME.config[d].hp;
+    document.getElementById('easy-btn').className = d === 'easy' ? 'btn active' : 'btn';
+    document.getElementById('hard-btn').className = d === 'hardcore' ? 'btn active' : 'btn';
 }
 
 function gameLoop() {
-    if(!GAME.active) return;
+    if (!GAME.active) return;
     GAME.frame++;
-    if(GAME.shake > 0) GAME.shake *= 0.9;
+    if (GAME.shake > 0) GAME.shake *= 0.9;
 
-    player.update(levelData);
+    const currentLvl = LM.currentLevelData;
+    player.update(currentLvl);
     
-    // Kamera Takibi
-    cam.x += (player.x - canvas.width/2.5 - cam.x) * 0.08;
-    if(cam.x < 0) cam.x = 0;
+    // Smooth Camera (Lerp)
+    cam.x += (player.x - canvas.width / 2.5 - cam.x) * 0.1;
+    cam.y += (player.y - canvas.height / 2 - cam.y) * 0.1;
 
-    // Düşman Güncelleme
-    levelData.enemies.forEach(e => {
+    // Enemy Logic
+    currentLvl.enemies.forEach(e => {
         e.update(player.x, player.y);
-        if(Math.hypot(player.x+20 - e.x-20, player.y+30 - e.y-20) < 45) takeDamage();
+        if (Math.hypot(player.x - e.x, player.y - e.y) < 50) takeDamage();
     });
 
-    // Hedef Kontrolü
-    if(Math.hypot(player.x - levelData.goal.x, player.y - levelData.goal.y) < 100) {
+    // Goal Logic
+    if (Math.hypot(player.x - currentLvl.goal.x, player.y - currentLvl.goal.y) < 100) {
         GAME.level++;
-        if(GAME.level >= GAME.words.length) { alert("GRADUATED!"); location.reload(); }
-        player.reset(); cam.x = 0; updateHUD();
+        if (GAME.level >= GAME.words.length) { alert("MASTER OF LEXICON!"); location.reload(); }
+        LM.loadLevel(GAME.level);
+        player.x = 100; player.y = 500; updateUI();
     }
 
-    draw();
+    render();
     requestAnimationFrame(gameLoop);
 }
 
-function draw() {
-    // 1. ARKA PLAN (GÖKYÜZÜ VE OKUL SİLÜETİ)
-    let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grd.addColorStop(0, "#020617"); grd.addColorStop(1, "#1e293b");
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+function render() {
+    ctx.fillStyle = "#02040a"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
     ctx.save();
-    if(GAME.shake > 1) ctx.translate((Math.random()-0.5)*GAME.shake, (Math.random()-0.5)*GAME.shake);
+    if (GAME.shake > 1) ctx.translate((Math.random() - 0.5) * GAME.shake, (Math.random() - 0.5) * GAME.shake);
 
-    // Parallax Okul Duvarları
-    ctx.fillStyle = "rgba(15, 23, 42, 0.5)";
-    for(let i=0; i<6; i++) {
-        ctx.fillRect((i*1600) - cam.x * 0.2, 50, 800, 1000);
-        // Camlar
-        ctx.fillStyle = "rgba(56, 189, 248, 0.05)";
-        for(let j=0; j<10; j++) ctx.fillRect((i*1600) - cam.x * 0.2 + 100, 100 + j*80, 60, 40);
-        ctx.fillStyle = "rgba(15, 23, 42, 0.5)";
+    // Parallax Background Stars/Particles
+    ctx.fillStyle = "rgba(0, 242, 255, 0.1)";
+    for (let i = 0; i < 50; i++) {
+        let px = (i * 250 - cam.x * 0.2) % 3000;
+        let py = (i * 150 - cam.y * 0.1) % 2000;
+        ctx.fillRect(px, py, 2, 2);
     }
 
-    ctx.translate(-cam.x, 0);
+    ctx.translate(-cam.x, -cam.y);
 
-    // 2. PLATFORMLAR
-    levelData.platforms.forEach(p => {
-        if(p.type === 'marble') {
-            ctx.fillStyle = "#0f172a"; ctx.fillRect(p.x, p.y, p.w, p.h);
-            ctx.fillStyle = "#38bdf8"; ctx.fillRect(p.x, p.y, p.w, 4); // Parlayan kenar
-        } else {
-            ctx.fillStyle = "#451a03"; ctx.fillRect(p.x, p.y, p.w, p.h);
-            ctx.fillStyle = "#78350f"; ctx.fillRect(p.x, p.y, p.w, 10);
-            // Rafın içindeki kitaplar
-            for(let k=10; k<p.w-10; k+=15) {
-                ctx.fillStyle = `hsl(${k%360}, 60%, 40%)`;
-                ctx.fillRect(p.x+k, p.y+10, 10, 25);
-            }
+    // Draw Platforms with Style
+    const lvl = LM.currentLevelData;
+    lvl.platforms.forEach(p => {
+        const isMarble = p.c === '#1e293b';
+        ctx.fillStyle = p.c || "#0f172a";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        // Neon Top Edge
+        ctx.fillStyle = "#00f2ff";
+        ctx.fillRect(p.x, p.y, p.w, 4);
+        // Details
+        if(!isMarble) {
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            for(let k=10; k<p.w-10; k+=20) ctx.fillRect(p.x+k, p.y+10, 10, 25);
         }
     });
 
-    // 3. DÜŞMANLAR VE HEDEF
-    levelData.enemies.forEach(e => e.draw(0));
+    // Draw Enemies & Goal
+    lvl.enemies.forEach(e => e.draw(0, 0));
     
-    ctx.fillStyle = "#fff"; ctx.font = "bold 50px Cinzel"; ctx.textAlign = "center";
-    ctx.shadowBlur = 20; ctx.shadowColor = "#00f2ff";
-    ctx.fillText(GAME.words[GAME.level], levelData.goal.x, levelData.goal.y + Math.sin(GAME.frame*0.05)*20);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 55px Cinzel"; ctx.textAlign = "center";
+    ctx.shadowBlur = 25; ctx.shadowColor = "#00f2ff";
+    ctx.fillText(GAME.words[GAME.level], lvl.goal.x, lvl.goal.y + Math.sin(GAME.frame * 0.05) * 20);
     ctx.shadowBlur = 0;
 
-    // 4. OYUNCU
-    player.draw(0);
-
+    player.draw(0, 0);
     ctx.restore();
 }
 </script>
