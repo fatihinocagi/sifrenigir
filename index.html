@@ -2,189 +2,296 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cosmic Word Builder - 9th Grade English</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Lexicon - Professional Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #050505; color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
-        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        .stat { position: absolute; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid #00f2ff; border-radius: 5px; }
-        #score-div { top: 20px; left: 20px; color: #00f2ff; }
-        #sentence-container { top: 20px; left: 50%; transform: translateX(-50%); width: 60%; text-align: center; }
-        .word-slot { display: inline-block; margin: 5px; padding: 5px 15px; border-bottom: 3px solid #444; min-width: 80px; font-size: 20px; }
-        .found { border-bottom-color: #00f2ff; color: #00f2ff; animation: glow 1s ease; }
-        @keyframes glow { 0% { text-shadow: 0 0 20px #fff; } 100% { text-shadow: 0 0 5px #00f2ff; } }
+        :root { --neon-blue: #00f2ff; --neon-pink: #ff0055; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #020205; font-family: 'Orbitron', sans-serif; }
+        
+        /* Arka Plan Efekti */
+        #nebula {
+            position: fixed; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #0a1128 0%, #020205 100%);
+            z-index: -1;
+        }
+
+        /* Modern UI Elements */
+        #ui-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; padding: 30px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        #top-bar { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .stat-box { text-align: left; }
+        .label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
+        .value { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 0 10px var(--neon-blue); }
+
+        #sentence-display {
+            width: 60%; align-self: center; text-align: center;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .word-slot {
+            display: inline-block; margin: 0 10px; font-size: 22px;
+            color: rgba(255,255,255,0.2); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .active-word { color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); }
+        .completed-word { color: #00ff88; text-shadow: 0 0 15px #00ff88; }
+
+        #shield-container { width: 200px; height: 10px; background: #222; border-radius: 5px; margin-top: 5px; overflow: hidden; }
+        #shield-bar { width: 100%; height: 100%; background: var(--neon-blue); transition: width 0.3s; }
+
+        canvas { display: block; filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.2)); }
     </style>
 </head>
 <body>
 
-<div id="ui-layer">
-    <div id="score-div" class="stat">SCORE: <span id="score">0</span></div>
-    <div id="sentence-container" class="stat">
-        <div id="hint">NEXT WORD: <b id="target-hint" style="color:#ffcc00">I</b></div>
-        <div id="slots"></div>
+<div id="nebula"></div>
+<div id="ui-wrapper">
+    <div id="top-bar">
+        <div class="glass-card stat-box">
+            <div class="label">SCORE</div>
+            <div id="score" class="value">0000</div>
+            <div class="label" style="margin-top:10px">SHIELD</div>
+            <div id="shield-container"><div id="shield-bar"></div></div>
+        </div>
+
+        <div id="sentence-display" class="glass-card">
+            <div class="label">MISSION: CONSTRUCT SENTENCE</div>
+            <div id="slots-area"></div>
+        </div>
+
+        <div class="glass-card stat-box" style="text-align:right">
+            <div class="label">TARGET UNIT</div>
+            <div class="value" style="font-size:18px">STUDY ABROAD</div>
+            <div class="label" style="margin-top:10px; color:var(--neon-pink)">LEVEL: 9TH GRADE</div>
+        </div>
     </div>
 </div>
+
 <canvas id="gameCanvas"></canvas>
 
 <script>
+/** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// --- OYUN AYARLARI ---
-const sentence = ["I", "WANT", "TO", "STUDY", "ABROAD", "IN", "A", "UNIQUE", "CITY"];
-const distractors = ["THE", "CAT", "RUNS", "DOG", "COLLEAGUE", "AMBITIOUS", "GENEROUS", "ENVIRONMENT"];
-let currentStep = 0;
+// --- GAME CONFIG ---
+const targetSentence = ["I", "WANT", "TO", "STUDY", "ABROAD", "IN", "A", "UNIQUE", "DESTINATION"];
+const vocabularyPool = ["DESTINATION", "UNIQUE", "COLLEAGUE", "ABROAD", "GENEROUS", "AMBITIOUS", "TRADITION", "ENVIRONMENT", "CULTURE", "SCHOLARSHIP"];
+let currentIndex = 0;
 let score = 0;
-const particles = [];
-const bullets = [];
-const enemies = [];
-const fallingWords = [];
-const stars = Array(150).fill().map(() => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2}));
+let shield = 100;
+let screenShake = 0;
 
-// --- SES MOTORU (Web Audio API) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(freq, type, duration) {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+const player = { x: canvas.width/2, y: canvas.height - 120, w: 60, h: 70, targetX: canvas.width/2 };
+const projectiles = [];
+const enemies = [];
+const particles = [];
+const floatTexts = [];
+
+// UI Setup
+const slotsArea = document.getElementById('slots-area');
+targetSentence.forEach((word, i) => {
+    const span = document.createElement('span');
+    span.className = 'word-slot';
+    span.id = `slot-${i}`;
+    span.innerText = "_".repeat(word.length);
+    slotsArea.appendChild(span);
+});
+updateActiveSlot();
+
+// --- AUDIO ENGINE ---
+const audio = new (window.AudioContext || window.webkitAudioContext)();
+function beep(freq, type, vol, len) {
+    const osc = audio.createOscillator();
+    const gain = audio.createGain();
     osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
+    osc.frequency.setValueAtTime(freq, audio.currentTime);
+    gain.gain.setValueAtTime(vol, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + len);
+    osc.connect(gain); gain.connect(audio.destination);
+    osc.start(); osc.stop(audio.currentTime + len);
 }
 
-// --- BAŞLANGIÇ ---
-const slotsDiv = document.getElementById('slots');
-sentence.forEach(() => {
-    let s = document.createElement('span');
-    s.className = 'word-slot';
-    s.innerText = '_____';
-    slotsDiv.appendChild(s);
-});
-
-// --- OYUN NESNELERİ ---
-const player = { x: canvas.width/2, y: canvas.height - 100, w: 40, h: 40 };
-
-function createParticle(x, y, color) {
-    for(let i=0; i<10; i++) {
-        particles.push({x, y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1, color});
+// --- CLASSES ---
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.v = { x: (Math.random()-0.5)*10, y: (Math.random()-0.5)*10 };
+        this.life = 1.0;
+        this.color = color;
+    }
+    draw() {
+        this.life -= 0.02;
+        ctx.fillStyle = this.color.replace('1)', `${this.life})`);
+        ctx.fillRect(this.x, this.y, 3, 3);
     }
 }
 
-function spawnEnemy() {
-    const isTarget = Math.random() > 0.6;
-    const word = isTarget ? sentence[currentStep] : distractors[Math.floor(Math.random()*distractors.length)];
-    enemies.push({
-        x: Math.random() * (canvas.width-100) + 50,
-        y: -50,
-        word: word,
-        isTarget: word === sentence[currentStep],
-        speed: 2 + (score/1000)
-    });
+class Enemy {
+    constructor() {
+        this.isCorrect = Math.random() > 0.5;
+        this.word = this.isCorrect ? targetSentence[currentIndex] : vocabularyPool[Math.floor(Math.random()*vocabularyPool.length)];
+        this.x = Math.random() * (canvas.width - 150) + 75;
+        this.y = -50;
+        this.speed = 1.5 + (score / 2000);
+        this.w = ctx.measureText(this.word).width + 40;
+    }
+    draw() {
+        this.y += this.speed;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        
+        // Neon Box
+        ctx.strokeStyle = this.isCorrect ? '#00f2ff' : '#ff0055';
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ctx.strokeStyle;
+        ctx.strokeRect(-this.w/2, -20, this.w, 40);
+        
+        // Text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 16px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.word, 0, 7);
+        ctx.restore();
+    }
 }
 
-// --- ANA DÖNGÜ ---
-function loop() {
-    ctx.fillStyle = '#050505';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+// --- CORE FUNCTIONS ---
+function updateActiveSlot() {
+    document.querySelectorAll('.word-slot').forEach(s => s.classList.remove('active-word'));
+    if(currentIndex < targetSentence.length) {
+        document.getElementById(`slot-${currentIndex}`).classList.add('active-word');
+    }
+}
 
-    // Arka Plan Yıldızlar
-    ctx.fillStyle = 'white';
-    stars.forEach(s => {
-        s.y += s.s;
-        if(s.y > canvas.height) s.y = 0;
-        ctx.fillRect(s.x, s.y, 1, 1);
-    });
+function spawn() { if(enemies.length < 5) enemies.push(new Enemy()); }
 
-    // Oyuncu (Uzay Gemisi)
-    ctx.fillStyle = '#00f2ff';
+function handleCollision(enemyIndex, bulletIndex) {
+    const en = enemies[enemyIndex];
+    screenShake = 10;
+    
+    // Effect
+    for(let i=0; i<15; i++) particles.push(new Particle(en.x, en.y, en.isCorrect ? 'rgba(0, 242, 255, 1)' : 'rgba(255, 0, 85, 1)'));
+    
+    if(en.word === targetSentence[currentIndex]) {
+        beep(600, 'sine', 0.1, 0.3);
+        const slot = document.getElementById(`slot-${currentIndex}`);
+        slot.innerText = en.word;
+        slot.className = 'word-slot completed-word';
+        currentIndex++;
+        score += 500;
+        updateActiveSlot();
+        if(currentIndex >= targetSentence.length) victory();
+    } else {
+        beep(150, 'sawtooth', 0.1, 0.4);
+        score = Math.max(0, score - 200);
+        shield -= 20;
+        document.getElementById('shield-bar').style.width = shield + "%";
+        if(shield <= 0) gameOver();
+    }
+    
+    enemies.splice(enemyIndex, 1);
+    if(bulletIndex !== null) projectiles.splice(bulletIndex, 1);
+}
+
+function victory() {
+    alert("🌌 MISSION ACCOMPLISHED!\nScore: " + score + "\n9th Grade English: MASTERED");
+    location.reload();
+}
+
+function gameOver() {
+    alert("🚀 SHIELD DEPLETED!\nMission Failed. Try again, Cadet.");
+    location.reload();
+}
+
+// --- RENDER LOOP ---
+function draw() {
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    
+    // Screen Shake
+    if(screenShake > 0) {
+        ctx.translate(Math.random()*screenShake, Math.random()*screenShake);
+        screenShake *= 0.9;
+    }
+
+    // Player (Cyberpunk Ship)
+    player.x += (player.targetX - player.x) * 0.1;
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    // Ship Body
+    ctx.fillStyle = '#111';
+    ctx.strokeStyle = var(--neon-blue);
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(player.x, player.y + player.h);
-    ctx.lineTo(player.x + player.w/2, player.y);
-    ctx.lineTo(player.x + player.w, player.y + player.h);
-    ctx.fill();
+    ctx.moveTo(0, -40); ctx.lineTo(30, 20); ctx.lineTo(-30, 20); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Engine Glow
+    ctx.fillStyle = Math.random() > 0.5 ? var(--neon-pink) : var(--neon-blue);
+    ctx.fillRect(-10, 20, 20, 10);
+    ctx.restore();
 
-    // Mermiler
-    bullets.forEach((b, i) => {
-        b.y -= 10;
-        ctx.fillStyle = '#ff0055';
-        ctx.fillRect(b.x - 2, b.y, 4, 15);
-        if(b.y < 0) bullets.splice(i, 1);
-    });
-
-    // Düşmanlar (Balon/Kelimeler)
-    enemies.forEach((en, i) => {
-        en.y += en.speed;
-        ctx.strokeStyle = '#00f2ff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(en.x - 40, en.y - 20, 80, 40);
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.fillText(en.word, en.x, en.y + 7);
-
-        // Vurulma Kontrolü
-        bullets.forEach((b, bi) => {
-            if(b.x > en.x-40 && b.x < en.x+40 && b.y > en.y-20 && b.y < en.y+20) {
-                createParticle(en.x, en.y, '#00f2ff');
-                playSound(400, 'square', 0.1);
-                if(en.word === sentence[currentStep]) {
-                    fallingWords.push({x: en.x, y: en.y, text: en.word});
-                }
-                enemies.splice(i, 1);
-                bullets.splice(bi, 1);
+    // Projectiles
+    projectiles.forEach((p, i) => {
+        p.y -= 15;
+        ctx.fillStyle = var(--neon-pink);
+        ctx.shadowBlur = 15; ctx.shadowColor = var(--neon-pink);
+        ctx.fillRect(p.x-2, p.y, 4, 20);
+        if(p.y < 0) projectiles.splice(i, 1);
+        
+        enemies.forEach((en, ei) => {
+            if(p.x > en.x - en.w/2 && p.x < en.x + en.w/2 && p.y > en.y - 20 && p.y < en.y + 20) {
+                handleCollision(ei, i);
             }
         });
     });
 
-    // Düşen Kelimeleri Toplama
-    fallingWords.forEach((fw, i) => {
-        fw.y += 3;
-        ctx.fillStyle = '#ffcc00';
-        ctx.font = 'bold 24px Arial';
-        ctx.fillText(fw.text, fw.x, fw.y);
-
-        if(Math.abs(fw.x - (player.x + 20)) < 40 && Math.abs(fw.y - player.y) < 40) {
-            playSound(800, 'sine', 0.2);
-            slotsDiv.children[currentStep].innerText = fw.text;
-            slotsDiv.children[currentStep].classList.add('found');
-            currentStep++;
-            score += 100;
-            document.getElementById('score').innerText = score;
-            fallingWords.splice(i, 1);
-            
-            if(currentStep >= sentence.length) {
-                alert("MISSION COMPLETE! 9th Grade English Mastered!");
-                location.reload();
-            } else {
-                document.getElementById('target-hint').innerText = sentence[currentStep];
-            }
-        }
+    enemies.forEach((en, i) => {
+        en.draw();
+        if(en.y > canvas.height) enemies.splice(i, 1);
     });
 
-    // Parçacıklar
     particles.forEach((p, i) => {
-        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
-        ctx.fillStyle = `rgba(0, 242, 255, ${p.life})`;
-        ctx.fillRect(p.x, p.y, 3, 3);
+        p.draw();
         if(p.life <= 0) particles.splice(i, 1);
     });
 
-    requestAnimationFrame(loop);
+    document.getElementById('score').innerText = score.toString().padStart(4, '0');
+    requestAnimationFrame(draw);
 }
 
-// Kontroller
-window.onmousemove = (e) => player.x = e.clientX - 20;
+// --- INPUTS ---
+window.onmousemove = (e) => player.targetX = e.clientX;
 window.onclick = () => {
-    bullets.push({x: player.x + 20, y: player.y});
-    playSound(150, 'sawtooth', 0.05);
+    projectiles.push({x: player.x, y: player.y - 20});
+    beep(200, 'square', 0.05, 0.1);
 };
+window.onkeydown = (e) => { if(e.code === 'Space') window.onclick(); };
 
-setInterval(spawnEnemy, 1200);
-loop();
+setInterval(spawn, 1500);
+draw();
+
+// CSS Variables helper
+const style = getComputedStyle(document.documentElement);
+var --neon-blue = style.getPropertyValue('--neon-blue').trim();
+var --neon-pink = style.getPropertyValue('--neon-pink').trim();
+
 </script>
 </body>
 </html>
