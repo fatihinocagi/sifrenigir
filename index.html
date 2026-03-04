@@ -1,169 +1,190 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drip Caws | Official Store | Turkish Drill Culture</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Cosmic Word Builder - 9th Grade English</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Oswald:wght@500;700&display=swap');
-        
-        :root { --main-red: #ff0000; --dark-bg: #0a0a0a; }
-        body { background-color: black; color: white; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-        .oswald { font-family: 'Oswald', sans-serif; }
-        
-        /* Animasyonlar */
-        .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Ürün Kartı Efekti */
-        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1a1a1a; position: relative; }
-        .product-card:hover { border-color: var(--main-red); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 0, 0, 0.15); }
-        .badge { background: var(--main-red); color: white; font-size: 10px; font-weight: 900; padding: 4px 8px; position: absolute; top: 10px; left: 10px; z-index: 10; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--main-red); }
-
-        /* Slider Styles */
-        .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; }
-        .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; width: 200%; height: 100%; }
-        .slide { width: 50%; height: 100%; flex-shrink: 0; display: flex; items-center; justify-content: center; }
-        .slide img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply; }
-        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; cursor: pointer; z-index: 20; font-size: 18px; }
-        .slider-btn.prev { left: 10px; }
-        .slider-btn.next { right: 10px; }
+        body { margin: 0; background: #050505; color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .stat { position: absolute; background: rgba(0,0,0,0.6); padding: 10px 20px; border: 1px solid #00f2ff; border-radius: 5px; }
+        #score-div { top: 20px; left: 20px; color: #00f2ff; }
+        #sentence-container { top: 20px; left: 50%; transform: translateX(-50%); width: 60%; text-align: center; }
+        .word-slot { display: inline-block; margin: 5px; padding: 5px 15px; border-bottom: 3px solid #444; min-width: 80px; font-size: 20px; }
+        .found { border-bottom-color: #00f2ff; color: #00f2ff; animation: glow 1s ease; }
+        @keyframes glow { 0% { text-shadow: 0 0 20px #fff; } 100% { text-shadow: 0 0 5px #00f2ff; } }
     </style>
 </head>
 <body>
 
-    <div class="bg-[#ff0000] overflow-hidden py-2 border-b border-black">
-        <div class="whitespace-nowrap animate-marquee font-black text-[10px] tracking-[0.2em]">
-            <span>1.500 TL ÜZERİ KAPIDA ÖDEME | 12 TAKSİT İMKANI | TÜM DÜNYAYA KARGO | YENİ SEZON TECH FLEECE STOKLARDA!</span>
-        </div>
+<div id="ui-layer">
+    <div id="score-div" class="stat">SCORE: <span id="score">0</span></div>
+    <div id="sentence-container" class="stat">
+        <div id="hint">NEXT WORD: <b id="target-hint" style="color:#ffcc00">I</b></div>
+        <div id="slots"></div>
     </div>
+</div>
+<canvas id="gameCanvas"></canvas>
 
-    <header class="sticky top-0 z-[100] bg-black/95 border-b border-zinc-900 backdrop-blur-md px-6 py-4">
-        <div class="max-w-[1600px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <div class="oswald text-3xl font-bold tracking-tighter cursor-pointer" onclick="showPage('home')">
-                    DRIP<span class="text-red-600">CAWS</span>
-                </div>
-                <nav class="hidden lg:flex gap-6 text-[11px] font-bold tracking-widest text-zinc-400">
-                    <a onclick="showPage('home')" class="hover:text-white cursor-pointer transition">ANASAYFA</a>
-                    <a onclick="showPage('shop')" class="hover:text-white cursor-pointer transition uppercase">Giyim</a>
-                    <a onclick="showPage('shoes')" class="hover:text-white cursor-pointer transition uppercase">Ayakkabı</a>
-                    <a onclick="showPage('contact')" class="hover:text-white cursor-pointer transition">İLETİŞİM</a>
-                </nav>
-            </div>
-            <div class="flex items-center gap-5 text-sm">
-                <i class="fa-solid fa-magnifying-glass hover:text-red-600 cursor-pointer"></i>
-                <i class="fa-solid fa-user hover:text-red-600 cursor-pointer"></i>
-                <div class="relative cursor-pointer group" onclick="alert('Sepetiniz boş!')">
-                    <i class="fa-solid fa-bag-shopping hover:text-red-600"></i>
-                    <span class="absolute -top-2 -right-2 bg-red-600 text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
-                </div>
-            </div>
-        </div>
-    </header>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    <main id="shop" class="page py-16 px-6 max-w-[1600px] mx-auto active">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-                <h2 class="oswald text-5xl font-black italic uppercase italic">Giyim Koleksiyonu</h2>
-                <p class="text-zinc-500 mt-2">Drip Caws özel seçki: Tech Fleece, Trapstar, Corteiz</p>
-            </div>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+// --- OYUN AYARLARI ---
+const sentence = ["I", "WANT", "TO", "STUDY", "ABROAD", "IN", "A", "UNIQUE", "CITY"];
+const distractors = ["THE", "CAT", "RUNS", "DOG", "COLLEAGUE", "AMBITIOUS", "GENEROUS", "ENVIRONMENT"];
+let currentStep = 0;
+let score = 0;
+const particles = [];
+const bullets = [];
+const enemies = [];
+const fallingWords = [];
+const stars = Array(150).fill().map(() => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2}));
+
+// --- SES MOTORU (Web Audio API) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq, type, duration) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+// --- BAŞLANGIÇ ---
+const slotsDiv = document.getElementById('slots');
+sentence.forEach(() => {
+    let s = document.createElement('span');
+    s.className = 'word-slot';
+    s.innerText = '_____';
+    slotsDiv.appendChild(s);
+});
+
+// --- OYUN NESNELERİ ---
+const player = { x: canvas.width/2, y: canvas.height - 100, w: 40, h: 40 };
+
+function createParticle(x, y, color) {
+    for(let i=0; i<10; i++) {
+        particles.push({x, y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1, color});
+    }
+}
+
+function spawnEnemy() {
+    const isTarget = Math.random() > 0.6;
+    const word = isTarget ? sentence[currentStep] : distractors[Math.floor(Math.random()*distractors.length)];
+    enemies.push({
+        x: Math.random() * (canvas.width-100) + 50,
+        y: -50,
+        word: word,
+        isTarget: word === sentence[currentStep],
+        speed: 2 + (score/1000)
+    });
+}
+
+// --- ANA DÖNGÜ ---
+function loop() {
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Arka Plan Yıldızlar
+    ctx.fillStyle = 'white';
+    stars.forEach(s => {
+        s.y += s.s;
+        if(s.y > canvas.height) s.y = 0;
+        ctx.fillRect(s.x, s.y, 1, 1);
+    });
+
+    // Oyuncu (Uzay Gemisi)
+    ctx.fillStyle = '#00f2ff';
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y + player.h);
+    ctx.lineTo(player.x + player.w/2, player.y);
+    ctx.lineTo(player.x + player.w, player.y + player.h);
+    ctx.fill();
+
+    // Mermiler
+    bullets.forEach((b, i) => {
+        b.y -= 10;
+        ctx.fillStyle = '#ff0055';
+        ctx.fillRect(b.x - 2, b.y, 4, 15);
+        if(b.y < 0) bullets.splice(i, 1);
+    });
+
+    // Düşmanlar (Balon/Kelimeler)
+    enemies.forEach((en, i) => {
+        en.y += en.speed;
+        ctx.strokeStyle = '#00f2ff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(en.x - 40, en.y - 20, 80, 40);
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.fillText(en.word, en.x, en.y + 7);
+
+        // Vurulma Kontrolü
+        bullets.forEach((b, bi) => {
+            if(b.x > en.x-40 && b.x < en.x+40 && b.y > en.y-20 && b.y < en.y+20) {
+                createParticle(en.x, en.y, '#00f2ff');
+                playSound(400, 'square', 0.1);
+                if(en.word === sentence[currentStep]) {
+                    fallingWords.push({x: en.x, y: en.y, text: en.word});
+                }
+                enemies.splice(i, 1);
+                bullets.splice(bi, 1);
+            }
+        });
+    });
+
+    // Düşen Kelimeleri Toplama
+    fallingWords.forEach((fw, i) => {
+        fw.y += 3;
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText(fw.text, fw.x, fw.y);
+
+        if(Math.abs(fw.x - (player.x + 20)) < 40 && Math.abs(fw.y - player.y) < 40) {
+            playSound(800, 'sine', 0.2);
+            slotsDiv.children[currentStep].innerText = fw.text;
+            slotsDiv.children[currentStep].classList.add('found');
+            currentStep++;
+            score += 100;
+            document.getElementById('score').innerText = score;
+            fallingWords.splice(i, 1);
             
-            <div class="product-card group bg-zinc-950 p-4">
-                <div class="badge">%15 İNDİRİM</div>
-                <div class="h-64 overflow-hidden mb-6 bg-white relative">
-                    <div class="slider-container" id="tech-fleece-slider">
-                        <div class="slider-wrapper">
-                            <div class="slide">
-                                <img src="https://i.pinimg.com/originals/31/28/59/312859505383884557.jpg" alt="Nike Tech Fleece Siyah">
-                            </div>
-                            <div class="slide">
-                                <img src="https://i.pinimg.com/originals/80/22/10/8022105581583917d0c83a54a7c0f16f.jpg" alt="Nike Tech Fleece Gri">
-                            </div>
-                        </div>
-                        <button class="slider-btn prev" onclick="moveSlide(-1, 'tech-fleece-slider')">&#10094;</button>
-                        <button class="slider-btn next" onclick="moveSlide(1, 'tech-fleece-slider')">&#10095;</button>
-                    </div>
-                </div>
-                <h3 class="font-black text-[11px] mb-2 tracking-tight h-8 uppercase">NIKE TECH FLEECE - SEZON RENKLERİ</h3>
-                <div class="flex items-baseline gap-2 mb-4">
-                    <span class="text-red-600 font-black text-lg">2.850 TL</span>
-                    <span class="text-zinc-600 text-[10px] line-through">3.200 TL</span>
-                </div>
-                <button class="w-full bg-white text-black py-3 text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition">SEPETE EKLE</button>
-            </div>
-
-            <div class="product-card group bg-zinc-950 p-4">
-                <div class="badge">POPÜLER</div>
-                <div class="h-64 overflow-hidden mb-6 bg-white flex items-center justify-center">
-                    <img src="https://images.stockx.com/images/Trapstar-Irongate-Detachable-Hood-Puffer-Jacket-Black.jpg" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition duration-500">
-                </div>
-                <h3 class="font-black text-[11px] mb-2 tracking-tight h-8 uppercase">TRAPSTAR IRONGATE PUFFER - SHINY BLACK</h3>
-                <div class="flex items-baseline gap-2 mb-4">
-                    <span class="text-red-600 font-black text-lg">4.500 TL</span>
-                    <span class="text-zinc-600 text-[10px] line-through">5.500 TL</span>
-                </div>
-                <button class="w-full bg-white text-black py-3 text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition">SEPETE EKLE</button>
-            </div>
-            
-            </div>
-    </main>
-
-    <footer class="bg-zinc-950 border-t border-zinc-900 py-20 px-6 mt-20">
-        <div class="max-w-[1600px] mx-auto text-center">
-            <div class="oswald text-4xl font-black italic mb-6">DRIP<span class="text-red-600">CAWS</span></div>
-            <p class="text-zinc-600 text-[10px] font-black">© 2026 DRIP CAWS OFFICIAL. ALL RIGHTS RESERVED.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Sayfa Değiştirme Fonksiyonu (Temel)
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Bu örnekte sadece Shop sayfası aktif. Diğer sayfalar için içerik eklenmeli.
-            if(id === 'shop' || id === 'home') {
-                document.getElementById('shop').classList.add('active');
+            if(currentStep >= sentence.length) {
+                alert("MISSION COMPLETE! 9th Grade English Mastered!");
+                location.reload();
+            } else {
+                document.getElementById('target-hint').innerText = sentence[currentStep];
             }
-            window.scrollTo(0, 0);
         }
+    });
 
-        // Slider Fonksiyonu
-        let slideIndices = {}; // Her slider için ayrı bir index tutar
+    // Parçacıklar
+    particles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+        ctx.fillStyle = `rgba(0, 242, 255, ${p.life})`;
+        ctx.fillRect(p.x, p.y, 3, 3);
+        if(p.life <= 0) particles.splice(i, 1);
+    });
 
-        function moveSlide(n, sliderId) {
-            if (!slideIndices[sliderId]) {
-                slideIndices[sliderId] = 0; // Eğer bu slider için index yoksa, 0'dan başla
-            }
+    requestAnimationFrame(loop);
+}
 
-            const slider = document.getElementById(sliderId);
-            const wrapper = slider.querySelector('.slider-wrapper');
-            const totalSlides = slider.querySelectorAll('.slide').length;
+// Kontroller
+window.onmousemove = (e) => player.x = e.clientX - 20;
+window.onclick = () => {
+    bullets.push({x: player.x + 20, y: player.y});
+    playSound(150, 'sawtooth', 0.05);
+};
 
-            slideIndices[sliderId] += n;
-
-            // Döngüsel slider (sona gelince başa dön)
-            if (slideIndices[sliderId] >= totalSlides) {
-                slideIndices[sliderId] = 0;
-            } else if (slideIndices[sliderId] < 0) {
-                slideIndices[sliderId] = totalSlides - 1;
-            }
-
-            // Wrapper'ı kaydır
-            const percentage = -slideIndices[sliderId] * 100; // Genişlik 200% olduğu için 100% kaydır
-            wrapper.style.transform = `translateX(${percentage/totalSlides}%)`; // Toplam genişliğe göre oranla
-        }
-    </script>
+setInterval(spawnEnemy, 1200);
+loop();
+</script>
 </body>
 </html>
