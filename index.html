@@ -2,29 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lexicon Hero - Pixel Adventure</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Hollow Lexicon - Alpha Build</title>
     <style>
-        body { margin: 0; background: #121212; overflow: hidden; font-family: 'Press Start 2P', cursive; }
-        #game-ui { position: absolute; top: 20px; left: 20px; color: white; z-index: 10; }
-        .mission-box {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0, 0, 0, 0.7); padding: 15px;
-            border: 3px solid #00f2ff; color: #00f2ff; font-size: 10px;
+        body { margin: 0; background: #08080a; overflow: hidden; font-family: 'Courier New', monospace; }
+        canvas { display: block; }
+        #ui {
+            position: absolute; top: 20px; left: 20px; color: #fff;
+            text-shadow: 0 0 5px #00f2ff; pointer-events: none;
         }
-        canvas { display: block; box-shadow: inset 0 0 100px #000; }
     </style>
 </head>
 <body>
 
-<div id="game-ui">
-    <div>POINTS: <span id="score">0</span></div>
-    <div id="lives-display" style="color: #ff0055; margin-top: 10px;">LIVES: ♥♥♥</div>
-</div>
-
-<div class="mission-box">
-    MISSION: COLLECT WORDS
-    <div id="target" style="color: #fff; margin-top: 10px; font-size: 14px;">NEXT: "UNIQUE"</div>
+<div id="ui">
+    <div>FOCUS: <span id="word-target" style="color:#ff0055">NONE</span></div>
+    <div style="font-size: 10px; margin-top:5px;">Controls: A-D (Move), W (Jump - Hold for higher), SHIFT (Dash)</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
@@ -35,180 +27,178 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const GRAVITY = 0.6;
-const JUMP = -14;
-const SPEED = 6;
+// --- HOLLOW KNIGHT FİZİK AYARLARI ---
+const CONFIG = {
+    gravity: 0.8,
+    accel: 1.5,          // Hızlanma (Akıcılık için)
+    friction: 0.85,      // Sürtünme (Yağ gibi kayma hissi)
+    maxSpeed: 8,
+    jumpForce: -16,
+    minJumpForce: -6,    // Kısa basınca zıplama yüksekliği
+    dashSpeed: 20,
+    dashDuration: 10     // Kaç frame dash yapacak
+};
 
-let score = 0;
-let lives = 3;
 let frameCount = 0;
-const mission = ["UNIQUE", "DESTINATION", "SCHOLARSHIP", "ABROAD", "COLLEAGUE"];
-let currentIdx = 0;
-
 const keys = {};
 window.onkeydown = e => keys[e.code] = true;
 window.onkeyup = e => keys[e.code] = false;
 
+// --- NESNELER ---
 const player = {
-    x: 100, y: 500, w: 30, h: 50,
-    vx: 0, vy: 0, grounded: false,
-    facing: 1 // 1 for right, -1 for left
+    x: 100, y: 300, w: 25, h: 45,
+    vx: 0, vy: 0,
+    grounded: false,
+    facing: 1,
+    isDashing: false,
+    dashTimer: 0,
+    canDash: true
 };
 
 const platforms = [
-    {x: 0, y: canvas.height - 50, w: canvas.width, h: 50}, // Ground
-    {x: 200, y: canvas.height - 200, w: 150, h: 20},
-    {x: 450, y: canvas.height - 350, w: 200, h: 20},
-    {x: 100, y: canvas.height - 450, w: 150, h: 20},
-    {x: 750, y: canvas.height - 250, w: 150, h: 20},
-    {x: 1000, y: canvas.height - 400, w: 200, h: 20}
+    {x: 0, y: canvas.height - 30, w: canvas.width, h: 30}, // Ground
+    {x: 200, y: canvas.height - 150, w: 200, h: 15},
+    {x: 500, y: canvas.height - 280, w: 150, h: 15},
+    {x: 800, y: canvas.height - 200, w: 200, h: 15},
+    {x: 100, y: canvas.height - 350, w: 150, h: 15},
 ];
 
-const words = mission.map((text, i) => ({
-    text, x: 200 + Math.random()*(canvas.width-400), 
-    y: 100 + Math.random()*(canvas.height-400),
-    collected: false
-}));
+// --- FİZİK MOTORU (AKICI HAREKET) ---
+function update() {
+    frameCount++;
 
-// --- KARAKTER ÇİZİM FONKSİYONU (İNSAN FİGÜRÜ) ---
-function drawHuman(x, y, facing, isMoving, isJumping) {
+    // 1. Dash Mantığı
+    if (keys['ShiftLeft'] && player.canDash && !player.isDashing) {
+        player.isDashing = true;
+        player.canDash = false;
+        player.dashTimer = CONFIG.dashDuration;
+        player.vy = 0; // Dash sırasında yerçekimini kapa
+    }
+
+    if (player.isDashing) {
+        player.vx = CONFIG.dashSpeed * player.facing;
+        player.dashTimer--;
+        if (player.dashTimer <= 0) {
+            player.isDashing = false;
+            player.vx = CONFIG.maxSpeed * player.facing * 0.5; // Dash bitişi yavaşla
+        }
+    } else {
+        // 2. Yatay Hareket (Akıcı Hızlanma/Yavaşlama)
+        if (keys['KeyD']) {
+            player.vx += CONFIG.accel;
+            player.facing = 1;
+        } else if (keys['KeyA']) {
+            player.vx -= CONFIG.accel;
+            player.facing = -1;
+        }
+
+        player.vx *= CONFIG.friction; // Sürtünme uygula
+
+        // Maksimum hız sınırı
+        if (Math.abs(player.vx) > CONFIG.maxSpeed) {
+            player.vx = CONFIG.maxSpeed * Math.sign(player.vx);
+        }
+
+        // 3. Zıplama Mantığı (Hassas Kontrol)
+        if ((keys['KeyW'] || keys['Space']) && player.grounded) {
+            player.vy = CONFIG.jumpForce;
+            player.grounded = false;
+        }
+        
+        // Hollow Knight Hissi: Tuşu bırakınca zıplamayı kes
+        if (!(keys['KeyW'] || keys['Space']) && player.vy < CONFIG.minJumpForce) {
+            player.vy = CONFIG.minJumpForce;
+        }
+
+        // Yerçekimi
+        player.vy += CONFIG.gravity;
+    }
+
+    // Pozisyonu güncelle
+    player.x += player.vx;
+    player.y += player.vy;
+
+    // 4. Çarpışma Kontrolü (Pürüzsüz)
+    player.grounded = false;
+    platforms.forEach(p => {
+        // Yatay Çarpışma (Duvarlar)
+        if (player.x < p.x + p.w && player.x + player.w > p.x &&
+            player.y + player.h > p.y && player.y < p.y + p.h) {
+            
+            // Üstten çarpma (Yere inme)
+            if (player.vy > 0 && player.y + player.h - player.vy <= p.y) {
+                player.y = p.y - player.h;
+                player.vy = 0;
+                player.grounded = true;
+                player.canDash = true; // Yere değince dash yenile
+            } 
+            // Alttan çarpma (Kafayı vurma)
+            else if (player.vy < 0 && player.y - player.vy >= p.y + p.h) {
+                player.y = p.y + p.h;
+                player.vy = 0;
+            }
+        }
+    });
+
+    // Ekran sınırları
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+    if (player.y > canvas.height) { player.x = 100; player.y = 100; player.vy = 0; }
+}
+
+// --- ÇİZİM VE ATMOSFER ---
+function draw() {
+    // Arka plan (Gradient - Derinlik hissi)
+    let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grd.addColorStop(0, "#0a0a12");
+    grd.addColorStop(1, "#020205");
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Platformlar (Neon-Gothic)
+    ctx.fillStyle = "#111";
+    platforms.forEach(p => {
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        
+        // Neon Çizgi
+        ctx.strokeStyle = "#ff0055";
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#ff0055";
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
+        ctx.shadowBlur = 0; // Reset blur
+    });
+
+    // Karakter (Pelerinli Silüet)
     ctx.save();
-    ctx.translate(x + 15, y + 25);
-    ctx.scale(facing, 1);
-
-    const anim = isMoving ? Math.sin(frameCount * 0.2) * 10 : 0;
+    ctx.translate(player.x + player.w/2, player.y + player.h/2);
+    ctx.scale(player.facing, 1);
     
-    // Kafa
-    ctx.fillStyle = "#FFDBAC"; // Ten rengi
-    ctx.fillRect(-10, -25, 20, 20);
-    
-    // Saç/Şapka
-    ctx.fillStyle = "#331E12";
-    ctx.fillRect(-10, -25, 20, 5);
+    // Pelerin (Hareketli)
+    const capeAnim = Math.sin(frameCount * 0.15) * 3;
+    ctx.fillStyle = player.isDashing ? "#fff" : "#ff0055";
+    ctx.beginPath();
+    ctx.moveTo(-10, -20);
+    ctx.lineTo(10, -20);
+    ctx.lineTo(15 + capeAnim, 20); // Pelerin ucu dalgalanıyor
+    ctx.lineTo(-15 - capeAnim, 20);
+    ctx.fill();
 
-    // Gövde (T-Shirt)
-    ctx.fillStyle = "#00f2ff";
-    ctx.fillRect(-12, -5, 24, 20);
-
-    // Bacaklar
-    ctx.fillStyle = "#333";
-    if (isJumping) {
-        ctx.fillRect(-10, 15, 8, 10); // Sol bacak kırık
-        ctx.fillRect(2, 10, 8, 10);   // Sağ bacak yukarıda
-    } else {
-        ctx.fillRect(-10, 15, 8, 10 + anim); // Sol bacak
-        ctx.fillRect(2, 15, 8, 10 - anim);  // Sağ bacak
-    }
-
-    // Kollar
-    ctx.fillStyle = "#FFDBAC";
-    if (isMoving) {
-        ctx.fillRect(8, -5, 6, 12 + anim);
-    } else {
-        ctx.fillRect(8, -5, 6, 15);
-    }
+    // Kafa/Vücut Silüeti
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(-8, -25, 16, 16); // Kafa
+    ctx.fillRect(-5, -9, 10, 20); // Gövde
 
     ctx.restore();
 }
 
-function update() {
-    frameCount++;
-    if (keys['ArrowRight'] || keys['KeyD']) {
-        player.vx = SPEED;
-        player.facing = 1;
-    } else if (keys['ArrowLeft'] || keys['KeyA']) {
-        player.vx = -SPEED;
-        player.facing = -1;
-    } else {
-        player.vx *= 0.8;
-    }
-
-    if ((keys['Space'] || keys['KeyW'] || keys['ArrowUp']) && player.grounded) {
-        player.vy = JUMP;
-        player.grounded = false;
-    }
-
-    player.vy += GRAVITY;
-    player.x += player.vx;
-    player.y += player.vy;
-
-    player.grounded = false;
-    platforms.forEach(p => {
-        if (player.x < p.x + p.w && player.x + player.w > p.x &&
-            player.y < p.y + p.h && player.y + player.h > p.y) {
-            if (player.vy > 0) {
-                player.y = p.y - player.h;
-                player.vy = 0;
-                player.grounded = true;
-            }
-        }
-    });
-
-    words.forEach(w => {
-        if (!w.collected && Math.abs(player.x - w.x) < 50 && Math.abs(player.y - w.y) < 50) {
-            if (w.text === mission[currentIdx]) {
-                w.collected = true;
-                currentIdx++;
-                score += 500;
-                if(currentIdx < mission.length) {
-                    document.getElementById('target').innerText = `NEXT: "${mission[currentIdx]}"`;
-                } else {
-                    alert("VICTORY! All words collected!");
-                    location.reload();
-                }
-            } else {
-                lives--;
-                player.x = 100; player.y = 100;
-                document.getElementById('lives-display').innerText = "LIVES: " + "♥".repeat(lives);
-                if(lives <= 0) { alert("GAME OVER!"); location.reload(); }
-            }
-        }
-    });
-
-    if (player.y > canvas.height) { player.x = 100; player.y = 0; lives--; }
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
-function draw() {
-    ctx.fillStyle = "#1a1a2e";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Platformlar
-    ctx.fillStyle = "#16213e";
-    platforms.forEach(p => {
-        ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.strokeStyle = "#4cc9f0";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(p.x, p.y, p.w, p.h);
-    });
-
-    // Kelimeler
-    words.forEach(w => {
-        if (!w.collected) {
-            ctx.fillStyle = (w.text === mission[currentIdx]) ? "#fff" : "#444";
-            ctx.font = "12px 'Press Start 2P'";
-            ctx.textAlign = "center";
-            ctx.fillText(w.text, w.x, w.y);
-            if (w.text === mission[currentIdx]) {
-                ctx.strokeStyle = "rgba(255,255,255,0.2)";
-                ctx.beginPath();
-                ctx.arc(w.x, w.y-5, 40, 0, Math.PI*2);
-                ctx.stroke();
-            }
-        }
-    });
-
-    // Karakter (İnsan)
-    const isMoving = Math.abs(player.vx) > 0.5;
-    drawHuman(player.x, player.y, player.facing, isMoving, !player.grounded);
-
-    document.getElementById('score').innerText = score;
-    requestAnimationFrame(draw);
-}
-
-gameLoop = () => { update(); draw(); requestAnimationFrame(gameLoop); };
-draw(); // Start loop
-update();
-requestAnimationFrame(gameLoop);
+gameLoop();
 </script>
 </body>
 </html>
