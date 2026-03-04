@@ -2,244 +2,378 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Hollow Lexicon: Absolute Academy</title>
+    <title>Hollow Lexicon: The Eternal Void</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --warn: #ff0055; --bg: #05070a; }
-        body { margin: 0; background: var(--bg); overflow: hidden; font-family: 'Orbitron', sans-serif; }
-        canvas { display: block; image-rendering: pixelated; }
-
-        /* Modern HUD */
-        #hud {
-            position: absolute; top: 25px; left: 25px; pointer-events: none;
-            background: rgba(10, 15, 25, 0.9); padding: 25px;
-            border-left: 6px solid var(--neon); border-radius: 0 15px 15px 0;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5); border-right: 1px solid rgba(255,255,255,0.1);
+        body { margin: 0; background: #020205; overflow: hidden; font-family: 'Orbitron', sans-serif; }
+        canvas { display: block; filter: contrast(110%) brightness(90%); }
+        
+        /* UI Layers */
+        #ui-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 100;
         }
-        .hp-container { color: var(--warn); font-size: 32px; filter: drop-shadow(0 0 8px var(--warn)); }
-        .word-box { font-family: 'Cinzel'; font-size: 38px; color: white; text-shadow: 0 0 15px var(--neon); margin-bottom: 5px; }
-        .area-tag { color: var(--neon); font-size: 11px; letter-spacing: 3px; font-weight: bold; opacity: 0.8; }
+        #main-menu {
+            position: absolute; inset: 0; background: radial-gradient(circle, #101025 0%, #020205 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
+        }
+        .menu-title { font-family: 'Cinzel'; font-size: 80px; color: #fff; text-shadow: 0 0 30px #00f2ff; margin-bottom: 20px; }
+        .btn {
+            padding: 15px 60px; margin: 15px; border: 2px solid #00f2ff; color: #fff;
+            background: rgba(0, 242, 255, 0.05); cursor: pointer; font-size: 20px;
+            transition: all 0.3s; letter-spacing: 3px; position: relative; overflow: hidden;
+        }
+        .btn:hover { background: #00f2ff; color: #000; box-shadow: 0 0 50px #00f2ff; transform: scale(1.1); }
+        
+        #hud { position: absolute; top: 30px; left: 30px; display: none; }
+        .sentence-display { font-family: 'Cinzel'; font-size: 35px; color: #fff; text-shadow: 0 0 15px #00f2ff; }
+        .hp-bar { font-size: 30px; color: #ff0055; margin-top: 10px; }
+
+        #settings-panel {
+            display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.9);
+            flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
+        }
     </style>
 </head>
 <body>
 
-<div id="hud">
-    <div id="word-display" class="word-box">_ _ _ _ _</div>
-    <div id="hp-display" class="hp-container">♥♥♥</div>
-    <div id="area-display" class="area-tag">AREA: THE SCHOOL PLAYGROUND</div>
+<div id="ui-wrapper">
+    <div id="main-menu">
+        <div class="menu-title">HOLLOW LEXICON</div>
+        <button class="btn" onclick="initGame()">ASCEND</button>
+        <button class="btn" onclick="toggleSettings(true)">SETTINGS</button>
+    </div>
+
+    <div id="settings-panel">
+        <h2 style="color:#00f2ff; font-family:'Cinzel'; font-size: 40px;">VOID CONFIG</h2>
+        <div style="margin: 20px; text-align: center;">
+            <p>SOUND VOLUME</p>
+            <input type="range" id="vol" min="0" max="100" value="80" style="width:300px; accent-color:#00f2ff;">
+        </div>
+        <button class="btn" onclick="toggleSettings(false)">RETURN</button>
+    </div>
+
+    <div id="hud">
+        <div class="sentence-display" id="sentence-text">_ _ _ _ _</div>
+        <div class="hp-bar" id="hp-icons">♥♥♥</div>
+    </div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
 <script>
-/**
- * HOLLOW LEXICON - MASTER ENGINE
- * Her satırı senin görsellerine özel optimize edildi kanka.
- */
-
+/** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// --- GLOBAL STATE ---
 const GAME = {
-    level: 0, hp: 3, frame: 0, active: true,
-    words: ["I", "WANT", "TO", "LEARN", "ENGLISH"],
-    areas: ["OKUL BAHÇESİ", "YERALTI TÜNELİ", "KÜTÜPHANE", "SPOR SALONU", "GRAND FINALE"],
-    shake: 0
+    active: false,
+    frame: 0,
+    currentLevel: 0,
+    sentence: ["I", "WANT", "TO", "LEARN", "ENGLISH"],
+    hp: 3,
+    shake: 0,
+    volume: 0.8
 };
 
 const keys = {};
 window.onkeydown = e => keys[e.code] = true;
 window.onkeyup = e => keys[e.code] = false;
 
-// --- GÖRSELDEKİ KARAKTERİN ANALİZİNE GÖRE OLUŞTURULAN SINIF ---
+// --- CLASSES ---
+class Particle {
+    constructor(x, y, color, vx, vy, life) {
+        this.x = x; this.y = y; this.color = color;
+        this.vx = vx; this.vy = vy; this.life = life; this.maxLife = life;
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy; this.life--;
+    }
+    draw(cx) {
+        ctx.globalAlpha = this.life / this.maxLife;
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x - cx, this.y, 3, 3);
+        ctx.globalAlpha = 1;
+    }
+}
+
 class Player {
     constructor() {
-        this.x = 200; this.y = 400;
-        this.vx = 0; this.vy = 0;
-        this.w = 50; this.h = 85;
-        this.facing = 1;
-        this.grounded = false;
-        this.isAttacking = false;
-        this.moveSpeed = 0.6; // Hız düşürüldü, daha kontrollü
-        this.maxSpeed = 8;
-        this.friction = 0.88; // Kayma engellendi
+        this.reset();
+        this.w = 30; this.h = 55;
+        this.trail = [];
     }
-
-    update() {
-        // Hareket Mantığı
-        if (keys['KeyD'] || keys['ArrowRight']) { this.vx += this.moveSpeed; this.facing = 1; }
-        else if (keys['KeyA'] || keys['ArrowLeft']) { this.vx -= this.moveSpeed; this.facing = -1; }
-        else { this.vx *= this.friction; }
-
-        // Hız Sınırı
-        if (Math.abs(this.vx) > this.maxSpeed) this.vx = this.maxSpeed * Math.sign(this.vx);
-
-        // Zıplama
-        if ((keys['Space'] || keys['KeyW']) && this.grounded) {
-            this.vy = -18;
-            this.grounded = false;
+    reset() {
+        this.x = 150; this.y = 400; this.vx = 0; this.vy = 0;
+        this.facing = 1; this.grounded = false;
+        this.isDashing = false; this.dashCooldown = 0;
+        this.dashTime = 0;
+    }
+    update(lvl) {
+        // Dash Logic
+        if (keys['ShiftLeft'] && this.dashCooldown <= 0) {
+            this.isDashing = true; this.dashCooldown = 60; this.dashTime = 12;
+            GAME.shake = 10;
         }
 
-        // Saldırı (Kitap Savurma)
-        if (keys['KeyE'] && !this.isAttacking) {
-            this.isAttacking = true;
-            GAME.shake = 12;
-            setTimeout(() => this.isAttacking = false, 300);
+        if (this.isDashing) {
+            this.vx = 22 * this.facing;
+            this.vy = 0;
+            this.dashTime--;
+            if (this.dashTime <= 0) this.isDashing = false;
+            // Ghost trail
+            if (GAME.frame % 2 === 0) this.trail.push({x: this.x, y: this.y, life: 20});
+        } else {
+            // Movement
+            if (keys['KeyD'] || keys['ArrowRight']) { this.vx += 1.2; this.facing = 1; }
+            else if (keys['KeyA'] || keys['ArrowLeft']) { this.vx -= 1.2; this.facing = -1; }
+            else this.vx *= 0.82;
+
+            if (Math.abs(this.vx) > 8) this.vx = 8 * Math.sign(this.vx);
+            
+            if ((keys['Space'] || keys['KeyW']) && this.grounded) {
+                this.vy = -17; this.grounded = false;
+                spawnParticles(this.x + 15, this.y + 55, "#fff", 10);
+            }
+            this.vy += 0.85; // Gravity
         }
 
-        // Fizik
-        this.vy += 0.8; // Yerçekimi
+        if (this.dashCooldown > 0) this.dashCooldown--;
+
         this.x += this.vx; this.y += this.vy;
 
-        // Platform Çarpışması
+        // Platform Collisions
         this.grounded = false;
-        const currentMap = levels[GAME.level].platforms;
-        currentMap.forEach(p => {
-            if (this.x < p.x + p.w && this.x + this.w > p.x && 
-                this.y + this.h > p.y && this.y + this.h < p.y + 30 && this.vy >= 0) {
-                this.y = p.y - this.h;
-                this.vy = 0;
-                this.grounded = true;
+        lvl.platforms.forEach(p => {
+            if (this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y + this.h < p.y + 25 && this.vy >= 0) {
+                this.y = p.y - this.h; this.vy = 0; this.grounded = true;
             }
         });
 
-        if (this.y > canvas.height + 100) this.die();
+        // Spike Collisions
+        lvl.spikes.forEach(s => {
+            if (this.x + 5 < s.x + s.w && this.x + this.w - 5 > s.x && this.y + 5 < s.y + s.h && this.y + this.h > s.y) {
+                takeDamage();
+            }
+        });
+
+        // Trail Update
+        this.trail.forEach((t, i) => { t.life--; if(t.life <= 0) this.trail.splice(i, 1); });
+        
+        // Particles on move
+        if(this.grounded && Math.abs(this.vx) > 2 && GAME.frame % 5 === 0) {
+            spawnParticles(this.x + 15, this.y + 55, "rgba(255,255,255,0.3)", 1);
+        }
     }
 
-    die() {
-        GAME.hp--; GAME.shake = 25;
-        this.x = 200; this.y = 400; this.vx = 0;
-        if (GAME.hp <= 0) { alert("FAILED THE CLASS!"); location.reload(); }
-        updateHUD();
-    }
+    draw(cx) {
+        // Trail
+        this.trail.forEach(t => {
+            ctx.globalAlpha = t.life / 20 * 0.4;
+            ctx.fillStyle = "#00f2ff";
+            ctx.fillRect(t.x - cx, t.y, this.w, this.h);
+        });
+        ctx.globalAlpha = 1;
 
-    draw() {
         ctx.save();
-        ctx.translate(this.x - cam.x + (this.facing === -1 ? this.w : 0), this.y - cam.y);
+        ctx.translate(this.x - cx + 15, this.y + 25);
         ctx.scale(this.facing, 1);
 
-        // Animasyon Değişkenleri
-        let walkCycle = Math.sin(GAME.frame * 0.15) * 4;
-        let idleCycle = Math.sin(GAME.frame * 0.05) * 2;
+        // Cape
+        ctx.fillStyle = "#450a1d";
+        const capeWave = Math.sin(GAME.frame * 0.2) * 3;
+        ctx.beginPath();
+        ctx.moveTo(-5, -5); ctx.quadraticCurveTo(-25 - (this.isDashing?20:0), 10, -10, 35 + capeWave);
+        ctx.lineTo(10, 35 + capeWave); ctx.lineTo(5, -5); ctx.fill();
 
-        // --- GÖRSELDEKİ SPRITE TASARIMI ---
-        // Ayaklar (Bej)
-        ctx.fillStyle = "#8d7a5d";
-        ctx.fillRect(8, 65 + walkCycle, 12, 20);
-        ctx.fillRect(28, 65 - walkCycle, 12, 20);
+        // Body
+        ctx.fillStyle = "#05050a";
+        ctx.beginPath(); ctx.roundRect(-14, -15, 28, 40, 10); ctx.fill();
 
-        // Gövde (Yeşil Ceket)
-        ctx.fillStyle = "#2d4c2d";
-        ctx.fillRect(5, 30 + idleCycle, 40, 40);
-        
-        // Kafa (Karakterinin saçı ve gözlüğü)
-        ctx.fillStyle = "#ffe0b2"; // Ten
-        ctx.fillRect(10, 0 + idleCycle, 30, 30);
-        ctx.fillStyle = "#8d4a3e"; // Saç
-        ctx.fillRect(8, -8 + idleCycle, 34, 15);
-        ctx.fillRect(35, 5 + idleCycle, 8, 15);
-        
-        // Gözlükler
-        ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5;
-        ctx.strokeRect(15, 10 + idleCycle, 8, 7);
-        ctx.strokeRect(27, 10 + idleCycle, 8, 7);
-
-        // KİTAP (English Book)
-        ctx.fillStyle = this.isAttacking ? "#ff0055" : "#1b5e20";
-        let attackExtra = this.isAttacking ? 15 * this.facing : 0;
-        ctx.fillRect(32 + attackExtra, 35 + idleCycle, 20, 28);
-        ctx.fillStyle = "#fff"; ctx.fillRect(48 + attackExtra, 35 + idleCycle, 4, 28);
+        // Mask
+        ctx.fillStyle = "#f0f0f0";
+        ctx.beginPath(); ctx.arc(0, -28, 18, 0, Math.PI*2); ctx.fill();
+        // Horns
+        ctx.beginPath(); ctx.moveTo(-12, -35); ctx.lineTo(-20, -55); ctx.lineTo(-4, -40); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(12, -35); ctx.lineTo(20, -55); ctx.lineTo(4, -40); ctx.fill();
+        // Eyes
+        ctx.fillStyle = "#000";
+        ctx.beginPath(); ctx.ellipse(-7, -28, 4, 7, 0, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(7, -28, 4, 7, 0, 0, Math.PI*2); ctx.fill();
 
         ctx.restore();
     }
 }
 
-// --- LEVEL DESIGN (GÖRSELDEKİ OKUL BAHÇESİ VE DİĞERLERİ) ---
+// --- LEVEL DESIGN (MAP) ---
 const levels = [
-    {   // Level 1: Bahçe (Playground)
+    {
         platforms: [
-            {x: 0, y: 700, w: 1200, h: 400, c: "#4d7c0f"}, // Ana Zemin
-            {x: 500, y: 550, w: 300, h: 30, c: "#b45309"}, // Kaydırak Üstü
-            {x: 1300, y: 850, w: 1000, h: 300, c: "#1e293b"} // Yeraltı Tünel Girişi
+            {x: 0, y: 650, w: 1200, h: 200}, {x: 1400, y: 500, w: 400, h: 30},
+            {x: 1900, y: 400, w: 300, h: 30}, {x: 2300, y: 600, w: 1000, h: 200},
+            {x: 3500, y: 450, w: 500, h: 30}, {x: 4200, y: 600, w: 1000, h: 200}
         ],
-        bg: "#bae6fd", goal: {x: 2100, y: 750}
+        spikes: [
+            {x: 1200, y: 700, w: 200, h: 50}, {x: 3300, y: 700, w: 200, h: 50},
+            {x: 2400, y: 580, w: 300, h: 20}
+        ],
+        enemies: [
+            {x: 1450, y: 460, range: 300, speed: 3},
+            {x: 2500, y: 560, range: 600, speed: 5}
+        ],
+        goal: {x: 4800, y: 550, text: "I"}
     },
-    {   // Level 2: Yeraltı (Underground)
+    { // Level 2: WANT
         platforms: [
-            {x: 0, y: 850, w: 2000, h: 200, c: "#0f172a"},
-            {x: 400, y: 650, w: 200, h: 30, c: "#334155"},
-            {x: 800, y: 450, w: 200, h: 30, c: "#334155"}
+            {x:0, y:600, w:500, h:50}, {x:600, y:400, w:150, h:20}, {x:850, y:250, w:150, h:20},
+            {x:1100, y:400, w:150, h:20}, {x:1400, y:600, w:1000, h:100}, {x:2500, y:400, w:300, h:20}
         ],
-        bg: "#020617", goal: {x: 1800, y: 750}
+        spikes: [{x:500, y:680, w:900, h:50}, {x:1800, y:580, w:400, h:20}],
+        enemies: [{x:1500, y:560, range: 700, speed: 7}],
+        goal: {x:2650, y:350, text: "WANT"}
     }
 ];
 
 const player = new Player();
-const cam = { x: 0, y: 0 };
+const particles = [];
+const cam = { x: 0, targetX: 0 };
 
-function updateHUD() {
-    document.getElementById('word-display').innerText = GAME.words.map((w, i) => i < GAME.level ? w : "_").join("  ");
-    document.getElementById('hp-display').innerText = "♥".repeat(GAME.hp);
-    document.getElementById('area-display').innerText = "AREA: " + GAME.areas[GAME.level];
+// --- CORE ENGINE ---
+function spawnParticles(x, y, color, count) {
+    for(let i=0; i<count; i++) {
+        particles.push(new Particle(x, y, color, (Math.random()-0.5)*10, (Math.random()-0.5)*10, 20 + Math.random()*20));
+    }
 }
 
-function render() {
+function takeDamage() {
+    GAME.hp--;
+    GAME.shake = 25;
+    spawnParticles(player.x+15, player.y+25, "#ff0055", 20);
+    if(GAME.hp <= 0) { alert("VOID CONSUMED YOU"); location.reload(); }
+    player.reset();
+    updateHUD();
+}
+
+function nextLevel() {
+    GAME.currentLevel++;
+    if(GAME.currentLevel >= levels.length) { alert("SENTENCE COMPLETE: I WANT TO LEARN ENGLISH"); location.reload(); }
+    player.reset();
+    cam.x = 0;
+    updateHUD();
+}
+
+function updateHUD() {
+    let t = GAME.sentence.map((w, i) => i < GAME.currentLevel ? w : "_").join("  ");
+    document.getElementById('sentence-text').innerText = t;
+    document.getElementById('hp-icons').innerText = "♥".repeat(GAME.hp);
+}
+
+function initGame() {
+    document.getElementById('main-menu').style.display = 'none';
+    document.getElementById('hud').style.display = 'block';
+    GAME.active = true;
+    updateHUD();
+    gameLoop();
+}
+
+function toggleSettings(show) {
+    document.getElementById('settings-panel').style.display = show ? 'flex' : 'none';
+}
+
+function gameLoop() {
+    if(!GAME.active) return;
     GAME.frame++;
-    if (GAME.shake > 0) GAME.shake *= 0.9;
+    if(GAME.shake > 0) GAME.shake *= 0.9;
 
-    // Arka Plan Katmanları (Parallax)
-    ctx.fillStyle = levels[GAME.level].bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    player.update(levels[GAME.currentLevel]);
 
-    // Güneş ve Bulutlar (Görselindeki gibi)
-    if (GAME.level === 0) {
-        ctx.fillStyle = "#fde047";
-        ctx.beginPath(); ctx.arc(canvas.width - 150, 100, 50, 0, Math.PI*2); ctx.fill();
+    // Camera follow
+    let tx = player.x - canvas.width / 2.5;
+    cam.x += (tx - cam.x) * 0.08;
+    if(cam.x < 0) cam.x = 0;
+
+    // Goal Check
+    let goal = levels[GAME.currentLevel].goal;
+    if(Math.hypot(player.x - goal.x, player.y - goal.y) < 80) nextLevel();
+
+    // Draw
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Screen Shake apply
+    ctx.save();
+    if(GAME.shake > 1) ctx.translate((Math.random()-0.5)*GAME.shake, (Math.random()-0.5)*GAME.shake);
+
+    // Parallax Background
+    ctx.fillStyle = "#050510";
+    for(let i=0; i<10; i++) {
+        ctx.fillRect((i*1200) - cam.x*0.2, 100, 600, 600);
+    }
+    ctx.fillStyle = "rgba(0, 242, 255, 0.02)";
+    for(let i=0; i<15; i++) {
+        ctx.beginPath();
+        ctx.arc((i*800) - cam.x*0.5, 300 + Math.sin(GAME.frame*0.01 + i)*50, 200, 0, Math.PI*2);
+        ctx.fill();
     }
 
     ctx.save();
-    // Ekran Sallanma Efekti
-    if (GAME.shake > 1) ctx.translate((Math.random()-0.5)*GAME.shake, (Math.random()-0.5)*GAME.shake);
+    ctx.translate(-cam.x, 0);
 
-    // Kamera Takibi
-    cam.x += (player.x - canvas.width/2.5 - cam.x) * 0.1;
-    cam.y += (player.y - canvas.height/1.5 - cam.y) * 0.05;
-
-    ctx.translate(-cam.x, -cam.y);
-
-    // Platformları Çiz
-    levels[GAME.level].platforms.forEach(p => {
-        ctx.fillStyle = p.c;
+    const lvl = levels[GAME.currentLevel];
+    
+    // Draw Platforms
+    ctx.shadowBlur = 20; ctx.shadowColor = "#00f2ff";
+    ctx.fillStyle = "#080812";
+    lvl.platforms.forEach(p => {
         ctx.fillRect(p.x, p.y, p.w, p.h);
-        // Üst Işık (Detay)
-        ctx.fillStyle = "rgba(255,255,255,0.15)";
-        ctx.fillRect(p.x, p.y, p.w, 8);
+        ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 2;
+        ctx.strokeRect(p.x, p.y, p.w, 2);
     });
 
-    // Hedef (Goal)
-    const goal = levels[GAME.level].goal;
-    ctx.fillStyle = "#fff"; ctx.font = "bold 50px Cinzel";
-    ctx.shadowBlur = 20; ctx.shadowColor = "#00f2ff";
-    ctx.fillText(GAME.words[GAME.level], goal.x, goal.y - 50);
-    ctx.shadowBlur = 0;
+    // Draw Spikes
+    ctx.shadowColor = "#ff0055"; ctx.fillStyle = "#ff0055";
+    lvl.spikes.forEach(s => {
+        for(let i=0; i<s.w; i+=25) {
+            ctx.beginPath(); ctx.moveTo(s.x+i, s.y+s.h); ctx.lineTo(s.x+i+12.5, s.y); ctx.lineTo(s.x+i+25, s.y+s.h); ctx.fill();
+        }
+    });
 
-    if (Math.hypot(player.x - goal.x, player.y - goal.y) < 100) {
-        GAME.level++;
-        if (GAME.level >= GAME.words.length) { alert("MEZUNİYET!"); location.reload(); }
-        player.x = 100; player.y = 400; updateHUD();
-    }
+    // Draw Enemies
+    ctx.shadowColor = "#ffcc00"; ctx.fillStyle = "#ffcc00";
+    lvl.enemies.forEach(e => {
+        if(!e.curX) e.curX = e.x;
+        e.curX += e.speed;
+        if(e.curX > e.x + e.range || e.curX < e.x) e.speed *= -1;
+        ctx.beginPath(); ctx.arc(e.curX, e.y, 20, 0, Math.PI*2); ctx.fill();
+        // Glow pulse
+        ctx.globalAlpha = 0.3 + Math.sin(GAME.frame*0.1)*0.2;
+        ctx.beginPath(); ctx.arc(e.curX, e.y, 35, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+        
+        if(Math.hypot(player.x+15 - e.curX, player.y+25 - e.y) < 40) takeDamage();
+    });
 
-    player.update();
-    player.draw();
+    // Draw Goal
+    ctx.shadowColor = "#fff"; ctx.fillStyle = "#fff";
+    ctx.font = "bold 40px Cinzel"; ctx.textAlign = "center";
+    ctx.fillText(lvl.goal.text, lvl.goal.x, lvl.goal.y + Math.sin(GAME.frame*0.05)*20);
+
+    // Draw Player
+    player.draw(0); // Player draws itself using its own X, but we translated the context
+    
+    // Particles
+    particles.forEach((p, i) => {
+        p.update(); p.draw(0);
+        if(p.life <= 0) particles.splice(i, 1);
+    });
 
     ctx.restore();
-    requestAnimationFrame(render);
+    ctx.restore();
+    
+    requestAnimationFrame(gameLoop);
 }
-
-updateHUD();
-render();
 </script>
 </body>
 </html>
