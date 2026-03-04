@@ -2,38 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>The Scholar's Journey - English Quest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Hollow Lexicon: The Grand Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #1a2a1a; overflow: hidden; font-family: 'Poppins', sans-serif; }
-        canvas { display: block; filter: saturate(1.2) contrast(1.1); }
-        
-        #ui { position: absolute; inset: 0; pointer-events: none; z-index: 100; padding: 25px; }
-        .sentence-display { text-align: center; font-family: 'Cinzel'; font-size: 32px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); background: rgba(0,0,0,0.3); padding: 10px; border-radius: 15px; width: fit-content; margin: 0 auto; }
-        .stats { display: flex; justify-content: space-between; margin-top: 15px; }
-        #hp-display { color: #ff3e3e; font-size: 28px; text-shadow: 0 0 10px #ff3e3e; }
+        body { margin: 0; background: #02040a; overflow: hidden; font-family: 'Orbitron', sans-serif; }
+        canvas { display: block; filter: contrast(110%) brightness(90%); }
 
-        #start-menu {
-            position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80');
-            background-size: cover; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* UI */
+        #ui-wrapper { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
+        #main-menu, #settings-screen {
+            position: absolute; inset: 0; background: radial-gradient(circle, #0f172a 0%, #02040a 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto;
         }
-        .btn { padding: 15px 50px; border: 3px solid #fff; background: none; color: white; cursor: pointer; font-size: 22px; font-family: 'Cinzel'; transition: 0.3s; }
-        .btn:hover { background: #fff; color: #1a2a1a; transform: scale(1.1); box-shadow: 0 0 30px #fff; }
+        .title { font-family: 'Cinzel'; font-size: clamp(40px, 8vw, 80px); color: #fff; text-shadow: 0 0 30px #00f2ff; margin: 0; }
+        .btn {
+            padding: 15px 50px; margin: 10px; border: 2px solid #00f2ff; color: #fff;
+            background: rgba(0, 242, 255, 0.05); cursor: pointer; font-size: 18px;
+            font-family: 'Orbitron'; transition: 0.3s; letter-spacing: 3px;
+        }
+        .btn:hover, .btn.active { background: #00f2ff; color: #000; box-shadow: 0 0 40px #00f2ff; transform: translateY(-3px); }
+
+        #hud { position: absolute; top: 20px; left: 20px; display: none; }
+        .sentence-box { background: rgba(0,0,0,0.8); padding: 20px; border-radius: 15px; border: 1px solid #00f2ff; }
+        .sentence-display { font-family: 'Cinzel'; font-size: 28px; color: #fff; text-shadow: 0 0 10px #00f2ff; }
+        .hp-bar { font-size: 24px; color: #ff0055; margin-top: 5px; }
+        .lvl-indicator { color: #00f2ff; font-size: 14px; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="start-menu">
-    <h1 style="color:white; font-family:'Cinzel'; font-size: 55px; margin-bottom: 20px;">SCHOLAR'S JOURNEY</h1>
-    <p style="color:#ddd; margin-bottom:30px;">Collect the words, finish the sentence.</p>
-    <button class="btn" onclick="startGame()">START ADVENTURE</button>
-</div>
+<div id="ui-wrapper">
+    <div id="main-menu">
+        <h1 class="title">HOLLOW LEXICON</h1>
+        <p style="color: #64748b; letter-spacing: 5px; margin-bottom: 30px;">ACADEMY OF VOID</p>
+        <button class="btn" onclick="initGame()">START ADVENTURE</button>
+        <button class="btn" onclick="toggleSettings(true)">SETTINGS</button>
+    </div>
 
-<div id="ui">
-    <div class="sentence-display" id="sentence-text">_ _ _ _ _</div>
-    <div class="stats">
-        <div id="hp-display">♥♥♥</div>
-        <div style="color:#6affbe; font-weight:bold;">SHIFT: KNOWLEDGE DASH</div>
+    <div id="settings-screen" style="display:none;">
+        <h2 style="color:#00f2ff; font-family:'Cinzel';">GAME CONFIG</h2>
+        <div style="margin: 20px; color: white;">
+            <p>DIFFICULTY</p>
+            <button id="btn-easy" class="btn" onclick="setDifficulty('easy')">EASY</button>
+            <button id="btn-hard" class="btn" onclick="setDifficulty('hardcore')">HARDCORE</button>
+        </div>
+        <button class="btn" style="border-color: #ff0055; color: #ff0055;" onclick="toggleSettings(false)">SAVE & BACK</button>
+    </div>
+
+    <div id="hud">
+        <div class="sentence-box">
+            <div id="sentence-text" class="sentence-display">_ _ _ _ _</div>
+            <div id="hp-icons" class="hp-bar">♥♥♥</div>
+            <div id="lvl-text" class="lvl-indicator">AREA: THE ENTRANCE</div>
+        </div>
     </div>
 </div>
 
@@ -45,198 +66,212 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// --- GAME DATA ---
 const GAME = {
-    active: false, frame: 0, level: 0, hp: 3, shake: 0,
-    words: ["I", "WANT", "TO", "LEARN", "ENGLISH"]
+    active: false, frame: 0, level: 0, hp: 3, shake: 0, difficulty: 'easy',
+    words: ["I", "WANT", "TO", "LEARN", "ENGLISH"],
+    areaNames: ["THE ENTRANCE", "THE LIBRARY", "CLOCK TOWER", "THE DUNGEON", "GRAND FINALE"],
+    config: {
+        easy: { grav: 0.75, jump: -18, speed: 8, hp: 5 },
+        hardcore: { grav: 1.0, jump: -16, speed: 6, hp: 1 }
+    }
 };
 
+// --- LEVEL DESIGNER (5 FARKLI MAP) ---
+const getLevels = () => [
+    { // Level 1: Koridor
+        platforms: [{x:0, y:650, w:1200, h:400, t:'m'}, {x:1300, y:500, w:400, h:40, t:'s'}, {x:1800, y:650, w:1000, h:400, t:'m'}],
+        enemies: [{x:1400, y:450, r:300, s:2}],
+        goal: {x:2400, y:600}
+    },
+    { // Level 2: Kütüphane (Dikey)
+        platforms: [{x:0, y:650, w:500, h:100, t:'m'}, {x:600, y:500, w:300, h:40, t:'s'}, {x:200, y:350, w:300, h:40, t:'s'}, {x:700, y:200, w:300, h:40, t:'s'}, {x:1100, y:350, w:500, h:40, t:'s'}],
+        enemies: [{x:650, y:450, r:200, s:4}, {x:250, y:300, r:200, s:3}],
+        goal: {x:1400, y:300}
+    },
+    { // Level 3: Saat Kulesi (Havada Süzülen)
+        platforms: [{x:0, y:600, w:200, h:40, t:'m'}, {x:300, y:500, w:150, h:40, t:'m'}, {x:600, y:400, w:150, h:40, t:'m'}, {x:900, y:300, w:150, h:40, t:'m'}, {x:1200, y:400, w:400, h:40, t:'m'}],
+        enemies: [{x:620, y:350, r:100, s:6}],
+        goal: {x:1450, y:350}
+    },
+    { // Level 4: Mahzen (Dar ve Tehlikeli)
+        platforms: [{x:0, y:650, w:2000, h:100, t:'m'}, {x:400, y:500, w:200, h:20, t:'s'}, {x:800, y:500, w:200, h:20, t:'s'}, {x:1200, y:500, w:200, h:20, t:'s'}],
+        enemies: [{x:500, y:600, r:800, s:8}, {x:200, y:600, r:1000, s:5}],
+        goal: {x:1800, y:600}
+    },
+    { // Level 5: Final
+        platforms: [{x:0, y:600, w:300, h:40, t:'m'}, {x:500, y:400, w:300, h:40, t:'s'}, {x:1000, y:200, w:300, h:40, t:'m'}, {x:1500, y:400, w:300, h:40, t:'s'}, {x:2000, y:600, w:500, h:400, t:'m'}],
+        enemies: [{x:1050, y:150, r:200, s:10}, {x:1550, y:350, r:200, s:7}],
+        goal: {x:2250, y:550}
+    }
+];
+
+let levels = getLevels();
 const keys = {};
 window.onkeydown = e => keys[e.code] = true;
 window.onkeyup = e => keys[e.code] = false;
 
-// --- DÜNYA VE KARAKTER ---
-const player = {
-    x: 150, y: 300, vx: 0, vy: 0, w: 40, h: 65,
-    facing: 1, grounded: false, dashing: false, dashCooldown: 0,
-    update(lvl) {
-        // Dash Sistemi
-        if(keys['ShiftLeft'] && this.dashCooldown <= 0) {
-            this.dashing = true; this.dashCooldown = 60;
-            GAME.shake = 10;
-            spawnParticles(this.x, this.y, "#fff", 15); // Sayfa efekti
+// --- PLAYER CLASS ---
+class Player {
+    constructor() {
+        this.reset();
+        this.w = 40; this.h = 65;
+        this.trail = [];
+    }
+    reset() {
+        this.x = 100; this.y = 400; this.vx = 0; this.vy = 0;
+        this.facing = 1; this.grounded = false; this.dashCD = 0; this.dashing = false;
+    }
+    update() {
+        let conf = GAME.config[GAME.difficulty];
+        // Dash
+        if(keys['ShiftLeft'] && this.dashCD <= 0) {
+            this.dashing = true; this.dashCD = 50;
+            GAME.shake = 15;
             setTimeout(() => this.dashing = false, 180);
         }
 
         if(this.dashing) {
-            this.vx = 20 * this.facing; this.vy = 0;
+            this.vx = 25 * this.facing; this.vy = 0;
+            this.trail.push({x:this.x, y:this.y, l:15});
         } else {
-            if(keys['KeyD'] || keys['ArrowRight']) { this.vx += 0.8; this.facing = 1; }
-            else if(keys['KeyA'] || keys['ArrowLeft']) { this.vx -= 0.8; this.facing = -1; }
+            if(keys['KeyD'] || keys['ArrowRight']) { this.vx += 1; this.facing = 1; }
+            else if(keys['KeyA'] || keys['ArrowLeft']) { this.vx -= 1; this.facing = -1; }
             else this.vx *= 0.82;
 
-            if(Math.abs(this.vx) > 7) this.vx = 7 * Math.sign(this.vx);
-            if((keys['Space'] || keys['KeyW']) && this.grounded) { this.vy = -16; this.grounded = false; }
-            this.vy += 0.8;
+            if(Math.abs(this.vx) > conf.speed) this.vx = conf.speed * Math.sign(this.vx);
+            if((keys['Space'] || keys['KeyW']) && this.grounded) { this.vy = conf.jump; this.grounded = false; }
+            this.vy += conf.grav;
         }
 
         this.x += this.vx; this.y += this.vy;
-        if(this.dashCooldown > 0) this.dashCooldown--;
+        if(this.dashCD > 0) this.dashCD--;
 
-        // BUG FIX: Aşağı düşme kontrolü
-        if(this.y > canvas.height + 100) {
-            takeDamage();
-            return;
-        }
-
-        // Platform Çarpışma
+        // Collision
         this.grounded = false;
-        lvl.platforms.forEach(p => {
-            if(this.x < p.x + p.w && this.x + this.w > p.x && this.y + this.h > p.y && this.y + this.h < p.y + 20 && this.vy >= 0) {
-                this.y = p.y - this.h; this.vy = 0; this.grounded = true;
+        levels[GAME.level].platforms.forEach(p => {
+            if(this.x < p.x+p.w && this.x+this.w > p.x && this.y+this.h > p.y && this.y+this.h < p.y+25 && this.vy >= 0) {
+                this.y = p.y-this.h; this.vy = 0; this.grounded = true;
             }
         });
+
+        if(this.y > canvas.height + 200) takeDamage();
+        this.trail.forEach((t, i) => { t.l--; if(t.l<=0) this.trail.splice(i,1); });
     }
-};
-
-// --- DOĞA TEMALI MAP TASARIMI ---
-const map = {
-    platforms: [
-        {x: 0, y: 650, w: 900, h: 300, color: '#2d4c2d'}, // Başlangıç toprağı
-        {x: 1050, y: 500, w: 300, h: 40, color: '#4a7c4a'}, // Havada asılı ada
-        {x: 1450, y: 350, w: 250, h: 40, color: '#4a7c4a'},
-        {x: 1800, y: 550, w: 1000, h: 400, color: '#2d4c2d'},
-        {x: 3000, y: 400, w: 400, h: 40, color: '#4a7c4a'},
-        {x: 3600, y: 600, w: 1200, h: 300, color: '#2d4c2d'}
-    ],
-    goal: {x: 4500, y: 550, text: "I"}
-};
-
-const particles = [];
-const cam = { x: 0 };
-
-function spawnParticles(x, y, color, count) {
-    for(let i=0; i<count; i++) {
-        particles.push({
-            x: x, y: y, 
-            vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
-            life: 30, text: ["A","B","C","?","!"][Math.floor(Math.random()*5)]
+    draw(cx, cy) {
+        this.trail.forEach(t => {
+            ctx.globalAlpha = t.l/15; ctx.fillStyle = "#00f2ff";
+            ctx.fillRect(t.x-cx, t.y-cy, this.w, this.h);
         });
+        ctx.globalAlpha = 1;
+
+        ctx.save();
+        ctx.translate(this.x-cx+20, this.y-cy+32);
+        ctx.scale(this.facing, 1);
+        // Head
+        ctx.fillStyle = "#5d4037"; ctx.beginPath(); ctx.roundRect(-20,-45,40,30,10); ctx.fill();
+        ctx.fillStyle = "#ffe0b2"; ctx.beginPath(); ctx.arc(0,-25,14,0,Math.PI*2); ctx.fill();
+        // Body
+        ctx.fillStyle = "#2d4c2d"; ctx.fillRect(-18,-10,36,40);
+        // Book
+        ctx.fillStyle = "#1b5e20"; ctx.fillRect(8,-5,18,25);
+        ctx.restore();
     }
 }
+
+const player = new Player();
+const cam = { x: 0, y: 0 };
 
 function takeDamage() {
-    GAME.hp--; GAME.shake = 20;
-    if(GAME.hp <= 0) { alert("DERS BİTTİ! TEKRAR DENE."); location.reload(); }
-    player.x = 150; player.y = 300; player.vx = 0;
-    updateUI();
+    GAME.hp--; GAME.shake = 25;
+    if(GAME.hp <= 0) { alert("FAILED THE ACADEMY!"); location.reload(); }
+    player.reset(); updateHUD();
 }
 
-function updateUI() {
-    let t = GAME.words.map((w, i) => i < GAME.level ? w : "_").join("  ");
-    document.getElementById('sentence-text').innerText = t;
-    document.getElementById('hp-display').innerText = "♥".repeat(GAME.hp);
+function updateHUD() {
+    document.getElementById('sentence-text').innerText = GAME.words.map((w, i) => i < GAME.level ? w : "_").join("  ");
+    document.getElementById('hp-icons').innerText = "♥".repeat(GAME.hp);
+    document.getElementById('lvl-text').innerText = `AREA: ${GAME.areaNames[GAME.level]}`;
 }
 
-function startGame() {
-    document.getElementById('start-menu').style.display = 'none';
+function initGame() {
+    document.getElementById('main-menu').style.display = 'none';
+    document.getElementById('hud').style.display = 'block';
     GAME.active = true;
-    updateUI();
-    requestAnimationFrame(loop);
+    updateHUD();
+    loop();
 }
+
+function setDifficulty(d) {
+    GAME.difficulty = d;
+    GAME.hp = GAME.config[d].hp;
+    document.getElementById('btn-easy').className = d === 'easy' ? 'btn active' : 'btn';
+    document.getElementById('btn-hard').className = d === 'hardcore' ? 'btn active' : 'btn';
+}
+
+function toggleSettings(s) { document.getElementById('settings-screen').style.display = s ? 'flex' : 'none'; }
 
 function loop() {
     if(!GAME.active) return;
     GAME.frame++;
     if(GAME.shake > 0) GAME.shake *= 0.9;
 
-    player.update(map);
-    cam.x += (player.x - canvas.width/3 - cam.x) * 0.1;
-    if(cam.x < 0) cam.x = 0;
+    player.update();
+    
+    // Kamera (Yumuşak Takip)
+    cam.x += (player.x - canvas.width/2.5 - cam.x) * 0.1;
+    cam.y += (player.y - canvas.height/2 - cam.y) * 0.1;
 
-    // Hedef Kelimeye Ulaşma
-    if(Math.hypot(player.x - map.goal.x, player.y - map.goal.y) < 70) {
+    // Hedef Kontrol
+    let g = levels[GAME.level].goal;
+    if(Math.hypot(player.x - g.x, player.y - g.y) < 100) {
         GAME.level++;
-        if(GAME.level >= GAME.words.length) { alert("TEBRİKLER! TÜM CÜMLELER TAMAMLANDI."); location.reload(); }
-        player.x = 150; player.y = 300; cam.x = 0;
-        updateUI();
+        if(GAME.level >= GAME.words.length) { alert("GRADUATED WITH HONORS!"); location.reload(); }
+        player.reset(); updateHUD();
     }
 
-    // DRAW
-    // Gökyüzü (Sky Gradient)
-    let skyGrd = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    skyGrd.addColorStop(0, "#4facfe"); skyGrd.addColorStop(1, "#00f2fe");
-    ctx.fillStyle = skyGrd;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.save();
-    if(GAME.shake > 1) ctx.translate((Math.random()-0.5)*GAME.shake, (Math.random()-0.5)*GAME.shake);
-    
-    // Parallax Bulutlar
-    ctx.fillStyle = "rgba(255,255,255,0.5)";
-    for(let i=0; i<10; i++) ctx.beginPath(), ctx.arc((i*1000)-cam.x*0.3, 200, 50, 0, 7), ctx.fill();
-
-    ctx.translate(-cam.x, 0);
-
-    // Platformları Çiz (Doğa Görünümü)
-    map.platforms.forEach(p => {
-        // Toprak kısmı
-        ctx.fillStyle = "#3e2723"; 
-        ctx.fillRect(p.x, p.y + 10, p.w, p.h);
-        // Çimen üst tabaka
-        ctx.fillStyle = "#4caf50";
-        ctx.fillRect(p.x, p.y, p.w, 15);
-        // Çimen parlaması
-        ctx.fillStyle = "#8bc34a";
-        ctx.fillRect(p.x, p.y, p.w, 4);
-    });
-
-    // Kelime / Kitap (Hedef)
-    ctx.fillStyle = "#fff"; ctx.font = "bold 35px Cinzel"; ctx.textAlign = "center";
-    ctx.fillText(map.goal.text, map.goal.x, map.goal.y + Math.sin(GAME.frame*0.1)*15);
-
-    // Karakter Çizimi (Senin attığın sprite tarzında)
-    drawScholar();
-
-    // Harf Parçacıkları (Knowledge Dust)
-    particles.forEach((p, i) => {
-        p.x += p.vx; p.y += p.vy; p.life--;
-        ctx.fillStyle = `rgba(255,255,255, ${p.life/30})`;
-        ctx.font = "15px Arial";
-        ctx.fillText(p.text, p.x, p.y);
-        if(p.life <= 0) particles.splice(i, 1);
-    });
-
-    ctx.restore();
+    draw();
     requestAnimationFrame(loop);
 }
 
-function drawScholar() {
+function draw() {
+    // Bg
+    ctx.fillStyle = "#02040a"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    
     ctx.save();
-    ctx.translate(player.x + 20, player.y + 30);
-    ctx.scale(player.facing, 1);
+    if(GAME.shake > 1) ctx.translate((Math.random()-0.5)*GAME.shake, (Math.random()-0.5)*GAME.shake);
 
-    // Dash sırasında hayalet iz
-    if(player.dashing) {
-        ctx.fillStyle = "rgba(255,255,255,0.3)";
-        ctx.fillRect(-25, -30, 40, 60);
-    }
+    // Parallax
+    ctx.fillStyle = "rgba(15,23,42,0.5)";
+    for(let i=0; i<10; i++) ctx.fillRect(i*1200 - cam.x*0.2, 0 - cam.y*0.1, 600, 2000);
 
-    // Gövde (Ceket/Kıyafet)
-    ctx.fillStyle = "#2d4c2d";
-    ctx.fillRect(-15, -10, 30, 35);
+    ctx.translate(-cam.x, -cam.y);
 
-    // Kafa ve Saç (Senin attığın karakterin kahverengi saçları gibi)
-    ctx.fillStyle = "#5d4037"; // Saç
-    ctx.beginPath(); ctx.roundRect(-18, -35, 36, 25, 10); ctx.fill();
-    ctx.fillStyle = "#ffe0b2"; // Yüz
-    ctx.beginPath(); ctx.arc(0, -20, 12, 0, Math.PI*2); ctx.fill();
+    // Platforms
+    levels[GAME.level].platforms.forEach(p => {
+        ctx.fillStyle = p.t === 'm' ? "#0f172a" : "#451a03";
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = p.t === 'm' ? "#00f2ff" : "#78350f";
+        ctx.fillRect(p.x, p.y, p.w, 4);
+    });
 
-    // Elinde Kitap (Yeşil kitap)
-    ctx.fillStyle = "#1b5e20";
-    ctx.fillRect(5, -5, 15, 20);
-    ctx.fillStyle = "#fff"; // Kitap sayfaları
-    ctx.fillRect(18, -5, 2, 20);
+    // Enemies
+    levels[GAME.level].enemies.forEach(e => {
+        if(!e.curX) e.curX = e.x;
+        e.curX += e.s;
+        if(Math.abs(e.curX - e.x) > e.r) e.s *= -1;
+        ctx.fillStyle = "#ff0055"; ctx.font = "bold 40px Cinzel";
+        ctx.fillText("F", e.curX, e.y+30);
+        if(Math.hypot(player.x-e.curX, player.y-e.y) < 50) takeDamage();
+    });
 
+    // Word
+    ctx.fillStyle = "#fff"; ctx.font = "bold 45px Cinzel"; ctx.textAlign="center";
+    ctx.shadowBlur = 20; ctx.shadowColor = "#fff";
+    ctx.fillText(GAME.words[GAME.level], levels[GAME.level].goal.x, levels[GAME.level].goal.y + Math.sin(GAME.frame*0.05)*20);
+    ctx.shadowBlur = 0;
+
+    player.draw(0, 0);
     ctx.restore();
 }
 </script>
